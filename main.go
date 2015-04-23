@@ -4,30 +4,23 @@ import (
 	"html/template"
 	"net/http"
 	"sail/conf"
-	"sail/dbase"
 )
 
-var db = dbase.Open("hi")
-
-func reqHandler(writer http.ResponseWriter, req *http.Request) {
-	row := db.QueryRow("select language from sl_page_meta where domain=?", "default")
-	var lang string
-	err1 := row.Scan(&lang)
+func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	t, err := template.ParseFiles(conf.DOCROOT + "index.html")
 	if err != nil {
 		println(err.Error())
 	} else {
-		if err1 != nil {
-			println(err1.Error())
-		}
 		t.Execute(writer, nil)
 	}
 }
 
+func backendHandler(writer http.ResponseWriter, req *http.Request) {
+	// check for session cookie, show login page if not present
+}
+
 func main() {
-	http.HandleFunc("/", reqHandler)
-	if db != nil {
-		println("db connected")
-	}
+	http.HandleFunc("/", frontendHandler)
+	http.HandleFunc("/office/", backendHandler)
 	http.ListenAndServe(":8080", nil)
 }
