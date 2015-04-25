@@ -1,17 +1,29 @@
 package main
 
 import (
-	_ "html/template"
+	"bytes"
+	"io"
 	"net/http"
-	_ "sail/conf"
 	"sail/dbase"
 	"sail/page"
 )
 
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
-	db := dbase.Open("sl_main")
-	p := page.Builder("home", db)
-	p.Frame.Execute(writer, p)
+	var p *page.Page
+	var b bytes.Buffer
+
+	if db := dbase.Open("sl_main"); db == nil {
+		p = page.Load404()
+	} else {
+		p = page.Builder("home", db)
+	}
+
+	if err := p.Frame.Execute(&b, p); err != nil {
+		println(err.Error())
+		io.WriteString(writer, page.NOTFOUND404)
+	} else {
+		b.WriteTo(writer)
+	}
 }
 
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
@@ -19,7 +31,10 @@ func backendHandler(writer http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+
 	http.HandleFunc("/", frontendHandler)
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img"))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 	http.HandleFunc("/office/", backendHandler)
 	http.ListenAndServe(":8080", nil)
 }

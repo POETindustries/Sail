@@ -1,4 +1,4 @@
-// Trustworthiness of data
+// Trustworthiness of Data
 //
 // The contract for handling database content is that methods and functions
 // that read from the database assume that the database content is trustworthy
@@ -8,6 +8,23 @@
 // This is only safe as long as an intruder does not manage to write harmful
 // code directly into the database by bypassing the filters used by write
 // functions. This needs to be addressed.
+//
+// On Separation Logic From Views
+//
+// It is considered good practice to separate data, logic and outside views
+// as much as possible (hence, MVC patterns and such). This package is
+// something of an exception to this otherwise reasonable rule. There are
+// some string constant and functions that contain html markup directly
+// embedded into the code.
+//
+// The reason is simple: If all else fails, we still want to be able to let
+// the user know that there is a problem with the website and that they should
+// consider coming back later. We cannot load templates if something with
+// loading templates is wrong and we cannot load data from databases if
+// loading from databases is broken, so we have to assume that in the worst
+// case scenario nothing else works other than simplest code.
+//
+// This is why there is some hardcoded html in this package as kind of failsafe.
 package page
 
 import (
@@ -16,6 +33,15 @@ import (
 	"sail/conf"
 	"sail/dbase"
 )
+
+// NOTFOUND404 is a very basic web page signaling a 404 error.
+// It contails the bare minimum necessary for a syntactically
+// correct html web page and is used in those cases when not even
+// basic database connections and templates work. The cms cannot
+// be considered functional should that happen, and this markup
+// at least tells the user as much.
+const NOTFOUND404 = "<!doctype html><html><head></head>" +
+	"<body><h1>PAGE NOT FOUND</h1><img src='/img/b4.jpg'/></body></html>"
 
 // Page contains the information needed to generate a web page for display.
 type Page struct {
@@ -77,11 +103,4 @@ func (p *Page) LoadContent(db *sql.DB) {
 		}
 	} // else: content still has zero value and is just an empty string
 	p.Content = template.HTML(content)
-}
-
-// Load404 is called whenever generating a page fails somewhere in the process.
-// It generates a default error page that informs the user that something
-// went wrong when processing their request.
-func (p *Page) load404() {
-	println("404 loaded")
 }
