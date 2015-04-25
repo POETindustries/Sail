@@ -1,8 +1,9 @@
-// Package page creates html markup and templates from database data.
+// Package page creates html markup from database data and template files.
 package page
 
 import (
 	"database/sql"
+	"html/template"
 	"sail/dbase"
 )
 
@@ -27,6 +28,18 @@ func Builder(name string, db *sql.DB) *Page {
 // It generates a default error page that informs the user that something
 // went wrong when processing their request.
 func Load404() *Page {
-	println("404 loaded")
-	return nil
+	frame, _ := template.New("frame").Parse(NOTFOUND404)
+	p := Page{
+		Id:      0,
+		Domain:  "error",
+		Title:   "Sorry about that!",
+		Frame:   frame,
+		Meta:    &Meta{},
+		Content: template.HTML("")}
+
+	// TODO this is the barest minimum of a page. If possible, load another
+	// template that fits the corporate design better and generate a 404 out
+	// of that one.
+
+	return &p
 }

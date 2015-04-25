@@ -24,7 +24,8 @@
 // loading from databases is broken, so we have to assume that in the worst
 // case scenario nothing else works other than simplest code.
 //
-// This is why there is some hardcoded html in this package as kind of failsafe.
+// This is why there is some hardcoded html in this package, acting as some
+// kind of failsafe.
 package page
 
 import (
@@ -40,8 +41,12 @@ import (
 // basic database connections and templates work. The cms cannot
 // be considered functional should that happen, and this markup
 // at least tells the user as much.
-const NOTFOUND404 = "<!doctype html><html><head></head>" +
-	"<body><h1>PAGE NOT FOUND</h1><img src='/img/b4.jpg'/></body></html>"
+const NOTFOUND404 = `<!doctype html>
+		<html style="background:black;text-align:center;color:white;">
+		<head><title>Sorry About That</title><meta charset="utf-8"></head>
+		<body style="padding:72px;font-family:sans-serif;font-size:1.5em;">
+		<p style="font-size:2em;">Sorry About That!</p>
+		<p>PAGE NOT FOUND</p></body></html>`
 
 // Page contains the information needed to generate a web page for display.
 type Page struct {
@@ -92,7 +97,8 @@ func (p *Page) LoadFrame(db *sql.DB) {
 
 // LoadContent fetches the page's content from the database. Content is that
 // piece of a web page that is usually generated in the backend by someone
-// working with the cms.
+// working with the cms. It should allow some subsets of html tags, but it
+// is usually a good idea to sanitize JavaScript.
 func (p *Page) LoadContent(db *sql.DB) {
 	var content string
 	query := "select content from sl_page where id=?"
