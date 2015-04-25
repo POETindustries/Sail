@@ -28,11 +28,11 @@ func Open(dbname string) *sql.DB {
 // a query string and the query parameters, constructs a statement out of
 // them, checks for connection problems and returns one row and an error
 // reference
-func QueryRow(query string, db *sql.DB, args string) (*sql.Row, error) {
+func QueryRow(query string, db *sql.DB, args ...interface{}) *sql.Row {
 	if stmt, err := db.Prepare(query); err != nil {
-		println("Prepared statement creation failed: " + err.Error())
-		return nil, err
+		println(err.Error())
 	} else {
-		return stmt.QueryRow(args), nil
+		return stmt.QueryRow(args...)
 	}
+	return nil
 }

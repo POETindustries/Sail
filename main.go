@@ -1,18 +1,17 @@
 package main
 
 import (
-	"html/template"
+	_ "html/template"
 	"net/http"
-	"sail/conf"
+	_ "sail/conf"
+	"sail/dbase"
+	"sail/page"
 )
 
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
-	t, err := template.ParseFiles(conf.DOCROOT + "index.html")
-	if err != nil {
-		println(err.Error())
-	} else {
-		t.Execute(writer, nil)
-	}
+	db := dbase.Open("sl_main")
+	p := page.Builder("home", db)
+	p.Frame.Execute(writer, p)
 }
 
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
@@ -23,4 +22,7 @@ func main() {
 	http.HandleFunc("/", frontendHandler)
 	http.HandleFunc("/office/", backendHandler)
 	http.ListenAndServe(":8080", nil)
+}
+
+func testCurrent() {
 }
