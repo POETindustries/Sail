@@ -1,3 +1,4 @@
 /sail
 *.test.*
 *.swp
+/.project
