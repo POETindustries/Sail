@@ -37,6 +37,7 @@ func main() {
 	http.HandleFunc("/", frontendHandler)
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
+	http.Handle("/theme/", http.StripPrefix("/theme/", http.FileServer(http.Dir("theme"))))
 	http.HandleFunc("/office/", backendHandler)
 	http.ListenAndServe(":8080", nil)
 }
