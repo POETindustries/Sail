@@ -8,6 +8,9 @@ import (
 	"sail/page"
 )
 
+// FrontendHandler handles all requests that are coming from site visitors.
+// It parses the request url and calls the functions necessary for generating
+// a valid page that is send to the client.
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	var p *page.Page
 	var b bytes.Buffer
@@ -17,7 +20,6 @@ func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	} else {
 		p = page.Builder("home", db)
 	}
-
 	if err := p.Frame.Execute(&b, p); err != nil {
 		println(err.Error())
 		io.WriteString(writer, page.NOTFOUND404)
@@ -26,12 +28,12 @@ func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// BackendHandler handles connections to the administrative interface.
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
-	// check for session cookie, show login page if not present
+	// TODO check for session cookie, show login page if not present
 }
 
 func main() {
-
 	http.HandleFunc("/", frontendHandler)
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
