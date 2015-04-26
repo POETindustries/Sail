@@ -36,11 +36,11 @@ import (
 )
 
 // NOTFOUND404 is a very basic web page signaling a 404 error.
-// It contails the bare minimum necessary for a syntactically
-// correct html web page and is used in those cases when not even
-// basic database connections and templates work. The cms cannot
-// be considered functional should that happen, and this markup
-// at least tells the user as much.
+// It contails the bare minimum necessary for a syntactically correct html web
+// page and is used in those cases when not even basic database connections
+// and templates work. The cms cannot be considered functional should that
+// happen, and this markup at least tells the user as much. The markup is as
+// generic as possible while still being somewhat good looking.
 const NOTFOUND404 = `<!doctype html>
 		<html style="background:black;text-align:center;color:white;">
 		<head><title>Sorry About That</title><meta charset="utf-8"></head>
@@ -90,8 +90,9 @@ func (p *Page) LoadFrame(db *sql.DB) {
 			templateFile += ".html"
 		}
 	} //else: templateFile points to a default 404 page
-	if p.Frame, err = template.ParseFiles(conf.DOCROOT + templateFile); err != nil {
+	if p.Frame, err = template.ParseFiles(conf.TMPLDIR + templateFile); err != nil {
 		println(err.Error())
+		p.Frame, _ = template.New("frame").Parse(NOTFOUND404)
 	}
 }
 

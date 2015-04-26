@@ -38,6 +38,3 @@ func main() {
 	http.HandleFunc("/office/", backendHandler)
 	http.ListenAndServe(":8080", nil)
 }
-
-func testCurrent() {
-}

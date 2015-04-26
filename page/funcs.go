@@ -7,11 +7,18 @@ import (
 	"sail/dbase"
 )
 
-func Builder(name string, db *sql.DB) *Page {
+// Builder creates and returns a Page object. It takes the unique url
+// path to the specified page and a database as parameters.
+//
+// Builder always returns a Page object. If there is no page with the given
+// name or if there is, but scanning the dataset returns an error, a 404
+// page will be returned. Otherwise, the page will be fully constructed
+// using its load* methods and a pointer to it is returned.
+func Builder(inUrl string, db *sql.DB) *Page {
 	var p Page
 	query := "select id,domain,title from sl_page where in_url=?"
 
-	if row := dbase.QueryRow(query, db, name); row == nil {
+	if row := dbase.QueryRow(query, db, inUrl); row == nil {
 		return Load404()
 	} else if err := row.Scan(&p.Id, &p.Domain, &p.Title); err != nil {
 		println(err.Error())
