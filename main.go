@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+	"sail/conf"
 	"sail/dbase"
 	"sail/page"
 )
@@ -34,10 +35,11 @@ func backendHandler(writer http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	conf.InitConf()
 	http.HandleFunc("/", frontendHandler)
-	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img"))))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
-	http.Handle("/theme/", http.StripPrefix("/theme/", http.FileServer(http.Dir("theme"))))
+	http.Handle("/img/", http.FileServer(http.Dir(conf.CWD)))
+	http.Handle("/js/", http.FileServer(http.Dir(conf.CWD)))
+	http.Handle("/theme/", http.FileServer(http.Dir(conf.CWD)))
 	http.HandleFunc("/office/", backendHandler)
 	http.ListenAndServe(":8080", nil)
 }
