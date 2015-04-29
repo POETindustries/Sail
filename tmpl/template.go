@@ -4,32 +4,34 @@ import (
 	"fmt"
 	"io/ioutil"
 	"regexp"
-	"sail/conf"
 	"strings"
 )
 
-var files = [1]string{"menu"}
-
-// FetchFiles prepares a slice of template file names for later parsing.
-func FetchFiles(frame string) *[]string {
-	var templates []string
-	templates = append(templates, conf.TMPLDIR+frame+".html")
-	for _, file := range files {
-		templates = append(templates, conf.TMPLDIR+file+".html")
-	}
-	readFile(templates[0])
-	return &templates
+type Template struct {
+	Templates []string
+	Files     []string
+	Content   string
+	FileName  string
 }
 
-func readFile(file string) {
-	f, _ := ioutil.ReadFile(file) // TODO catch error return value
+func readFile(file string) string {
+	f, err := ioutil.ReadFile(file)
+	if err != nil {
+		println(err.Error())
+		return ""
+	}
+	return string(f)
+}
+
+func extractNames(tmpl string) []string {
 	re := regexp.MustCompile(`{{template ".*" .*}}`)
-	templates := re.FindAllString(string(f), -1)
+	templates := re.FindAllString(tmpl, -1)
 
 	for i := 0; i < len(templates); i++ {
-		templates[i] = strings.TrimPrefix(templates[i], "{{template \"")
-		templates[i] = templates[i][:strings.Index(templates[i], "\"")]
+		templates[i] = strings.TrimPrefix(templates[i], `{{template "`)
+		templates[i] = templates[i][:strings.Index(templates[i], `"`)]
 	}
 
 	fmt.Println(templates)
+	return templates
 }
