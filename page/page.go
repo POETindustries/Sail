@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"sail/conf"
 	"sail/dbase"
+	"sail/tmpl"
 )
 
 // NOTFOUND404 is a very basic web page signaling a 404 error.
@@ -26,7 +27,7 @@ const NOTFOUND404 = `<!doctype html>
 // functions and methods in package page to make sure its fields are
 // properly initialized.
 type Page struct {
-	Id      int32
+	ID      int32
 	Domain  string
 	Title   string
 	Meta    *Meta
@@ -58,15 +59,16 @@ func (p *Page) LoadMeta(db *sql.DB) {
 // fetched later to generate the whole html page.
 func (p *Page) LoadFrame(db *sql.DB) {
 	var err error
-	templateFile := "404.html"
+	templates := &[]string{conf.TMPLDIR + "404.html"}
 	query := "select frame_tmpl from sl_page_meta where domain=?"
 
 	if row := dbase.QueryRow(query, db, p.Domain); row != nil {
-		if err = row.Scan(&templateFile); err == nil {
-			templateFile += ".html"
+		if row.Scan(&(*templates)[0]) == nil {
+			templates = tmpl.FetchFiles((*templates)[0])
 		}
 	} //else: templateFile points to a default 404 page
-	if p.Frame, err = template.ParseFiles(conf.TMPLDIR + templateFile); err != nil {
+
+	if p.Frame, err = template.ParseFiles(*templates...); err != nil {
 		println(err.Error())
 		p.Frame, _ = template.New("frame").Parse(NOTFOUND404)
 	}
@@ -80,7 +82,7 @@ func (p *Page) LoadContent(db *sql.DB) {
 	var content string
 	query := "select content from sl_page where id=?"
 
-	if row := dbase.QueryRow(query, db, p.Id); row != nil {
+	if row := dbase.QueryRow(query, db, p.ID); row != nil {
 		if err := row.Scan(&content); err != nil {
 			println(err.Error())
 		}

@@ -49,7 +49,7 @@ func Builder(inUrl string, db *sql.DB) *Page {
 
 	if row := dbase.QueryRow(query, db, inUrl); row == nil {
 		return Load404()
-	} else if err := row.Scan(&p.Id, &p.Domain, &p.Title); err != nil {
+	} else if err := row.Scan(&p.ID, &p.Domain, &p.Title); err != nil {
 		println(err.Error())
 		return Load404()
 	} else {
@@ -66,7 +66,7 @@ func Builder(inUrl string, db *sql.DB) *Page {
 func Load404() *Page {
 	frame, _ := template.New("frame").Parse(NOTFOUND404)
 	p := Page{
-		Id:      0,
+		ID:      0,
 		Domain:  "error",
 		Title:   "Sorry about that!",
 		Frame:   frame,
