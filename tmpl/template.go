@@ -1,37 +1,21 @@
 package tmpl
 
-import (
-	"fmt"
-	"io/ioutil"
-	"regexp"
-	"strings"
-)
-
 type Template struct {
+
+	// Templates contains the names of all templates used by this one.
+	// It includes its own name, alway at index 0.
 	Templates []string
-	Files     []string
-	Content   string
-	FileName  string
-}
 
-func readFile(file string) string {
-	f, err := ioutil.ReadFile(file)
-	if err != nil {
-		println(err.Error())
-		return ""
-	}
-	return string(f)
-}
+	// Files contains the complete file names of each template in Templates.
+	// This field can be passed to Go's template.ParseFiles method.
+	Files []string
 
-func extractNames(tmpl string) []string {
-	re := regexp.MustCompile(`{{template ".*" .*}}`)
-	templates := re.FindAllString(tmpl, -1)
+	// Content contains the whole markup of the template.
+	// It is not used for frontend functionality and is instead intended for
+	// use when editing templates from the backend.
+	Content string
 
-	for i := 0; i < len(templates); i++ {
-		templates[i] = strings.TrimPrefix(templates[i], `{{template "`)
-		templates[i] = templates[i][:strings.Index(templates[i], `"`)]
-	}
-
-	fmt.Println(templates)
-	return templates
+	// Name is the template's unique identifier.
+	// It is used in the database and for reference in other templates.
+	Name string
 }

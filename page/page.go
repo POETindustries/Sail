@@ -3,10 +3,8 @@ package page
 import (
 	"database/sql"
 	"html/template"
-	"sail/conf"
 	"sail/dbase"
 	"sail/tmpl"
-	"strings"
 )
 
 // NOTFOUND404 is a very basic web page signaling a 404 error.
@@ -50,7 +48,8 @@ func (p *Page) LoadMeta(db *sql.DB) {
 			&meta.Language,
 			&meta.PageTopic,
 			&meta.RevisitAfter,
-			&meta.Robots)
+			&meta.Robots,
+			&meta.Template)
 	} //else: meta has zero values, will be full of empty strings
 	p.Meta = &meta
 }
@@ -60,19 +59,12 @@ func (p *Page) LoadMeta(db *sql.DB) {
 // fetched later to generate the whole html page.
 func (p *Page) LoadFrame(db *sql.DB) {
 	var err error
-	var csv string
-	templates := []string{conf.TMPLDIR + "404.html"}
-	query := "select frame_tmpl from sl_page_meta where domain=?"
 
-	if row := dbase.QueryRow(query, db, p.Domain); row != nil {
-		if row.Scan(&csv) == nil {
-			templates = tmpl.PrepareFiles(strings.Split(csv, ","))
-		}
-	} //else: templates still contains only the 404 page
+	t := tmpl.Builder(db, p.Meta.Template, false)
 
-	if p.Frame, err = template.ParseFiles(templates...); err != nil {
+	if p.Frame, err = template.ParseFiles(t.Files...); err != nil {
 		println(err.Error())
-		p.Frame, _ = template.New("frame").Parse(NOTFOUND404)
+		p.Frame, _ = template.New("frame_default").Parse(NOTFOUND404)
 	}
 }
 
