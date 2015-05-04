@@ -10,9 +10,9 @@ import (
 	"strings"
 )
 
-func extractNames(tmpl string) []string {
+func extractNames(tmplContent string) []string {
 	re := regexp.MustCompile(`{{template ".*" .*}}`)
-	templates := re.FindAllString(tmpl, -1)
+	templates := re.FindAllString(tmplContent, -1)
 
 	for i := 0; i < len(templates); i++ {
 		templates[i] = strings.TrimPrefix(templates[i], `{{template "`)
@@ -71,6 +71,7 @@ func PrepFile(file string) string {
 func readFile(tmpl string) string {
 	file := PrepFile(tmpl)
 	f, err := ioutil.ReadFile(file)
+
 	if err != nil {
 		println(err.Error())
 		return ""
@@ -84,7 +85,7 @@ func readFile(tmpl string) string {
 // or anything goes wrong with the database connection, a default 404 template
 // is the only template name that the returned slice contains.
 func subTemplates(db *sql.DB, tmpl string) []string {
-	csv := ""
+	var csv string
 	query := "select templat from sl_template where name=?"
 	templates := []string{"404"}
 

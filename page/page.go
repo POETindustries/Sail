@@ -41,6 +41,7 @@ type Page struct {
 func (p *Page) LoadMeta(db *sql.DB) {
 	var meta Meta
 	query := "select " + DBMETAKEYS + " from sl_page_meta where domain=?"
+
 	if row := dbase.QueryRow(query, db, p.Domain); row != nil {
 		row.Scan(&meta.Title,
 			&meta.Keywords,
@@ -59,13 +60,12 @@ func (p *Page) LoadMeta(db *sql.DB) {
 // fetched later to generate the whole html page.
 func (p *Page) LoadFrame(db *sql.DB) {
 	var err error
-
 	t := tmpl.Builder(db, p.Meta.Template, false)
 
 	if p.Frame, err = template.ParseFiles(t.Files...); err != nil {
 		println(err.Error())
 		p.Frame, _ = template.New("frame_default").Parse(NOTFOUND404)
-	}
+	} // else: all went well
 }
 
 // LoadContent fetches the page's content from the database. Content is that
