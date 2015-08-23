@@ -62,7 +62,7 @@ func PrepFiles(files []string) (templates []string) {
 // template directory as stored in the conf package to point to the directory
 // that contains all templates on the same level.
 func PrepFile(file string) string {
-	return conf.TMPLDIR + file + ".html"
+	return conf.New().TmplDir + file + ".html"
 }
 
 // ReadFile is a helper function that returns the content of a template file.
@@ -86,7 +86,7 @@ func readFile(tmpl string) string {
 // is the only template name that the returned slice contains.
 func subTemplates(db *sql.DB, tmpl string) []string {
 	var csv string
-	query := "select templat from sl_template where name=?"
+	query := "select templates from sl_template where name=?"
 	templates := []string{"404"}
 
 	if row := dbase.QueryRow(query, db, tmpl); row != nil {
