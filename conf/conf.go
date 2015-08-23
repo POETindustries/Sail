@@ -1,30 +1,72 @@
-// Package conf contains constants and other basic website setup parameters.
-// It should serve as a central provider of systemwide used config variables.
-// Filepath names, template directories etc.
-//
-// While some of these variables are
-// technically not constants (due to their dependence on the executable's wd),
-// they still follow the typical naming convention of writing constants in all
-// upper case. This is intentional. It is a strong suggestion to work with them
-// as if they were constants, becuase for all intents and purposes, they are.
-// Changing their value without exactly knowing what you are doing will have
-// severe repercussions.
 package conf
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
-var CWD string
+const dbUser = "sl_user"
+const dbPass = "sl_pass"
+const dbName = "sl_main"
+const dbHost = "localhost"
 
-// TMPLDIR is defined relative to the Go executable. This is probably the way
-// we'll do it in the future.
-var TMPLDIR string
+const devMode = true
 
-// InitConf basically fills the config variables with values.
-func InitConf() {
-	// TODO check for errors below
-	CWD, _ = filepath.Abs(filepath.Dir(os.Args[0]))
-	TMPLDIR = CWD + "/tmpl/"
+type Config struct {
+	Cwd      string
+	TmplDir  string
+	ImgDir   string
+	JsDir    string
+	ThemeDir string
+
+	DBUser string `json:"db_user"`
+	DBPass string `json:"db_password"`
+	DBHost string `json:"db_host"`
+	DBName string `json:"db_name"`
+
+	DevMode bool `json:"dev_mode"`
+}
+
+func New() *Config {
+	cwd, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+
+	config := Config{
+		Cwd:      cwd + "/",
+		TmplDir:  cwd + "/tmpl/",
+		ImgDir:   cwd + "/img/",
+		JsDir:    cwd + "/js/",
+		ThemeDir: cwd + "/theme/"}
+
+	if config.load("development.conf") != nil {
+		config.DBUser = dbUser
+		config.DBPass = dbPass
+		config.DBHost = dbHost
+		config.DBName = dbName
+		config.DevMode = devMode
+	}
+
+	return &config
+}
+
+func (c *Config) DBCredString() string {
+	return "postgres://" +
+		c.DBUser + ":" +
+		c.DBPass + "@" +
+		c.DBHost + "/" +
+		c.DBName + "?" +
+		"sslmode=disable"
+}
+
+func (c *Config) load(file string) error {
+	in, err := ioutil.ReadFile(c.Cwd + file)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(in, c); err != nil {
+		return err
+	}
+
+	return nil
 }
