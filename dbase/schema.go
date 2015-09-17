@@ -5,7 +5,8 @@ const createPage = `create table if not exists sl_page(
     title varchar(63) not null,
     content text not null default '',
     domain integer not null default 1,
-    url varchar(63) not null);`
+    url varchar(63) not null,
+    status integer not null default -1);`
 
 const createPageMeta = `create table if not exists sl_page_meta(
     id integer not null unique,

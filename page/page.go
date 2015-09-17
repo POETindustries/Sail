@@ -27,8 +27,9 @@ const pagTitle = "title"
 const pagContent = "content"
 const pagDomain = "domain"
 const pagURL = "url"
+const pagStatus = "status"
 
-const pageKeys = pagID + "," + pagTitle + "," + pagContent + "," + pagDomain + "," + pagURL
+const pageKeys = pagID + "," + pagTitle + "," + pagContent + "," + pagDomain + "," + pagURL + "," + pagStatus
 
 // Page contains the information needed to generate a web page for display.
 // This is the basic struct that contains all information needed to generate
@@ -41,6 +42,7 @@ type Page struct {
 	Content template.HTML
 	Domain  *Domain
 	URL     string
+	Status  int8
 
 	Meta     *Meta
 	template *template.Template
@@ -49,10 +51,6 @@ type Page struct {
 	Config *conf.Config
 }
 
-// LoadMeta reads metadata from the database and prepares it for display.
-// The page's Meta field stores elements like page title, description,
-// keywords and other information that is inserted into the html document's
-// head area.
 func (p *Page) loadMeta() {
 	meta := Meta{ID: p.Domain.ID}
 	if meta.ScanFromDB(p.Conn) {
@@ -88,7 +86,12 @@ func (p *Page) ScanFromDB(attr string, val interface{}) bool {
 	p.Domain = &Domain{}
 	data := p.Conn.PageData(pageKeys, attr, val)
 
-	if err := data.Scan(&p.ID, &p.Title, &content, &p.Domain.ID, &p.URL); err != nil {
+	if err := data.Scan(&p.ID,
+		&p.Title,
+		&content,
+		&p.Domain.ID,
+		&p.URL,
+		&p.Status); err != nil {
 		errors.Log(err, true)
 		return false
 	}
