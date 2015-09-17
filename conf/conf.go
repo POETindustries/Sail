@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sail/errors"
 )
 
 const dbUser = "sl_user"
@@ -13,6 +14,7 @@ const dbName = "sl_main"
 const dbHost = "localhost"
 
 const devMode = true
+const firstRun = false
 
 type Config struct {
 	Cwd      string
@@ -26,7 +28,8 @@ type Config struct {
 	DBHost string `json:"db_host"`
 	DBName string `json:"db_name"`
 
-	DevMode bool `json:"dev_mode"`
+	DevMode  bool `json:"dev_mode"`
+	FirstRun bool `json:"first_run"`
 }
 
 func New() *Config {
@@ -39,12 +42,15 @@ func New() *Config {
 		JsDir:    cwd + "/js/",
 		ThemeDir: cwd + "/theme/"}
 
-	if config.load("development.conf") != nil {
+	if err := config.load("development.conf"); err != nil {
+		errors.Log(err, true)
+
 		config.DBUser = dbUser
 		config.DBPass = dbPass
 		config.DBHost = dbHost
 		config.DBName = dbName
 		config.DevMode = devMode
+		config.FirstRun = firstRun
 	}
 
 	return &config

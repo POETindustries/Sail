@@ -16,20 +16,13 @@ var conn *dbase.Conn
 // It parses the request url and calls the functions necessary for generating
 // a valid page that is send to the client.
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
-	var p *page.Page
 	var b bytes.Buffer
+	p := page.New(req.URL.RequestURI(), conn, config)
 
-	if !conn.Verify() {
-		p = page.Load404()
-	} else {
-		p = page.Build("home", conn.DB)
-	}
-
-	if err := p.Frame.Execute(&b, p); err != nil {
-		println(err.Error())
-		io.WriteString(writer, page.NOTFOUND404)
-	} else {
+	if conn.Verify() && p.Execute(&b, p) == nil {
 		b.WriteTo(writer)
+	} else {
+		io.WriteString(writer, page.NOTFOUND404)
 	}
 }
 
@@ -39,7 +32,7 @@ func backendHandler(writer http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	config := conf.New()
+	config = conf.New()
 	if conn = dbase.New(config); conn != nil {
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
