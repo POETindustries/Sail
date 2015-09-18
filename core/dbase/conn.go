@@ -55,15 +55,15 @@ func (c *Conn) queryRow(table, proj, attr string, val interface{}) *sql.Row {
 // If this fails, it is usually because of wrong credentials or because
 // there is no sql service running or the service does not listen on
 // the default port.
-func New(config *conf.Config) *Conn {
+func New() *Conn {
 	conn := &Conn{
-		Credentials: config.DBCredString(),
-		DevMode:     config.DevMode}
+		Credentials: conf.Instance().DBCredString(),
+		DevMode:     conf.Instance().DevMode}
 
 	if conn.init() == nil && conn.Verify() {
 		for _, instruct := range createInstructs {
 			if _, err := conn.DB.Exec(instruct); err != nil {
-				errors.Log(err, config.DevMode)
+				errors.Log(err, conf.Instance().DevMode)
 			}
 		}
 		return conn

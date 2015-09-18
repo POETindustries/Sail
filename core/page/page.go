@@ -47,13 +47,13 @@ type Page struct {
 	Meta     *Meta
 	template *template.Template
 
-	Conn   *dbase.Conn
-	Config *conf.Config
+	conn   *dbase.Conn
+	config *conf.Config
 }
 
 func (p *Page) loadMeta() {
 	meta := Meta{ID: p.Domain.ID}
-	if meta.ScanFromDB(p.Conn) {
+	if meta.ScanFromDB(p.conn) {
 		p.Meta = &meta
 	} else {
 		p.Meta = &Meta{}
@@ -61,17 +61,17 @@ func (p *Page) loadMeta() {
 }
 
 func (p *Page) loadDomain() {
-	if !p.Domain.ScanFromDB(p.Conn) {
+	if !p.Domain.ScanFromDB(p.conn) {
 		p.Domain = &Domain{ID: 0}
 	}
 }
 
 func (p *Page) loadTemplate() {
-	dir := p.Config.TmplDir + p.Domain.Template
+	dir := p.config.TmplDir + p.Domain.Template
 
 	t, err := template.ParseGlob(dir + "/*.html")
 	if err != nil {
-		errors.Log(err, p.Config.DevMode)
+		errors.Log(err, p.config.DevMode)
 		t, _ = template.New("frame").Parse(NOTFOUND404)
 	}
 
@@ -84,7 +84,7 @@ func (p *Page) ScanFromDB(attr string, val interface{}) bool {
 	var content string
 
 	p.Domain = &Domain{}
-	data := p.Conn.PageData(pageKeys, attr, val)
+	data := p.conn.PageData(pageKeys, attr, val)
 
 	if err := data.Scan(&p.ID,
 		&p.Title,
@@ -105,7 +105,7 @@ func (p *Page) Execute(wr io.Writer, data interface{}) error {
 	err := p.template.ExecuteTemplate(wr, "frame.html", &data)
 
 	if err != nil {
-		errors.Log(err, p.Config.DevMode)
+		errors.Log(err, p.config.DevMode)
 	}
 
 	return err
@@ -118,8 +118,8 @@ func (p *Page) Execute(wr io.Writer, data interface{}) error {
 // name or if there is, but scanning the dataset returns an error, a 404
 // page will be returned. Otherwise, the page will be fully constructed
 // using its load* methods and a pointer to it is returned.
-func New(url string, conn *dbase.Conn, config *conf.Config) *Page {
-	p := Page{Conn: conn, Config: config}
+func New(url string, conn *dbase.Conn) *Page {
+	p := Page{conn: conn, config: conf.Instance()}
 
 	if len(url) <= 1 || !p.ScanFromDB(pagURL, url) {
 		if !p.ScanFromDB(pagID, 1) {

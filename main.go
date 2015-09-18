@@ -9,7 +9,6 @@ import (
 	"sail/core/page"
 )
 
-var config *conf.Config
 var conn *dbase.Conn
 
 // FrontendHandler handles all requests that are coming from site visitors.
@@ -17,7 +16,7 @@ var conn *dbase.Conn
 // a valid page that is send to the client.
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	var b bytes.Buffer
-	p := page.New(req.URL.RequestURI(), conn, config)
+	p := page.New(req.URL.RequestURI(), conn)
 
 	if conn.Verify() && p.Execute(&b, p) == nil {
 		b.WriteTo(writer)
@@ -32,8 +31,8 @@ func backendHandler(writer http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	config = conf.New()
-	if conn = dbase.New(config); conn != nil {
+	config := conf.Instance()
+	if conn = dbase.New(); conn != nil {
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
 

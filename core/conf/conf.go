@@ -32,28 +32,37 @@ type Config struct {
 	FirstRun bool `json:"first_run"`
 }
 
-func New() *Config {
+var instance *Config
+
+func new() *Config {
 	cwd, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
-	config := Config{
+	instance = &Config{
 		Cwd:      cwd + "/",
 		TmplDir:  cwd + "/tmpl/",
 		ImgDir:   cwd + "/img/",
 		JsDir:    cwd + "/js/",
 		ThemeDir: cwd + "/theme/"}
 
-	if err := config.load("development.conf"); err != nil {
+	if err := instance.load("development.conf"); err != nil {
 		errors.Log(err, true)
 
-		config.DBUser = dbUser
-		config.DBPass = dbPass
-		config.DBHost = dbHost
-		config.DBName = dbName
-		config.DevMode = devMode
-		config.FirstRun = firstRun
+		instance.DBUser = dbUser
+		instance.DBPass = dbPass
+		instance.DBHost = dbHost
+		instance.DBName = dbName
+		instance.DevMode = devMode
+		instance.FirstRun = firstRun
 	}
 
-	return &config
+	return instance
+}
+
+func Instance() *Config {
+	if instance == nil {
+		new()
+	}
+	return instance
 }
 
 func (c *Config) DBCredString() string {
