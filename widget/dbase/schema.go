@@ -16,7 +16,7 @@ const addWidgetColumn = `do $$ begin if not exists (
     where table_name='sl_domain' and column_name='plugin_sail_widgets' )
     then
     alter table sl_domain
-    add column plugin_sail_widgets text default 'hi,there';
+    add column plugin_sail_widgets text default '';
     end if; end $$`
 
 var schema = []string{createWidget, createMenu, addWidgetColumn}
