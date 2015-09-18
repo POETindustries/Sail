@@ -7,18 +7,33 @@ import (
 	"sail/core/conf"
 	"sail/core/dbase"
 	"sail/core/page"
+	"sail/widget"
 )
 
 var conn *dbase.Conn
 
+func main() {
+	config := conf.Instance()
+	initPlugins()
+
+	if conn = dbase.New(); conn != nil {
+		http.HandleFunc("/", frontendHandler)
+		http.HandleFunc("/office/", backendHandler)
+
+		http.Handle("/img/", http.FileServer(http.Dir(config.Cwd)))
+		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
+		http.Handle("/theme/", http.FileServer(http.Dir(config.Cwd)))
+
+		http.ListenAndServe(":8080", nil)
+	}
+}
+
 // FrontendHandler handles all requests that are coming from site visitors.
-// It parses the request url and calls the functions necessary for generating
-// a valid page that is send to the client.
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	var b bytes.Buffer
 	p := page.New(req.URL.RequestURI(), conn)
 
-	if conn.Verify() && p.Execute(&b, p) == nil {
+	if conn.Verify() && p.Execute(&b) == nil {
 		b.WriteTo(writer)
 	} else {
 		io.WriteString(writer, page.NOTFOUND404)
@@ -30,16 +45,6 @@ func backendHandler(writer http.ResponseWriter, req *http.Request) {
 	// TODO check for session cookie, show login page if not present
 }
 
-func main() {
-	config := conf.Instance()
-	if conn = dbase.New(); conn != nil {
-		http.HandleFunc("/", frontendHandler)
-		http.HandleFunc("/office/", backendHandler)
-
-		http.Handle("/img/", http.FileServer(http.Dir(config.Cwd)))
-		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
-		http.Handle("/theme/", http.FileServer(http.Dir(config.Cwd)))
-
-		http.ListenAndServe(":8080", nil)
-	}
+func initPlugins() {
+	widget.Init()
 }

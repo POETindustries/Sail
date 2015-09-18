@@ -23,11 +23,6 @@ const createDomain = `create table if not exists sl_domain(
     name varchar(31) not null,
     template text not null default 'default');`
 
-const createMenu = `create if not exists sl_menu(
-    id serial primary key not null,
-    name varchar(31) not null,
-    entry_ids text not null default '1');`
-
 const initPage = `do $$ begin if not exists (select id from sl_page)
     then insert into sl_page
     (title, content, url)
@@ -54,7 +49,7 @@ const initMeta = `do $$ begin if not exists (select id from sl_page_meta)
     'allow');
     end if; end $$`
 
-var createInstructs = [...]string{
+var createInstructs = []string{
 	createPage,
 	createPageMeta,
 	createDomain,

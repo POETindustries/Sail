@@ -50,6 +50,15 @@ func (c *Conn) queryRow(table, proj, attr string, val interface{}) *sql.Row {
 	return c.DB.QueryRow(query, val)
 }
 
+func (c *Conn) execCreateInstructs(instructs []string) (err error) {
+	for _, instruct := range instructs {
+		if _, err = c.DB.Exec(instruct); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+		}
+	}
+	return
+}
+
 // New creates a connection object to access the database.
 //
 // If this fails, it is usually because of wrong credentials or because
@@ -61,12 +70,12 @@ func New() *Conn {
 		DevMode:     conf.Instance().DevMode}
 
 	if conn.init() == nil && conn.Verify() {
-		for _, instruct := range createInstructs {
-			if _, err := conn.DB.Exec(instruct); err != nil {
-				errors.Log(err, conf.Instance().DevMode)
-			}
-		}
+		conn.execCreateInstructs(createInstructs)
 		return conn
 	}
 	return nil
+}
+
+func AppendToSchema(schema []string) {
+	createInstructs = append(createInstructs, schema...)
 }

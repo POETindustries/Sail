@@ -101,8 +101,8 @@ func (p *Page) ScanFromDB(attr string, val interface{}) bool {
 	return true
 }
 
-func (p *Page) Execute(wr io.Writer, data interface{}) error {
-	err := p.template.ExecuteTemplate(wr, "frame.html", &data)
+func (p *Page) Execute(wr io.Writer) error {
+	err := p.template.ExecuteTemplate(wr, "frame.html", p)
 
 	if err != nil {
 		errors.Log(err, p.config.DevMode)
