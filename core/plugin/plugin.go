@@ -10,7 +10,7 @@ func ConfigData() *conf.Config {
 }
 
 func DBConnection() *dbase.Conn {
-	return nil
+	return dbase.New()
 }
 
 func InitDBSchema(schema []string) {

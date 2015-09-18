@@ -43,6 +43,13 @@ func (c *Conn) DomainData(attrs string, id uint32) *sql.Row {
 	return c.queryRow("sl_domain", attrs, "id", id)
 }
 
+// Data should be used for generic queries by objects that use their own
+// table information. It is intended for "override" functionality by
+// objects that have this database handle as one of their components.
+func (c *Conn) Data(table, attrs, attr string, val interface{}) *sql.Row {
+	return c.queryRow(table, attrs, attr, val)
+}
+
 func (c *Conn) queryRow(table, proj, attr string, val interface{}) *sql.Row {
 	sel := "where " + attr + " =$1"
 	query := "select " + proj + " from " + table + " " + sel

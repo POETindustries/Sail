@@ -28,7 +28,7 @@ func main() {
 	}
 }
 
-// FrontendHandler handles all requests that are coming from site visitors.
+// handles all requests that are coming from regular site visitors.
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	var b bytes.Buffer
 	p := page.New(req.URL.RequestURI(), conn)
@@ -40,7 +40,7 @@ func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// BackendHandler handles connections to the administrative interface.
+// handles connections to the administrative interface.
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
 	// TODO check for session cookie, show login page if not present
 }
