@@ -23,17 +23,27 @@ const createDomain = `create table if not exists sl_domain(
     name varchar(31) not null,
     template text not null default 'default');`
 
-const initPage = `insert into sl_page
+const createMenu = `create if not exists sl_menu(
+    id serial primary key not null,
+    name varchar(31) not null,
+    entry_ids text not null default '1');`
+
+const initPage = `do $$ begin if not exists (select id from sl_page)
+    then insert into sl_page
     (title, content, url)
     values
-    ('Home', 'Welcome to Sail', '/home')`
+    ('Home', 'Welcome to Sail', '/home');
+    end if; end $$`
 
-const initDomain = `insert into sl_domain
+const initDomain = `do $$ begin if not exists (select id from sl_domain)
+    then insert into sl_domain
     (name, template)
     values
-    ('default', 'default');`
+    ('default', 'default');
+    end if; end $$`
 
-const initMeta = `insert into sl_page_meta values(
+const initMeta = `do $$ begin if not exists (select id from sl_page_meta)
+    then insert into sl_page_meta values(
     1,
     'Sail',
     'cms,content management system, go, golang',
@@ -41,7 +51,8 @@ const initMeta = `insert into sl_page_meta values(
     'en',
     'cms',
     '1 month',
-    'allow');`
+    'allow');
+    end if; end $$`
 
 var createInstructs = [...]string{
 	createPage,

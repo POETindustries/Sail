@@ -2,8 +2,8 @@ package dbase
 
 import (
 	"database/sql"
-	"sail/conf"
-	"sail/errors"
+	"sail/core/conf"
+	"sail/core/errors"
 
 	_ "github.com/lib/pq" // driver for postgres
 )
@@ -61,11 +61,9 @@ func New(config *conf.Config) *Conn {
 		DevMode:     config.DevMode}
 
 	if conn.init() == nil && conn.Verify() {
-		if config.FirstRun {
-			for _, instruct := range createInstructs {
-				if _, err := conn.DB.Exec(instruct); err != nil {
-					errors.Log(err, config.DevMode)
-				}
+		for _, instruct := range createInstructs {
+			if _, err := conn.DB.Exec(instruct); err != nil {
+				errors.Log(err, config.DevMode)
 			}
 		}
 		return conn

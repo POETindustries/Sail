@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"sail/conf"
-	"sail/dbase"
-	"sail/errors"
+	"sail/core/conf"
+	"sail/core/dbase"
+	"sail/core/errors"
 )
 
 // NOTFOUND404 is a very basic web page signaling a 404 error.

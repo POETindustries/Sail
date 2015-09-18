@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sail/errors"
+	"sail/core/errors"
 )
 
 const dbUser = "sl_user"

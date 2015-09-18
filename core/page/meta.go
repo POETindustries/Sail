@@ -1,7 +1,7 @@
 package page
 
 import (
-	"sail/dbase"
+	"sail/core/dbase"
 )
 
 // DBKeys holds an enumeration of database table column names.

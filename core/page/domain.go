@@ -1,6 +1,8 @@
 package page
 
-import "sail/dbase"
+import (
+	"sail/core/dbase"
+)
 
 const domID = "id"
 const domName = "name"

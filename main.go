@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"sail/conf"
-	"sail/dbase"
-	"sail/page"
+	"sail/core/conf"
+	"sail/core/dbase"
+	"sail/core/page"
 )
 
 var config *conf.Config
