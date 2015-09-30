@@ -4,19 +4,16 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"sail/core/conf"
-	"sail/core/dbase"
-	"sail/core/page"
-	"sail/widget"
+	"sail/conf"
+	"sail/page"
+	"sail/storage"
+	"sail/tmpl"
 )
-
-var conn *dbase.Conn
 
 func main() {
 	config := conf.Instance()
-	initPlugins()
 
-	if conn = dbase.New(); conn != nil {
+	if storage.Instance() != nil {
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
 
@@ -31,20 +28,16 @@ func main() {
 // handles all requests that are coming from regular site visitors.
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	var b bytes.Buffer
-	p := page.New(req.URL.RequestURI(), conn)
+	p := page.New(req.URL.RequestURI())
 
-	if conn.Verify() && p.Execute(&b) == nil {
+	if storage.Instance().Verify() && p.Execute(&b) == nil {
 		b.WriteTo(writer)
 	} else {
-		io.WriteString(writer, page.NOTFOUND404)
+		io.WriteString(writer, tmpl.NOTFOUND404)
 	}
 }
 
 // handles connections to the administrative interface.
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
 	// TODO check for session cookie, show login page if not present
-}
-
-func initPlugins() {
-	widget.Init()
 }

@@ -1,20 +1,20 @@
-package dbase
+package storage
 
-const pageID = "id"
+const PageID = "id"
 const pageTitle = "title"
 const pageContent = "content"
 const pageDomain = "domain"
-const pageURL = "url"
+const PageURL = "url"
 const pageStatus = "status"
 const pageOwner = "owner"
 const pageCreationDate = "cdate"
 const pageEditDate = "edate"
 
-const PageAttrs = pageID + "," +
+const PageAttrs = PageID + "," +
 	pageTitle + "," +
 	pageContent + "," +
 	pageDomain + "," +
-	pageURL + "," +
+	PageURL + "," +
 	pageStatus + "," +
 	pageOwner + "," +
 	pageCreationDate + "," +
@@ -68,9 +68,9 @@ const MenuWidgetAttrs = menuWidgetEntryID + "," +
 	menuWidgetEntryPosition
 
 const createPage = `create table if not exists sl_page(
-    ` + pageID + ` serial primary key not null,
+    ` + PageID + ` serial primary key not null,
     ` + pageTitle + ` varchar(63) not null,
-    ` + pageURL + ` varchar(63) not null,
+    ` + PageURL + ` varchar(63) not null,
     ` + pageContent + ` text not null default '',
     ` + pageDomain + ` integer not null default 1,
     ` + pageStatus + ` integer not null default -1,
