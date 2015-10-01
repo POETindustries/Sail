@@ -13,5 +13,9 @@ func Log(e error, devMode bool) {
 }
 
 func NewNoPermission() error {
-	return errors.New("No permission to access the object")
+	return errors.New("No permission to access the object.")
+}
+
+func NoArguments() error {
+	return errors.New("No arguments passed.")
 }
