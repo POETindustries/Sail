@@ -12,7 +12,7 @@ func Log(e error, devMode bool) {
 	}
 }
 
-func NewNoPermission() error {
+func NoPermission() error {
 	return errors.New("No permission to access the object.")
 }
 
