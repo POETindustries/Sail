@@ -55,19 +55,6 @@ func (c *Conn) Verify() bool {
 	return true
 }
 
-// ExecCreateInstructs handles first-time table and data creation.
-//
-// It is designed to be called by datastore packages that add their
-// own tables, triggers and functions to the database backend.
-func (c *Conn) ExecCreateInstructs(instructs []string) (err error) {
-	for _, instruct := range instructs {
-		if _, err = c.DB.Exec(instruct); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
-		}
-	}
-	return
-}
-
 func (c *Conn) init() (err error) {
 	c.DB, err = sql.Open("postgres", c.credentials)
 	if err != nil {
