@@ -1,65 +1,29 @@
 package widget
 
-import "html/template"
+import "bytes"
 
-const menID = "id"
-const menName = "name"
-const menEntries = "entry_ids"
-
-const menuKeys = menID + "," + menName + "," + menEntries
-
+// Menu implements WidgetData. It ordered, clickable elements.
 type Menu struct {
-	ID      uint16
-	Name    string
 	Entries []*MenuEntry
 }
 
+// MenuEntry contains all information about a specific menu entry.
 type MenuEntry struct {
-	ID       uint32
-	PageName string
+	ID      uint32
+	Name    string
+	RefID   uint32
+	RefURL  string
+	Submenu uint32
+	Pos     uint16
 }
 
-func (m *Menu) ScanFromDB(attrs string, val interface{}) bool {
-	/*	data := storage.MenuData(attrs, val)
-		var pageIDs string
-
-		if err := data.Scan(&m.ID, &m.Name, &pageIDs); err != nil {
-			println("Here?")
-			plugin.LogError(err, plugin.ConfigData().DevMode)
-			println("Here.")
-			return false
-		}
-
-		m.deserialize(pageIDs)*/
-
-	return true
-}
-
-func (m *Menu) Markup() template.HTML {
-	var mk string
-
-	for _, entry := range m.Entries {
-		mk += "<li>" + entry.PageName + "</li>"
+// Markup returns the markup string for this widget data type. Do not
+// call this directly from template files!
+func (m *Menu) Markup(htmlTagID string) string {
+	mk := bytes.NewBufferString("<ul class='menu' id='" + htmlTagID + "'>")
+	for _, e := range m.Entries {
+		mk.WriteString("<li><a href='" + e.RefURL + "'>" + e.Name + "</a></li>")
 	}
-
-	//return template.HTML("<ul>" + mk + "</ul>")
-	return template.HTML(mk)
-}
-
-func (m *Menu) Store() {
-
-}
-
-func (m *Menu) deserialize(vals string) {
-	/*	slice := strings.Split(vals, ",")
-		m.Entries = make([]*MenuEntry, len(slice))
-		for _, val := range slice {
-			id, _ := strconv.Atoi(val)
-			entry := MenuEntry{ID: uint32(id)}
-			data := storage.PageName(uint32(id))
-			if err := data.Scan(&entry.PageName); err != nil {
-				plugin.LogError(err, plugin.ConfigData().DevMode)
-			}
-			m.Entries = append(m.Entries, &entry)
-		}*/
+	mk.WriteString("</ul>")
+	return mk.String()
 }
