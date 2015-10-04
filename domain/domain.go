@@ -1,10 +1,14 @@
 package domain
 
 import (
-	"sail/storage"
+	"fmt"
 	"sail/tmpl"
 )
 
+// Domain is the primary type for determining the presentation
+// of page data. It holds references to page metadata for use
+// in an html document's head area and to the template that
+// controls the actual layout.
 type Domain struct {
 	ID       uint32
 	Name     string
@@ -12,19 +16,13 @@ type Domain struct {
 	Template *tmpl.Template
 }
 
-func (d *Domain) ScanFromDB() bool {
-	m := Meta{}
-	data := storage.Instance().DomainData(d.ID)
-
-	if data.Scan(&d.ID, &d.Name, &m.Title, &m.Keywords, &m.Description, &m.Language,
-		&m.PageTopic, &m.RevisitAfter, &m.Robots, &d.Template) != nil {
-		return false
-	}
-	d.Meta = &m
-
-	return true
+// String prints the domain's data in an easily readable format.
+func (d *Domain) String() string {
+	str := "DOMAIN '%s': {ID:%d | Meta:%+v | Template:%+v}"
+	return fmt.Sprintf(str, d.Name, d.ID, d.Meta, d.Template)
 }
 
-func (d *Domain) loadTemplate() {
-	d.Template = tmpl.New("")
+// New creates a basic Domain object filled with default values.
+func New() *Domain {
+	return &Domain{Meta: &Meta{}, Template: tmpl.New()}
 }

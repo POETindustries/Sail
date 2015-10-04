@@ -3,7 +3,7 @@ package storage
 import (
 	"sail/conf"
 	"sail/errors"
-	"sail/storage/conn"
+	"sail/storage/psqldb"
 	"sail/storage/domainstore"
 	"sail/storage/pagestore"
 	"sail/storage/templatestore"
@@ -20,7 +20,7 @@ var createInstructs = [][]string{
 func ExecCreateInstructs() (err error) {
 	for _, instructs := range createInstructs {
 		for _, instruct := range instructs {
-			if _, err = conn.Instance().DB.Exec(instruct); err != nil {
+			if _, err = psqldb.Instance().DB.Exec(instruct); err != nil {
 				errors.Log(err, conf.Instance().DevMode)
 			}
 		}

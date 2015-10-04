@@ -65,11 +65,11 @@ func (q *Query) scanWidgets(data *sql.Rows, err error) ([]*widget.Widget, error)
 	widgets := []*widget.Widget{}
 	defer data.Close()
 	for data.Next() {
-		w := widget.Widget{}
+		w := widget.New()
 		if err = data.Scan(&w.ID, &w.Name, &w.RefName, &w.Type); err != nil {
 			return nil, err
 		}
-		widgets = append(widgets, &w)
+		widgets = append(widgets, w)
 	}
 	return widgets, nil
 }
