@@ -1,13 +1,12 @@
 package tmpl
 
 import (
+	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
-	"regexp"
 	"sail/conf"
 	"sail/errors"
-	"strings"
+	"sail/widget"
 )
 
 // NOTFOUND404 is a very basic web page signaling a 404 error.
@@ -23,85 +22,66 @@ const NOTFOUND404 = `<!doctype html>
 		<p style="font-size:2em;">Sorry About That!</p>
 		<p>PAGE NOT FOUND</p></body></html>`
 
+// Template is the data structure that contains all data necessary
+// to render the template files and all widgets contained within.
 type Template struct {
-	template *template.Template
-	widgets  map[string]interface{}
+	ID        uint32
+	Name      string
+	WidgetIDs []uint32
+	template  *template.Template
+	widgets   map[string]*widget.Widget
 }
 
+// Execute applies a parsed template to the specified data object,
+// writing the output to wr. If an error occurs during execution, it
+// is the responsibility of the caller to handle partially written
+// output.
 func (t *Template) Execute(wr io.Writer, data interface{}) error {
 	err := t.template.ExecuteTemplate(wr, "frame.html", data)
-
 	if err != nil {
 		errors.Log(err, conf.Instance().DevMode)
 	}
-
 	return err
 }
 
-func (t *Template) Load(name string) {
-	if name == "404" {
+// Compile parses the template files pointed at by the template.
+func (t *Template) Compile() {
+	if t.Name == "404" {
 		t.template, _ = template.New("frame").Parse(NOTFOUND404)
 	} else {
-		dir := conf.Instance().TmplDir + name
-
+		dir := conf.Instance().TmplDir + t.Name
 		tpl, err := template.ParseGlob(dir + "/*.html")
 		if err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 			tpl, _ = template.New("frame").Parse(NOTFOUND404)
 		}
-
 		t.template = tpl
 	}
 }
 
-func (t *Template) Widget(name string) interface{} {
-	return t.widgets[name]
-}
-
-// New creates a new Template object and fills it with data as far as that
-// data exists.
-//
-// The 'full' flag allows us to specify if we want all data to be loaded or if
-// zero values suffice for the current use case. The reasoning behind this is
-// that for frontend page building only the template file names are necessary.
-// Thus, most of the time we only need the Files field to contain meaningful
-// and correct data.
-//
-// The values of the other fields are only used when editing templates, which
-// happens orders of magnitude less frequent than simple display for the
-// average page visitor. Only then is there a need for a completely populated
-// and large struct.
-func New(name string) *Template {
-	t := Template{}
-	t.Load(name)
-	/*	t.widgets = make(map[string]interface{})
-		for _, id := range widgetIDs {
-			widget := widget.Menu{}
-			widget.ScanFromDB("id", id)
-			t.widgets[widget.Name] = widget
-		}*/
-	return &t
-}
-
-// ReadFile is a helper function that returns the content of a template file.
-// It expects a template name and returns the corresponding file's text or an
-// empty string if the file could not be read.
-func ReadFile(file string) string {
-	if f, err := ioutil.ReadFile(file); err == nil {
-		return string(f)
+// Widget returns a pointer to the widget designated by the name
+// parameter. If no such widget exists,
+func (t *Template) Widget(name string) (w *widget.Widget) {
+	if w = t.widgets[name]; w == nil {
+		return widget.New()
 	}
-
-	return ""
+	return
 }
 
-func subTemplates(tmplContent string) []string {
-	re := regexp.MustCompile(`{{template ".*" .*}}`)
-	templates := re.FindAllString(tmplContent, -1)
+// AddWidget adds the widget w to the template's internal collection
+// of widgets. If the widget or a widget with the same name already
+// exists, it is overwritten.
+func (t *Template) AddWidget(w *widget.Widget) {
+	t.widgets[w.RefName] = w
+}
 
-	for i := 0; i < len(templates); i++ {
-		templates[i] = strings.TrimPrefix(templates[i], `{{template "`)
-		templates[i] = templates[i][:strings.Index(templates[i], `"`)]
-	}
+// String prints the template's data in an easily readable format.
+func (t *Template) String() string {
+	str := "TEMPLATE '%s': {ID:%d | WidgetIDs:%+v | Template:%+v | Widgets:%+v}"
+	return fmt.Sprintf(str, t.Name, t.ID, t.WidgetIDs, t.template, t.widgets)
+}
 
-	return templates
+// New creates a new Template object
+func New() *Template {
+	return &Template{Name: "404", widgets: make(map[string]*widget.Widget)}
 }

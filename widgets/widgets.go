@@ -7,11 +7,11 @@ import (
 	"sail/widget"
 )
 
-// BuildWithID returns widgets that math the given parameter(s).
+// BuildWithID returns widgets that match the given parameter(s).
 //
-// It can be used for fetching one or more widgets and is quaranteed
-// to contain at least one correctly set up widget behind the first
-// position of the returned slice.
+// It should be used for fetching one or more widgets for rendering
+// and is guaranteed to contain at least one correctly set up widget
+// at the first position of the returned slice.
 func BuildWithID(id ...uint32) []*widget.Widget {
 	w, err := fetchByID(id...)
 	if err != nil || len(w) < 1 {
@@ -45,7 +45,7 @@ func fetchData(widgets []*widget.Widget) (err error) {
 }
 
 func fetchMenuData(id uint32) (*widget.Menu, error) {
-	return widgetstore.Get().ByID(id).Descending().Menu()
+	return widgetstore.Get().ByID(id).Ascending().Menu()
 }
 
 func fetchTextData(id uint32) (*widget.Text, error) {

@@ -1,10 +1,13 @@
 package widget
 
-import "html/template"
+import (
+	"fmt"
+	"html/template"
+)
 
-// WidgetData is the interface that all types must implement if they
+// Data is the interface that all types must implement if they
 // are to be used for holding Widget's data.
-type WidgetData interface {
+type Data interface {
 	Markup(htmlTagID string) string
 }
 
@@ -14,7 +17,7 @@ type Widget struct {
 	Name    string
 	RefName string
 	Type    string
-	Data    WidgetData
+	Data    Data
 }
 
 // Markup returns the widget's data in a form fit for display inside
@@ -30,6 +33,12 @@ func (w *Widget) Markup() template.HTML {
 		return template.HTML("")
 	}
 	return template.HTML(w.Data.Markup(w.RefName))
+}
+
+// String prints the widget's data in an easily readable format.
+func (w *Widget) String() string {
+	str := "WIDGET '%s': {ID:%d | RefName:%s | Type:%s | Data:%+v}"
+	return fmt.Sprintf(str, w.Name, w.ID, w.RefName, w.Type, w.Data)
 }
 
 // New creates and returns a new widget object.

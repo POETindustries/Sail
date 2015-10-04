@@ -1,75 +1,61 @@
 package widgetstore
 
 import (
-	"bytes"
 	"database/sql"
 	"fmt"
-	"sail/errors"
-	"sail/storage/conn"
+	"sail/storage/psqldb"
 	"sail/widget"
-	"strconv"
 )
-
-const and, or = " and ", " or "
 
 // Query collects all information needed for querying the database.
 type Query struct {
-	table     string
-	proj      string
-	sel       bytes.Buffer
-	selAttrs  []interface{}
-	attrCount int
-	order     string
-	asc       bool
-	desc      bool
+	query *psqldb.Query
 }
 
 // ByID prepares the query to select the widget that matches the given id.
 func (q *Query) ByID(ids ...uint32) *Query {
 	for _, id := range ids {
-		q.addAttr(widgetID, id, or)
+		q.query.AddAttr(widgetID, id, psqldb.OpOr)
 	}
 	return q
 }
 
 // Ascending prepares the query for table-specific ordering.
 func (q *Query) Ascending() *Query {
-	q.asc = true
+	q.query.Ascending()
 	return q
 }
 
 // Descending prepares the query for table-specific ordering.
 func (q *Query) Descending() *Query {
-	q.desc = true
+	q.query.Descending()
 	return q
 }
 
 // Widgets executes the query and returns all matching widget objects.
 func (q *Query) Widgets() ([]*widget.Widget, error) {
-	q.table = "sl_widget"
-	q.proj = widgetAttrs
-	return q.scanWidgets(q.execute())
+	q.query.Table = "sl_widget"
+	q.query.Proj = widgetAttrs
+	return q.scanWidgets(q.query.Execute())
 }
 
 // Menu executes the query, collecting information for one menu widget.
 func (q *Query) Menu() (*widget.Menu, error) {
 	stmt := "sl_widget_menu join (select %s,%s from sl_page) as p on %s=%s"
-	q.table = fmt.Sprintf(stmt, expPageID, expPageURL, expPageID, menuEntryReferenceID)
-	q.proj = menuAttrs + "," + expPageURL
+	q.query.Table = fmt.Sprintf(stmt, expPageID, expPageURL, expPageID, menuEntryReferenceID)
+	q.query.Proj = menuAttrs + "," + expPageURL
 
-	if q.asc {
-		q.order = "order by " + menuEntryPosition + " asc"
-	} else if q.desc {
-		q.order = "order by " + menuEntryPosition + " desc"
+	if o := q.query.Order(); o != "" {
+		q.query.SetOrderStmt("order by " + menuEntryPosition + o)
 	}
-	return q.scanMenu(q.execute())
+	return q.scanMenu(q.query.Execute())
 }
 
 // TextField executes the query, providing a text widget in return.
 func (q *Query) TextField() (*widget.Text, error) {
-	q.table = "sl_widget_text"
-	q.proj = textContent
-	return q.scanTextField(q.execute())
+	q.query.Table = "sl_widget_text"
+	q.query.Proj = textContent
+	return q.scanTextField(q.query.Execute())
 }
 
 func (q *Query) scanWidgets(data *sql.Rows, err error) ([]*widget.Widget, error) {
@@ -118,30 +104,9 @@ func (q *Query) scanTextField(data *sql.Rows, err error) (*widget.Text, error) {
 	return &text, nil
 }
 
-func (q *Query) addAttr(key string, val interface{}, op string) {
-	if q.attrCount > 1 {
-		q.sel.WriteString(op)
-	}
-	q.sel.WriteString(key + "=$" + strconv.Itoa(q.attrCount))
-	q.selAttrs = append(q.selAttrs, val)
-	q.attrCount++
-}
-
-func (q *Query) execute() (*sql.Rows, error) {
-	if q.sel.Len() < 1 {
-		return nil, errors.NoArguments()
-	}
-	return conn.Instance().DB.Query(q.build(), q.selAttrs...)
-}
-
-func (q *Query) build() string {
-	query := "select %s from %s where %s %s"
-	return fmt.Sprintf(query, q.proj, q.table, q.sel.String(), q.order)
-}
-
 // Get starts building the query that gets sent to the database.
 //
 // TODO: describe how queries should be built using method chaining.
 func Get() *Query {
-	return &Query{attrCount: 1}
+	return &Query{query: &psqldb.Query{}}
 }
