@@ -23,9 +23,9 @@ type Page struct {
 	EDate  string
 }
 
-// ContentHTML wraps p.Content into an html-friendly way, ready for
+// Markup wraps p.Content into an html-friendly way, ready for
 // usage in a template.
-func (p *Page) ContentHTML() template.HTML {
+func (p *Page) Markup() template.HTML {
 	return template.HTML(p.Content)
 }
 

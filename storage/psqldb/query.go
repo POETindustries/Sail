@@ -46,6 +46,7 @@ func (q *Query) Execute() (*sql.Rows, error) {
 	if q.sel.Len() < 1 {
 		return nil, errors.NoArguments()
 	}
+	//fmt.Printf("\n"+q.build()+" %+v\n", q.selAttrs)
 	return Instance().DB.Query(q.build(), q.selAttrs...)
 }
 

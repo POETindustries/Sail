@@ -48,7 +48,7 @@ const initDomain = `do $$ begin
     'en',
     'cms',
     '1 month',
-    'allow',
+    'index, follow',
     1);
     end if;
 	end $$`

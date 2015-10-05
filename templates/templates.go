@@ -27,7 +27,7 @@ func BuildWithID(ids ...uint32) []*tmpl.Template {
 			t.WidgetIDs = []uint32{}
 		}
 		t.WidgetIDs = widgetIDs
-		widgets := fetchWidgets(t.WidgetIDs...)
+		widgets := widgets.BuildWithID(t.WidgetIDs...)
 		for _, w := range widgets {
 			t.AddWidget(w)
 		}

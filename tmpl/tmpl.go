@@ -15,12 +15,13 @@ import (
 // and templates work. The cms cannot be considered functional should that
 // happen, and this markup at least tells the user as much. The markup is as
 // generic as possible while still being somewhat good looking.
-const NOTFOUND404 = `<!doctype html>
-		<html style="background:black;text-align:center;color:white;">
-		<head><title>Sorry About That</title><meta charset="utf-8"></head>
-		<body style="padding:72px;font-family:sans-serif;font-size:1.5em;">
+const NOTFOUND404 = `
+	<head><title>Sorry About That</title><meta charset="utf-8"></head>
+	<body style="background:black;text-align:center;color:white;padding:72px;font-size:1.5em;">
 		<p style="font-size:2em;">Sorry About That!</p>
-		<p>PAGE NOT FOUND</p></body></html>`
+		<p>PAGE NOT FOUND</p>
+	</body>
+`
 
 // Template is the data structure that contains all data necessary
 // to render the template files and all widgets contained within.
@@ -36,12 +37,14 @@ type Template struct {
 // writing the output to wr. If an error occurs during execution, it
 // is the responsibility of the caller to handle partially written
 // output.
-func (t *Template) Execute(wr io.Writer, data interface{}) error {
-	err := t.template.ExecuteTemplate(wr, "frame.html", data)
-	if err != nil {
-		errors.Log(err, conf.Instance().DevMode)
+func (t *Template) Execute(wr io.Writer, data interface{}) (err error) {
+	if t.template == nil {
+		err = errors.NilPointer()
+	} else {
+		err = t.template.ExecuteTemplate(wr, "frame.html", data)
 	}
-	return err
+	errors.Log(err, conf.Instance().DevMode)
+	return
 }
 
 // Compile parses the template files pointed at by the template.
@@ -83,5 +86,7 @@ func (t *Template) String() string {
 
 // New creates a new Template object
 func New() *Template {
-	return &Template{Name: "404", widgets: make(map[string]*widget.Widget)}
+	return &Template{
+		Name:    "404",
+		widgets: make(map[string]*widget.Widget)}
 }

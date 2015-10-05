@@ -5,18 +5,22 @@ import (
 	"io"
 	"net/http"
 	"sail/conf"
-	"sail/page"
+	"sail/pages"
 	"sail/storage"
+	"sail/storage/psqldb"
 	"sail/tmpl"
 )
 
+const docStart = "<!doctype html>"
+const htmlOpen = "<html>"
+const htmlClose = "</html>"
+
 func main() {
 	config := conf.Instance()
-
-	if storage.Instance() != nil {
+	if psqldb.Instance() != nil {
+		storage.ExecCreateInstructs()
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
-
 		http.Handle("/img/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/theme/", http.FileServer(http.Dir(config.Cwd)))
@@ -25,19 +29,17 @@ func main() {
 	}
 }
 
-// handles all requests that are coming from regular site visitors.
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
-	var b bytes.Buffer
-	p := page.New(req.URL.RequestURI())
-
-	if storage.Instance().Verify() && p.Execute(&b) == nil {
+	b := bytes.NewBufferString(docStart + htmlOpen)
+	p := pages.BuildWithURL(req.URL.RequestURI())
+	if psqldb.Instance().Verify() && pages.Serve(p, b) == nil {
+		b.WriteString(htmlClose)
 		b.WriteTo(writer)
 	} else {
-		io.WriteString(writer, tmpl.NOTFOUND404)
+		io.WriteString(writer, docStart+htmlOpen+tmpl.NOTFOUND404+htmlClose)
 	}
 }
 
-// handles connections to the administrative interface.
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
 	// TODO check for session cookie, show login page if not present
 }

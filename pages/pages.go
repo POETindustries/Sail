@@ -1,8 +1,8 @@
 package pages
 
 import (
-	"sail/conf"
-	"sail/errors"
+	"io"
+	"sail/domains"
 	"sail/page"
 	"sail/storage/pagestore"
 )
@@ -11,28 +11,43 @@ import (
 // corresponding page data.
 //
 // It is guaranteed to retun a functioning Page object even if the
-// passed string does not lead to any data.
+// url parameter does not lead to any data.
 func BuildWithURL(url string) *page.Page {
-	p := page.New()
-	if !fetchByURL(url, p) {
-		return load404()
+	var pages []*page.Page
+	var err error
+	if len(url) <= 1 {
+		pages, err = fetchByID(1)
+		if len(pages) == 0 || err != nil {
+			return load404()
+		}
+	} else {
+		pages, err = fetchByURL(url)
+		if len(pages) == 0 || err != nil {
+			pages, err = fetchByID(1)
+			if len(pages) == 0 || err != nil {
+				return load404()
+			}
+		}
 	}
-	return p
+	pages[0].Domain = domains.BuildWithID(pages[0].Domain.ID)[0]
+	return pages[0]
 }
 
-func fetchByURL(url string, p *page.Page) bool {
-	if len(url) <= 1 || pagestore.Get().ByURL(url).Execute(p) != nil {
-		return fetchByID(1, p)
-	}
-	return true
+// Serve renders the page p and writes the result to the writer wr.
+//
+// If anything goes wrong, a non-nil error will be returned. In that
+// case, it is the caller's responsibility to correct the contents of
+// wr, which may have been partially written into.
+func Serve(p *page.Page, wr io.Writer) error {
+	return p.Domain.Template.Execute(wr, p)
 }
 
-func fetchByID(id uint32, p *page.Page) bool {
-	if err := pagestore.Get().ByID(id).Execute(p); err != nil {
-		errors.Log(err, conf.Instance().DevMode)
-		return false
-	}
-	return true
+func fetchByURL(urls ...string) ([]*page.Page, error) {
+	return pagestore.Get().ByURL(urls...).Pages()
+}
+
+func fetchByID(ids ...uint32) ([]*page.Page, error) {
+	return pagestore.Get().ByID(ids...).Pages()
 }
 
 func load404() *page.Page {

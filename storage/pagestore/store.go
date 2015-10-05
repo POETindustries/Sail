@@ -1,74 +1,68 @@
 package pagestore
 
 import (
-	"bytes"
-	"sail/errors"
+	"database/sql"
 	"sail/page"
-	"sail/storage/conn"
-	"strconv"
+	"sail/storage/psqldb"
 )
 
 // Query collects all information needed for querying the database.
 type Query struct {
-	table     string
-	proj      string
-	sel       bytes.Buffer
-	selAttrs  []interface{}
-	attrCount int
+	query *psqldb.Query
 }
 
 // Visible prepares the query to select all pages that are visible
 // and accessible from the general internet.
 func (q *Query) Visible() *Query {
-	q.addAttr(pageStatus, -1)
+	q.query.AddAttr(pageStatus, -1, "")
 	return q
 }
 
 // ByURL prepares the query to select only those pages that match the
-// given url string.
-func (q *Query) ByURL(url string) *Query {
-	q.addAttr(pageURL, url)
+// given url(s).
+func (q *Query) ByURL(urls ...string) *Query {
+	for _, url := range urls {
+		q.query.AddAttr(pageURL, url, "")
+	}
 	return q
 }
 
-// ByID prepares the query to select the page that matches the given id.
-func (q *Query) ByID(id uint32) *Query {
-	q.addAttr(pageID, id)
+// ByID prepares the query to select the pages that matches the id(s).
+func (q *Query) ByID(ids ...uint32) *Query {
+	for _, id := range ids {
+		q.query.AddAttr(pageID, id, psqldb.OpOr)
+	}
 	return q
 }
 
-// Execute sends the query to the database and writes the resulting
-// data to the Page parameter.
-//
-// Any error that is raised during execution is returned. An error is
-// also returned if the query's selection does not contain at least
-// one attribute.
-func (q *Query) Execute(p *page.Page) error {
-	if q.sel.Len() < 1 {
-		return errors.NoArguments()
-	}
-	data := conn.Instance().DB.QueryRow(q.build(), q.selAttrs...)
-
-	return data.Scan(&p.ID, &p.Title, &p.Content, &p.Domain.ID, &p.URL,
-		&p.Status, &p.Owner, &p.CDate, &p.EDate)
+// Pages sends the query to the database and returns all matching
+// page objects.
+func (q *Query) Pages() ([]*page.Page, error) {
+	q.query.Table = "sl_page"
+	q.query.Proj = pageAttrs
+	return q.scanPages(q.query.Execute())
 }
 
-func (q *Query) addAttr(key string, val interface{}) {
-	if q.attrCount > 1 {
-		q.sel.WriteString(" and ")
+func (q *Query) scanPages(data *sql.Rows, err error) ([]*page.Page, error) {
+	if err != nil {
+		return nil, err
 	}
-	q.sel.WriteString(key + "=$" + strconv.Itoa(q.attrCount))
-	q.selAttrs = append(q.selAttrs, val)
-	q.attrCount++
-}
-
-func (q *Query) build() string {
-	return "select " + q.proj + " from " + q.table + " where " + q.sel.String()
+	pages := []*page.Page{}
+	defer data.Close()
+	for data.Next() {
+		p := page.New()
+		if err = data.Scan(&p.ID, &p.Title, &p.Content, &p.Domain.ID, &p.URL,
+			&p.Status, &p.Owner, &p.CDate, &p.EDate); err != nil {
+			return nil, err
+		}
+		pages = append(pages, p)
+	}
+	return pages, nil
 }
 
 // Get starts building the query that gets sent to the database.
 //
 // TODO: describe how queries should be built using method chaining.
 func Get() *Query {
-	return &Query{attrCount: 1, table: "sl_page", proj: pageAttrs}
+	return &Query{query: &psqldb.Query{}}
 }

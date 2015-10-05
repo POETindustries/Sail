@@ -15,7 +15,7 @@ import (
 // object at the first position of the returned slice.
 func BuildWithID(ids ...uint32) []*domain.Domain {
 	domains, err := fetchByID(ids...)
-	if err != nil {
+	if len(domains) == 0 || err != nil {
 		errors.Log(err, conf.Instance().DevMode)
 		return []*domain.Domain{domain.New()}
 	}
