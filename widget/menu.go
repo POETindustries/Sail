@@ -1,24 +1,10 @@
 package widget
 
-import (
-	"bytes"
-	"fmt"
-)
+import "fmt"
 
 // Menu implements WidgetData. It ordered, clickable elements.
 type Menu struct {
 	Entries []*MenuEntry
-}
-
-// Markup returns the markup string for this widget data type. Do not
-// call this directly from template files!
-func (m *Menu) Markup(htmlTagID string) string {
-	mk := bytes.NewBufferString("<nav class='menu' id='" + htmlTagID + "'>")
-	for _, e := range m.Entries {
-		mk.WriteString("<a href='" + e.RefURL + "'>" + e.Name + "</a>")
-	}
-	mk.WriteString("</nav>")
-	return mk.String()
 }
 
 // String prints the menu's data in an easily readable format.
@@ -29,17 +15,17 @@ func (m *Menu) String() string {
 
 // MenuEntry contains all information about a specific menu entry.
 type MenuEntry struct {
-	ID       uint32
-	Name     string
-	RefID    uint32
-	RefURL   string
-	Submenu  uint32
-	Pos      uint16
-	IsActive bool
+	ID      uint32
+	Name    string
+	Image   string
+	RefID   uint32
+	RefURL  string
+	Submenu uint32
+	Pos     uint16
 }
 
 // String prints the entry's data in an easily readable format.
 func (e *MenuEntry) String() string {
-	str := "ENTRY '%s': {ID:%d | RefID:%d | RefURL:%s | Pos:%d}"
-	return fmt.Sprintf(str, e.Name, e.ID, e.RefID, e.RefURL, e.Pos)
+	str := "ENTRY '%s': {ID:%d | Image:%s | RefID:%d | RefURL:%s | Pos:%d}"
+	return fmt.Sprintf(str, e.Name, e.ID, e.Image, e.RefID, e.RefURL, e.Pos)
 }

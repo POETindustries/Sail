@@ -2,6 +2,7 @@ package pagestore
 
 import (
 	"database/sql"
+	"html/template"
 	"sail/page"
 	"sail/storage/psqldb"
 )
@@ -50,11 +51,13 @@ func (q *Query) scanPages(data *sql.Rows, err error) ([]*page.Page, error) {
 	pages := []*page.Page{}
 	defer data.Close()
 	for data.Next() {
+		var c string
 		p := page.New()
-		if err = data.Scan(&p.ID, &p.Title, &p.Content, &p.Domain.ID, &p.URL,
+		if err = data.Scan(&p.ID, &p.Title, &c, &p.Domain.ID, &p.URL,
 			&p.Status, &p.Owner, &p.CDate, &p.EDate); err != nil {
 			return nil, err
 		}
+		p.Content = template.HTML(c)
 		pages = append(pages, p)
 	}
 	return pages, nil

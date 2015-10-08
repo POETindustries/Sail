@@ -3,6 +3,7 @@ package widgetstore
 import (
 	"database/sql"
 	"fmt"
+	"html/template"
 	"sail/storage/psqldb"
 	"sail/widget"
 )
@@ -97,9 +98,11 @@ func (q *Query) scanTextField(data *sql.Rows, err error) (*widget.Text, error) {
 	text := widget.Text{}
 	defer data.Close()
 	for data.Next() {
-		if err = data.Scan(&text.Content); err != nil {
+		var c template.HTML
+		if err = data.Scan(&c); err != nil {
 			return nil, err
 		}
+		text.Content = template.HTML(c)
 	}
 	return &text, nil
 }

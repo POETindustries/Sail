@@ -5,34 +5,37 @@ import (
 	"html/template"
 )
 
-// Data is the interface that all types must implement if they
-// are to be used for holding Widget's data.
-type Data interface {
-	Markup(htmlTagID string) string
-}
-
 // Widget holds all information to determine its type and function.
 type Widget struct {
 	ID      uint32
 	Name    string
 	RefName string
 	Type    string
-	Data    Data
+	Data    interface{}
 }
 
-// Markup returns the widget's data in a form fit for display inside
-// an html document.
-//
-// DO NOT EVER try to call the widget data's markup() method directly!
-// That method's return string is not suited for display inside an
-// html document and Bad Things Will Happen®. Always use this, the
-// widget's own Markup() method when the result is used for embedding
-// in html code.
-func (w *Widget) Markup() template.HTML {
-	if w.Data == nil {
-		return template.HTML("")
+// Menu returns the widget's data object cast to menu, if possible.
+// It is guaranteed to return an object of the correct type; if the
+// casting fails, an empty object is returned with all necessary
+// components minimally initialized.
+func (w *Widget) Menu() *Menu {
+	m, ok := w.Data.(*Menu)
+	if ok {
+		return m
 	}
-	return template.HTML(w.Data.Markup(w.RefName))
+	return &Menu{Entries: []*MenuEntry{}}
+}
+
+// Text returns the widget's data object cast to a text field, if
+// possible. It is guaranteed to return an object of the correct type;
+// if the casting fails, an empty object is returned with all
+// necessary components minimally initialized.
+func (w *Widget) Text() *Text {
+	t, ok := w.Data.(*Text)
+	if ok {
+		return t
+	}
+	return &Text{Content: template.HTML("")}
 }
 
 // String prints the widget's data in an easily readable format.
