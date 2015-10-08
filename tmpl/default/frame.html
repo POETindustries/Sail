@@ -1,26 +1,26 @@
-<!doctype html>
-
-<html>
 
 <head>
 	<title>{{.Title}}</title>
 	<meta charset="utf-8">
-	<meta name="title" content="{{.Meta.Title}}">
-	<meta name="keywords" content="{{.Meta.Keywords}}">
-	<meta name="description" content="{{.Meta.Description}}">
-	<meta name="language" content="{{.Meta.Language}}">
-	<meta name="page-topic" content="{{.Meta.PageTopic}}">
-	<meta name="revisit-after" content="{{.Meta.RevisitAfter}}">
-	<meta name="robots" content="{{.Meta.Robots}}">
-	<link rel="stylesheet" type="text/css" href="/theme/404.css"/>
+	<meta name="title" content="{{.Domain.Meta.Title}}">
+	<meta name="keywords" content="{{.Domain.Meta.Keywords}}">
+	<meta name="description" content="{{.Domain.Meta.Description}}">
+	<meta name="language" content="{{.Domain.Meta.Language}}">
+	<meta name="page-topic" content="{{.Domain.Meta.PageTopic}}">
+	<meta name="revisit-after" content="{{.Domain.Meta.RevisitAfter}}">
+	<meta name="robots" content="{{.Domain.Meta.Robots}}">
+	<link rel="stylesheet" type="text/css" href="/theme/default/style.css"/>
+	<script src="/js/default/site.js"></script>
 </head>
 
 <body>
-	{{template "menu_default" .}}
-    <p>hi, this is the default frame speaking</p>
-	<img src="/img/gopher.png"/>
-	{{template "content" .}}
-	{{template "menualt" .}}
-
+	<div id="header">
+		{{template "header" .}}
+	</div>
+    <div id="main_area">
+		{{template "content" .}}
+	</div>
+	<div id="footer">
+		{{template "footer" .Domain.Template.Widget "footer_text"}}
+	</div>
 </body>
-</html>

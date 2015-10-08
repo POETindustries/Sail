@@ -1,20 +1,10 @@
-{{define "menu_default"}}
-<a href="#"><span>First Item</span></a>
-<a href="#"><span>Second Item</span></a>
-<a href="#"><span>Third Item</span></a>
-<a href="#"><span>Fourth Item</span></a>
-{{end}}
-
-{{define "menualt"}}
-<a href="#"><span>Erster Punkt</span></a>
-<a href="#"><span>Zweiter Punkt</span></a>
-<a href="#"><span>Dritter Punkt</span></a>
-<a href="#"><span>Vierter Punkt</span></a>
-{{end}}
-
-{{define "menu_alt2"}}
-<a href="#"><span>Nuff</span></a>
-<a href="#"><span>Said</span></a>
-<a href="#"><span>Said</span></a>
-<a href="#"><span>Nuff</span></a>
-{{end}}
+    {{define "menu_main"}}
+        <nav id="{{.RefName}}">
+            {{range .Menu.Entries}}
+            <a href="{{.RefURL}}">
+                <img src="{{.Image}}" alt=""/>{{.Name}}
+            </a>
+            {{end}}
+        </nav>
+        <script src="/js/default/main_menu.js"></script>
+    {{end}}
