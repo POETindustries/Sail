@@ -23,7 +23,7 @@ func main() {
 		storage.ExecCreateInstructs()
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
-		http.Handle("/img/", http.FileServer(http.Dir(config.Cwd)))
+		http.Handle("/files/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/theme/", http.FileServer(http.Dir(config.Cwd)))
 
