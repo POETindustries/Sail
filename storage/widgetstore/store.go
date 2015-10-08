@@ -98,7 +98,7 @@ func (q *Query) scanTextField(data *sql.Rows, err error) (*widget.Text, error) {
 	text := widget.Text{}
 	defer data.Close()
 	for data.Next() {
-		var c template.HTML
+		var c string
 		if err = data.Scan(&c); err != nil {
 			return nil, err
 		}
