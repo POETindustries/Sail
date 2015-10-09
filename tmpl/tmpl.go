@@ -16,12 +16,14 @@ import (
 // happen, and this markup at least tells the user as much. The markup is as
 // generic as possible while still being somewhat good looking.
 const NOTFOUND404 = `
+<!doctype html>
+<html>
 	<head><title>Sorry About That</title><meta charset="utf-8"></head>
 	<body style="background:black;text-align:center;color:white;padding:72px;font-size:1.5em;">
 		<p style="font-size:2em;">Sorry About That!</p>
 		<p>PAGE NOT FOUND</p>
 	</body>
-`
+</html>`
 
 // Template is the data structure that contains all data necessary
 // to render the template files and all widgets contained within.
@@ -30,7 +32,7 @@ type Template struct {
 	Name      string
 	WidgetIDs []uint32
 	template  *template.Template
-	widgets   map[string]*widget.Widget
+	Widgets   map[string]*widget.Widget
 }
 
 // Execute applies a parsed template to the specified data object,
@@ -62,31 +64,15 @@ func (t *Template) Compile() {
 	}
 }
 
-// Widget returns a pointer to the widget designated by the name
-// parameter. If no such widget exists,
-func (t *Template) Widget(name string) (w *widget.Widget) {
-	if w = t.widgets[name]; w == nil {
-		return widget.New()
-	}
-	return
-}
-
-// AddWidget adds the widget w to the template's internal collection
-// of widgets. If the widget or a widget with the same name already
-// exists, it is overwritten.
-func (t *Template) AddWidget(w *widget.Widget) {
-	t.widgets[w.RefName] = w
-}
-
 // String prints the template's data in an easily readable format.
 func (t *Template) String() string {
 	str := "TEMPLATE '%s': {ID:%d | WidgetIDs:%+v | Template:%+v | Widgets:%+v}"
-	return fmt.Sprintf(str, t.Name, t.ID, t.WidgetIDs, t.template, t.widgets)
+	return fmt.Sprintf(str, t.Name, t.ID, t.WidgetIDs, t.template, t.Widgets)
 }
 
 // New creates a new Template object
 func New() *Template {
 	return &Template{
 		Name:    "404",
-		widgets: make(map[string]*widget.Widget)}
+		Widgets: make(map[string]*widget.Widget)}
 }

@@ -1,45 +1,22 @@
 package pages
 
 import (
-	"io"
-	"sail/domains"
+	"bytes"
 	"sail/page"
 	"sail/storage/pagestore"
+	"sail/tmpl"
 )
 
-// BuildWithURL expects a valid request uri in order to compile the
-// corresponding page data.
-//
-// It is guaranteed to retun a functioning Page object even if the
-// url parameter does not lead to any data.
-func BuildWithURL(url string) *page.Page {
-	var pages []*page.Page
-	var err error
-	if len(url) <= 1 {
-		pages, err = fetchByID(1)
-		if len(pages) == 0 || err != nil {
-			return load404()
-		}
-	} else {
-		pages, err = fetchByURL(url)
-		if len(pages) == 0 || err != nil {
-			pages, err = fetchByID(1)
-			if len(pages) == 0 || err != nil {
-				return load404()
-			}
-		}
-	}
-	pages[0].Domain = domains.BuildWithID(pages[0].Domain.ID)[0]
-	return pages[0]
-}
-
 // Serve renders the page p and writes the result to the writer wr.
-//
 // If anything goes wrong, a non-nil error will be returned. In that
 // case, it is the caller's responsibility to correct the contents of
 // wr, which may have been partially written into.
-func Serve(p *page.Page, wr io.Writer) error {
-	return p.Domain.Template.Execute(wr, p)
+func Serve(p *Presenter) *bytes.Buffer {
+	if p.compile() != nil {
+		markup := tmpl.NOTFOUND404
+		return bytes.NewBufferString(markup)
+	}
+	return p.markup
 }
 
 func fetchByURL(urls ...string) ([]*page.Page, error) {

@@ -1,9 +1,6 @@
 package page
 
-import (
-	"html/template"
-	"sail/domain"
-)
+import "sail/domain"
 
 // Page contains the information needed to generate a web page for display.
 // This is the basic struct that contains all information needed to generate
@@ -14,7 +11,7 @@ type Page struct {
 	ID      uint32
 	Title   string
 	URL     string
-	Content template.HTML
+	Content string
 	Domain  *domain.Domain
 
 	Status int8

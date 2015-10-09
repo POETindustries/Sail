@@ -1,21 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"net/http"
 	"sail/conf"
 	"sail/pages"
 	"sail/storage"
 	"sail/storage/psqldb"
-	"sail/tmpl"
 	"time"
 )
-
-const docStart = "<!doctype html>"
-const htmlOpen = "<html>"
-const htmlClose = "</html>"
 
 func main() {
 	config := conf.Instance()
@@ -33,14 +26,11 @@ func main() {
 
 func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	t1 := time.Now().Nanosecond()
-	b := bytes.NewBufferString(docStart + htmlOpen)
-	p := pages.BuildWithURL(req.URL.RequestURI())
-	if psqldb.Instance().Verify() && pages.Serve(p, b) == nil {
-		b.WriteString(htmlClose)
-		b.WriteTo(writer)
-	} else {
-		io.WriteString(writer, docStart+htmlOpen+tmpl.NOTFOUND404+htmlClose)
+
+	if psqldb.Instance().Verify() {
+		pages.Serve(pages.NewWithURL(req.URL.RequestURI())).WriteTo(writer)
 	}
+
 	t2 := time.Now().Nanosecond()
 	fmt.Printf("Time to serve page: %d\n", t2-t1)
 }

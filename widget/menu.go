@@ -2,7 +2,7 @@ package widget
 
 import "fmt"
 
-// Menu implements WidgetData. It ordered, clickable elements.
+// Menu contains ordered, clickable elements.
 type Menu struct {
 	Entries []*MenuEntry
 }
