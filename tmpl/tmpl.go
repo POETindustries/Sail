@@ -55,7 +55,7 @@ func (t *Template) Compile() {
 		t.template, _ = template.New("frame").Parse(NOTFOUND404)
 	} else {
 		dir := conf.Instance().TmplDir + t.Name
-		tpl, err := template.ParseGlob(dir + "/*.html")
+		tpl, err := template.New("").Funcs(funcMap).ParseGlob(dir + "/*.html")
 		if err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 			tpl, _ = template.New("frame").Parse(NOTFOUND404)
