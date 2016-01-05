@@ -28,7 +28,9 @@ func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	t1 := time.Now().Nanosecond()
 
 	if psqldb.Instance().Verify() {
-		pages.Serve(req.URL.RequestURI()).WriteTo(writer)
+		uri := req.URL.Path
+		_ = req.URL.Query() // TODO needs to be handled somewhere
+		pages.Serve(uri).WriteTo(writer)
 	}
 
 	t2 := time.Now().Nanosecond()

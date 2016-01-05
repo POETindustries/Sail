@@ -23,14 +23,14 @@ func BuildWithID(ids ...uint32) []*domain.Domain {
 	}
 	for _, d := range domains {
 		d.Template = templates.BuildWithID(d.Template.ID)[0]
-		cache.Domains[d.ID] = d
+		cache.Instance().PushDomain(d)
 		fmt.Printf("domain added to cache: %d\n", d.ID)
 	}
 	return domains
 }
 
 func FromCache(id uint32) *domain.Domain {
-	if domain, ok := cache.Domains[id].(*domain.Domain); ok {
+	if domain := cache.Instance().Domain(id); domain != nil {
 		fmt.Printf("found domain in cache: %d\n", id)
 		return domain
 	}

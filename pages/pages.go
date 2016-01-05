@@ -13,16 +13,15 @@ import (
 // case, it is the caller's responsibility to correct the contents of
 // wr, which may have been partially written into.
 func Serve(url string) *bytes.Buffer {
-	markup, ok := cache.Markup[url].([]byte)
-	if !ok {
-		if presenter := NewFromCache(url); presenter.compile() == nil {
-			cache.Markup[url] = presenter.markup.Bytes()
-			return presenter.markup
-		}
-		notFound := tmpl.NOTFOUND404
-		return bytes.NewBufferString(notFound)
+	if markup := cache.Instance().Markup(url); markup != nil {
+		return bytes.NewBuffer(markup)
 	}
-	return bytes.NewBuffer(markup)
+	if presenter := NewFromCache(url); presenter.compile() == nil {
+		cache.Instance().PushMarkup(url, presenter.markup.Bytes())
+		return presenter.markup
+	}
+	notFound := tmpl.NOTFOUND404
+	return bytes.NewBufferString(notFound)
 }
 
 func fetchByURL(urls ...string) ([]*page.Page, error) {

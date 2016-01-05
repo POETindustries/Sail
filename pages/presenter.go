@@ -116,8 +116,7 @@ func New() *Presenter {
 }
 
 func NewFromCache(url string) *Presenter {
-	page, ok := cache.Pages[url].(*page.Page)
-	if ok {
+	if page := cache.Instance().Page(url); page != nil {
 		fmt.Printf("page found in cache: %d\n", page.ID)
 		return &Presenter{page: page, markup: bytes.NewBufferString("")}
 	}
@@ -139,7 +138,7 @@ func NewWithURL(url string) *Presenter {
 	}
 	pages[0].Domain = domains.FromCache(pages[0].Domain.ID)
 	presenter.page = pages[0]
-	cache.Pages[url] = pages[0]
+	cache.Instance().PushPage(pages[0])
 	fmt.Printf("page added to cache: %d\n", pages[0].ID)
 	return presenter
 }
