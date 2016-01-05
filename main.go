@@ -19,7 +19,6 @@ func main() {
 		http.Handle("/files/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/theme/", http.FileServer(http.Dir(config.Cwd)))
-
 		http.ListenAndServe(":8080", nil)
 	}
 }
@@ -32,7 +31,7 @@ func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	t2 := time.Now().Nanosecond()
-	fmt.Printf("Time to serve page: %d\n", t2-t1)
+	fmt.Printf("Time to serve page: %d ms\n", (t2-t1)/1000000)
 }
 
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
