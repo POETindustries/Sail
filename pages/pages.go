@@ -2,6 +2,7 @@ package pages
 
 import (
 	"bytes"
+	"sail/cache"
 	"sail/page"
 	"sail/storage/pagestore"
 	"sail/tmpl"
@@ -11,12 +12,17 @@ import (
 // If anything goes wrong, a non-nil error will be returned. In that
 // case, it is the caller's responsibility to correct the contents of
 // wr, which may have been partially written into.
-func Serve(p *Presenter) *bytes.Buffer {
-	if p.compile() != nil {
-		markup := tmpl.NOTFOUND404
-		return bytes.NewBufferString(markup)
+func Serve(url string) *bytes.Buffer {
+	markup, ok := cache.Markup[url].([]byte)
+	if !ok {
+		if presenter := NewFromCache(url); presenter.compile() == nil {
+			cache.Markup[url] = presenter.markup.Bytes()
+			return presenter.markup
+		}
+		notFound := tmpl.NOTFOUND404
+		return bytes.NewBufferString(notFound)
 	}
-	return p.markup
+	return bytes.NewBuffer(markup)
 }
 
 func fetchByURL(urls ...string) ([]*page.Page, error) {

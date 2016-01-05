@@ -24,7 +24,7 @@ func BuildWithID(ids ...uint32) []*domain.Domain {
 	for _, d := range domains {
 		d.Template = templates.BuildWithID(d.Template.ID)[0]
 		cache.Domains[d.ID] = d
-		fmt.Printf("domain added to cache: %d", d.ID)
+		fmt.Printf("domain added to cache: %d\n", d.ID)
 	}
 	return domains
 }

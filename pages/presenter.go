@@ -91,10 +91,7 @@ func (p *Presenter) Menu(name string, isMain bool) *widget.Menu {
 	}
 	if isMain {
 		for _, e := range m.Entries {
-			if strings.HasPrefix(p.url, e.RefURL) {
-				e.Active = true
-				break
-			}
+			e.Active = strings.HasPrefix(p.url, e.RefURL)
 		}
 	}
 	return m
