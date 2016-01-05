@@ -22,10 +22,11 @@ type MenuEntry struct {
 	RefURL  string
 	Submenu uint32
 	Pos     uint16
+	Active  bool
 }
 
 // String prints the entry's data in an easily readable format.
 func (e *MenuEntry) String() string {
-	str := "ENTRY '%s': {ID:%d | Image:%s | RefID:%d | RefURL:%s | Pos:%d}"
-	return fmt.Sprintf(str, e.Name, e.ID, e.Image, e.RefID, e.RefURL, e.Pos)
+	str := "ENTRY '%s': {ID:%d | Image:%s | RefID:%d | RefURL:%s | Pos:%d | Active:%t}"
+	return fmt.Sprintf(str, e.Name, e.ID, e.Image, e.RefID, e.RefURL, e.Pos, e.Active)
 }

@@ -6,6 +6,7 @@ import (
 	"sail/domains"
 	"sail/page"
 	"sail/widget"
+	"strings"
 )
 
 // Presenter initiates page creation and loading for handling requests
@@ -13,6 +14,7 @@ import (
 type Presenter struct {
 	page   *page.Page
 	markup *bytes.Buffer
+	url    string
 }
 
 func (p *Presenter) compile() error {
@@ -79,13 +81,21 @@ func (p *Presenter) Widget(name string) (w *widget.Widget) {
 // It is guaranteed to return an object of the correct type; if the
 // desired object does not exist, an empty object is returned with
 // all necessary components minimally initialized.
-func (p *Presenter) Menu(name string) *widget.Menu {
+func (p *Presenter) Menu(name string, isMain bool) *widget.Menu {
 	w := p.Widget(name)
 	m, ok := w.Data.(*widget.Menu)
-	if ok {
-		return m
+	if !ok {
+		return &widget.Menu{Entries: []*widget.MenuEntry{}}
 	}
-	return &widget.Menu{Entries: []*widget.MenuEntry{}}
+	if isMain {
+		for _, e := range m.Entries {
+			if strings.HasPrefix(p.url, e.RefURL) {
+				e.Active = true
+				break
+			}
+		}
+	}
+	return m
 }
 
 // TextWidget returns the text of the text widget identified by the
@@ -114,6 +124,7 @@ func NewWithURL(url string) *Presenter {
 		return NewWithID(1)
 	}
 	presenter := New()
+	presenter.url = url
 	pages, err := fetchByURL(url)
 	if len(pages) == 0 || err != nil {
 		return NewWithID(1)
