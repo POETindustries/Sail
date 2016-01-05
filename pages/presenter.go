@@ -2,7 +2,9 @@ package pages
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
+	"sail/cache"
 	"sail/domains"
 	"sail/page"
 	"sail/widget"
@@ -116,6 +118,15 @@ func New() *Presenter {
 	return &Presenter{page: page.New(), markup: bytes.NewBufferString("")}
 }
 
+func NewFromCache(url string) *Presenter {
+	page, ok := cache.Pages[url].(*page.Page)
+	if ok {
+		fmt.Printf("page found in cache: %d\n", page.ID)
+		return &Presenter{page: page, markup: bytes.NewBufferString("")}
+	}
+	return NewWithURL(url)
+}
+
 // NewWithURL expects a valid request uri in order to compile the
 // corresponding page data. It is guaranteed to retun a functioning
 // presenter object even if the url parameter does not lead to any data.
@@ -129,8 +140,10 @@ func NewWithURL(url string) *Presenter {
 	if len(pages) == 0 || err != nil {
 		return NewWithID(1)
 	}
-	pages[0].Domain = domains.BuildWithID(pages[0].Domain.ID)[0]
+	pages[0].Domain = domains.FromCache(pages[0].Domain.ID)
 	presenter.page = pages[0]
+	cache.Pages[url] = pages[0]
+	fmt.Printf("page added to cache: %d\n", pages[0].ID)
 	return presenter
 }
 

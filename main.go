@@ -27,11 +27,12 @@ func frontendHandler(writer http.ResponseWriter, req *http.Request) {
 	t1 := time.Now().Nanosecond()
 
 	if psqldb.Instance().Verify() {
-		pages.Serve(pages.NewWithURL(req.URL.RequestURI())).WriteTo(writer)
+		//pages.Serve(pages.NewWithURL(req.URL.RequestURI())).WriteTo(writer)
+		pages.Serve(pages.NewFromCache(req.URL.RequestURI())).WriteTo(writer)
 	}
 
 	t2 := time.Now().Nanosecond()
-	fmt.Printf("Time to serve page: %d ms\n", (t2-t1)/1000000)
+	fmt.Printf("Time to serve page: %d microseconds\n", (t2-t1)/1000)
 }
 
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
