@@ -1,6 +1,8 @@
 package domains
 
 import (
+	"fmt"
+	"sail/cache"
 	"sail/conf"
 	"sail/domain"
 	"sail/errors"
@@ -21,8 +23,18 @@ func BuildWithID(ids ...uint32) []*domain.Domain {
 	}
 	for _, d := range domains {
 		d.Template = templates.BuildWithID(d.Template.ID)[0]
+		cache.Instance().PushDomain(d)
+		fmt.Printf("domain added to cache: %d\n", d.ID)
 	}
 	return domains
+}
+
+func FromCache(id uint32) *domain.Domain {
+	if domain := cache.Instance().Domain(id); domain != nil {
+		fmt.Printf("found domain in cache: %d\n", id)
+		return domain
+	}
+	return BuildWithID(id)[0]
 }
 
 func fetchByID(ids ...uint32) ([]*domain.Domain, error) {
