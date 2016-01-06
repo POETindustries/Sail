@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sail/backend"
 	"sail/conf"
 	"sail/pages"
 	"sail/storage"
@@ -42,5 +43,11 @@ func iconHandler(writer http.ResponseWriter, req *http.Request) {
 }
 
 func backendHandler(writer http.ResponseWriter, req *http.Request) {
-	// TODO check for session cookie, show login page if not present
+	if psqldb.Instance().Verify() {
+		data, cookie := backend.LoginPage(req)
+		if cookie != nil {
+			http.SetCookie(writer, cookie)
+		}
+		data.WriteTo(writer)
+	}
 }
