@@ -12,15 +12,25 @@ import (
 )
 
 // Presenter initiates page creation and loading for handling requests
-// by users from the www.
+// by users from the www. It also serves as the content provider for
+// templates.
+//
+// All exported functions and fields that return strings and
+// string-derived types are safe for use inside a template. All exported
+// functions and fields of type bool are safe for use as conditions
+// inside templates.
 type Presenter struct {
+	HasMessage bool
+	Message    string
+
 	page   *page.Page
 	markup *bytes.Buffer
 	url    string
 }
 
-func (p *Presenter) compile() error {
-	return p.page.Domain.Template.Execute(p.markup, p)
+func (p *Presenter) Compile() (*bytes.Buffer, error) {
+	err := p.page.Domain.Template.Execute(p.markup, p)
+	return p.markup, err
 }
 
 // PageTitle returns the title of the currently held page object.

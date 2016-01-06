@@ -16,12 +16,12 @@ func Serve(url string) *bytes.Buffer {
 	if markup := cache.Instance().Markup(url); markup != nil {
 		return bytes.NewBuffer(markup)
 	}
-	if presenter := NewFromCache(url); presenter.compile() == nil {
-		cache.Instance().PushMarkup(url, presenter.markup.Bytes())
-		return presenter.markup
+	presenter := NewFromCache(url)
+	if markup, err := presenter.Compile(); err == nil {
+		cache.Instance().PushMarkup(url, markup.Bytes())
+		return markup
 	}
-	notFound := tmpl.NOTFOUND404
-	return bytes.NewBufferString(notFound)
+	return bytes.NewBufferString(tmpl.NOTFOUND404)
 }
 
 func fetchByURL(urls ...string) ([]*page.Page, error) {
