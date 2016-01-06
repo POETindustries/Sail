@@ -44,9 +44,8 @@ func (q *Query) AddAttr(key string, val interface{}, op string) {
 // and queries the database.
 func (q *Query) Execute() (*sql.Rows, error) {
 	if q.sel.Len() < 1 {
-		return nil, errors.NoArguments()
+		return nil, errors.NoArguments("psqldb.Query.Execute()")
 	}
-	//fmt.Printf("\n"+q.build()+" %+v\n", q.selAttrs)
 	return Instance().DB.Query(q.build(), q.selAttrs...)
 }
 

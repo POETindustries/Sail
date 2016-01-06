@@ -38,7 +38,8 @@ const initPage = `do $$ begin
     then insert into sl_page
     (` + pageTitle + `,` + pageContent + `,` + pageURL + `)
     values
-    ('Home', 'Welcome to Sail', '/home');
+    ('Home', 'Welcome to Sail', '/home'),
+	('Login', 'Sail Backend Login', '/office');
     end if;
 	end $$`
 

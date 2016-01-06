@@ -49,7 +49,17 @@ const initDomain = `do $$ begin
     'cms',
     '1 month',
     'index, follow',
-    1);
+    1),(
+	2,
+	'default-backend',
+	'Sail Backend',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'noindex, nofollow',
+	2);
     end if;
 	end $$`
 

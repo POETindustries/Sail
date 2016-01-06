@@ -25,8 +25,8 @@ func NoPermission() error {
 // NoArguments returns a general error that can be raised when
 // a function requires values to be set, but finds them empty or not
 // present at all.
-func NoArguments() error {
-	return errors.New("ERROR: No arguments passed")
+func NoArguments(what string) error {
+	return errors.New("ERROR: No arguments passed - " + what)
 }
 
 // NilPointer returns a general error that signifies an attempt to
