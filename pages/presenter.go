@@ -130,13 +130,13 @@ func NewFromCache(url string) *Presenter {
 		fmt.Printf("page found in cache: %d\n", page.ID)
 		return &Presenter{page: page, markup: bytes.NewBufferString("")}
 	}
-	return NewWithURL(url)
+	return NewWithURL(url, true)
 }
 
 // NewWithURL expects a valid request uri in order to compile the
 // corresponding page data. It is guaranteed to retun a functioning
 // presenter object even if the url parameter does not lead to any data.
-func NewWithURL(url string) *Presenter {
+func NewWithURL(url string, cacheEnabled bool) *Presenter {
 	if len(url) <= 1 {
 		return NewWithID(1)
 	}
@@ -148,8 +148,10 @@ func NewWithURL(url string) *Presenter {
 	}
 	pages[0].Domain = domains.FromCache(pages[0].Domain.ID)
 	presenter.page = pages[0]
-	cache.Instance().PushPage(pages[0])
-	fmt.Printf("page added to cache: %d\n", pages[0].ID)
+	if cacheEnabled {
+		cache.Instance().PushPage(pages[0])
+		fmt.Printf("page added to cache: %d\n", pages[0].ID)
+	}
 	return presenter
 }
 
@@ -162,8 +164,9 @@ func NewWithID(id uint32) *Presenter {
 	if len(pages) == 0 || err != nil {
 		presenter.page = load404()
 	} else {
-		pages[0].Domain = domains.BuildWithID(pages[0].Domain.ID)[0]
+		pages[0].Domain = domains.FromCache(pages[0].Domain.ID)
 		presenter.page = pages[0]
+		presenter.url = pages[0].URL
 	}
 	return presenter
 }
