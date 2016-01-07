@@ -17,7 +17,7 @@ func LoginPage(req *http.Request) (*bytes.Buffer, *http.Cookie) {
 	if ok, msg := loginConfirm(req); !ok {
 		return loginPage(msg), nil
 	}
-	s := session.New(req, "whutman")
+	s := session.New(req, req.PostFormValue("user"))
 	session.DBInstance().Add(s)
 	c := http.Cookie{Name: "session", Value: s.ID}
 
@@ -28,13 +28,14 @@ func loginConfirm(req *http.Request) (bool, string) {
 	user := req.PostFormValue("user")
 	pass := req.PostFormValue("pass")
 	if user != "" && pass != "" {
-		return true, ""
+		// if credentials correct return true, ""
+		return false, "Wrong Login Credentials!"
 	}
 	return false, ""
 }
 
 func loginPage(msg string) *bytes.Buffer {
-	presenter := pages.NewWithURL("/login")
+	presenter := pages.NewFromCache("/office")
 	if msg != "" {
 		presenter.Message = msg
 		presenter.HasMessage = true
