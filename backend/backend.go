@@ -6,6 +6,7 @@ import (
 	"sail/pages"
 	"sail/session"
 	"sail/tmpl"
+	"sail/users"
 )
 
 // LoginPage returns the login page, asking for user credentials
@@ -25,10 +26,12 @@ func LoginPage(req *http.Request) (*bytes.Buffer, *http.Cookie) {
 }
 
 func loginConfirm(req *http.Request) (bool, string) {
-	user := req.PostFormValue("user")
-	pass := req.PostFormValue("pass")
-	if user != "" && pass != "" {
-		// if credentials correct return true, ""
+	u := req.PostFormValue("user")
+	p := req.PostFormValue("pass")
+	if u != "" && p != "" {
+		if users.Verify(u, p) {
+			return true, ""
+		}
 		return false, "Wrong Login Credentials!"
 	}
 	return false, ""
