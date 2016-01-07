@@ -15,7 +15,7 @@ const initTemplate = `do $$ begin
     then insert into sl_template
     (` + templateName + `)
     values
-    ('default'),('default-backend');
+    ('default'),('default-backend'),('default-login');
     end if;
     end $$`
 

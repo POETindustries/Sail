@@ -59,7 +59,17 @@ const initDomain = `do $$ begin
 	'',
 	'',
 	'noindex, nofollow',
-	2);
+	2),(
+	3,
+	'default-login',
+	'Sail Backend Login',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'noindex, nofollow',
+	3);
     end if;
 	end $$`
 

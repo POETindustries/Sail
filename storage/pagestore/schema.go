@@ -45,7 +45,7 @@ const initPage = `do $$ begin
     (` + pageTitle + `,` + pageContent + `,` + pageURL + `,` + pageDomainID + `)
     values
     ('Home', 'Welcome to Sail', '/home', 1),
-	('Login', '` + contentLogin + `', '/office', 2);
+	('Login', '` + contentLogin + `', '/office', 3);
     end if;
 	end $$`
 
