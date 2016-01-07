@@ -22,6 +22,12 @@ const pageAttrs = pageID + "," +
 	pageCreationDate + "," +
 	pageEditDate
 
+const contentLogin = `<form id="login_form" action="/office/" method="POST">
+	<input type="text" placeholder="User Name" name="user">
+	<input type="password" placeholder="Password" name="pass">
+	<input type="submit" value="Submit" id="submit">
+</form>`
+
 const createPage = `create table if not exists sl_page(
     ` + pageID + ` serial primary key not null,
     ` + pageTitle + ` varchar(63) not null,
@@ -36,10 +42,10 @@ const createPage = `create table if not exists sl_page(
 const initPage = `do $$ begin
 	if not exists (select ` + pageID + ` from sl_page)
     then insert into sl_page
-    (` + pageTitle + `,` + pageContent + `,` + pageURL + `)
+    (` + pageTitle + `,` + pageContent + `,` + pageURL + `,` + pageDomainID + `)
     values
-    ('Home', 'Welcome to Sail', '/home'),
-	('Login', 'Sail Backend Login', '/office');
+    ('Home', 'Welcome to Sail', '/home', 1),
+	('Login', '` + contentLogin + `', '/office', 2);
     end if;
 	end $$`
 
