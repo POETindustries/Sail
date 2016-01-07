@@ -3,10 +3,11 @@ package storage
 import (
 	"sail/conf"
 	"sail/errors"
-	"sail/storage/psqldb"
 	"sail/storage/domainstore"
 	"sail/storage/pagestore"
+	"sail/storage/psqldb"
 	"sail/storage/templatestore"
+	"sail/storage/userstore"
 	"sail/storage/widgetstore"
 )
 
@@ -14,7 +15,8 @@ var createInstructs = [][]string{
 	widgetstore.CreateInstructs,
 	templatestore.CreateInstructs,
 	domainstore.CreateInstructs,
-	pagestore.CreateInstructs}
+	pagestore.CreateInstructs,
+	userstore.CreateInstructs}
 
 // ExecCreateInstructs takes care of first-time setup of the datastore.
 func ExecCreateInstructs() (err error) {
