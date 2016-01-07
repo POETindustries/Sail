@@ -18,7 +18,7 @@ func Serve(url string) *bytes.Buffer {
 	}
 	presenter := NewFromCache(url)
 	if markup, err := presenter.Compile(); err == nil {
-		cache.Instance().PushMarkup(url, markup.Bytes())
+		cache.Instance().PushMarkup(presenter.url, markup.Bytes())
 		return markup
 	}
 	return bytes.NewBufferString(tmpl.NOTFOUND404)
