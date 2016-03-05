@@ -14,6 +14,7 @@ type Session struct {
 	ID   string
 	User string
 	Lang string
+	Time time.Time
 }
 
 func New(req *http.Request, user string) (s *Session) {

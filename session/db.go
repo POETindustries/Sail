@@ -1,5 +1,7 @@
 package session
 
+import "time"
+
 type Database struct {
 	sessions map[string]*Session
 }
@@ -9,7 +11,6 @@ var instance *Database
 func new() *Database {
 	db := Database{}
 	db.sessions = make(map[string]*Session)
-
 	return &db
 }
 
@@ -41,5 +42,20 @@ func (db *Database) Lang(id string) string {
 }
 
 func (db *Database) Has(id string) bool {
-	return DB().sessions[id] != nil
+	return db.sessions[id] != nil
+}
+
+func (db *Database) Start(id string) {
+	db.sessions[id].Time = time.Now()
+}
+
+// Clean removes all expired sessions.
+func (db *Database) Clean() {
+	// TODO: expiration time is hardcoded to 6 hours.
+	// This needs to be a config setting in the future.
+	for _, s := range db.sessions {
+		if time.Since(s.Time).Hours() > 6 {
+			db.Remove(s.ID)
+		}
+	}
 }

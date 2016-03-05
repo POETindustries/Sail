@@ -16,6 +16,7 @@ import (
 func LoginPage(req *http.Request) (*bytes.Buffer, *http.Cookie) {
 	cookie, _ := req.Cookie("session")
 	if cookie != nil && session.DB().Has(cookie.Value) {
+		session.DB().Start(cookie.Value)
 		return bytes.NewBufferString("All well, session found"), nil
 	}
 	if ok, msg := loginConfirm(req); !ok {
