@@ -37,7 +37,7 @@ const initUser = `do $$ begin
         values(
         1,
         'admin',
-        '$2a$08$F6i8O9iv0H8jP4HqU/FJN.FFOU4JTRF9lDOwFAedYgQKL0m8.3vWG',
+		'$2a$08$g312eq5uYaPXoixBVkOI4OC2Su1sgS2GOhOuNPJqMBrn1j/99vKe2',
         '',
         '',
         'admin@sail.example.com',

@@ -9,17 +9,20 @@ import (
 	"sail/users"
 )
 
-// LoginPage returns the login page, asking for user credentials
+// LoginPage returns the login page, asking for user credentials.
+//
+// On a fresh installation, the root user is 'admin' and the password
+// is 'password'. Leave it like this at your own peril.
 func LoginPage(req *http.Request) (*bytes.Buffer, *http.Cookie) {
 	cookie, _ := req.Cookie("session")
-	if cookie != nil && session.DBInstance().Has(cookie.Value) {
+	if cookie != nil && session.DB().Has(cookie.Value) {
 		return bytes.NewBufferString("All well, session found"), nil
 	}
 	if ok, msg := loginConfirm(req); !ok {
 		return loginPage(msg), nil
 	}
 	s := session.New(req, req.PostFormValue("user"))
-	session.DBInstance().Add(s)
+	session.DB().Add(s)
 	c := http.Cookie{Name: "session", Value: s.ID}
 
 	return bytes.NewBufferString("All well, session created"), &c
@@ -32,7 +35,7 @@ func loginConfirm(req *http.Request) (bool, string) {
 		if users.Verify(u, p) {
 			return true, ""
 		}
-		return false, "Wrong Login Credentials!"
+		return false, "Wrong login credentials!"
 	}
 	return false, ""
 }

@@ -1,45 +1,45 @@
 package session
 
-type DB struct {
+type Database struct {
 	sessions map[string]*Session
 }
 
-var instance *DB
+var instance *Database
 
-func new() *DB {
-	db := DB{}
+func new() *Database {
+	db := Database{}
 	db.sessions = make(map[string]*Session)
 
 	return &db
 }
 
-func DBInstance() *DB {
+func DB() *Database {
 	if instance == nil {
 		instance = new()
 	}
 	return instance
 }
 
-func (db *DB) Add(session *Session) {
+func (db *Database) Add(session *Session) {
 	db.sessions[session.ID] = session
 }
 
-func (db *DB) Remove(id string) {
+func (db *Database) Remove(id string) {
 	delete(db.sessions, id)
 }
 
-func (db *DB) ID(id string) string {
+func (db *Database) ID(id string) string {
 	return db.sessions[id].ID
 }
 
-func (db *DB) User(id string) string {
+func (db *Database) User(id string) string {
 	return db.sessions[id].User
 }
 
-func (db *DB) Lang(id string) string {
+func (db *Database) Lang(id string) string {
 	return db.sessions[id].Lang
 }
 
-func (db *DB) Has(id string) bool {
-	return DBInstance().sessions[id] != nil
+func (db *Database) Has(id string) bool {
+	return DB().sessions[id] != nil
 }
