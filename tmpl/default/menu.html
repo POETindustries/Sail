@@ -1,10 +1,13 @@
     {{define "menu_main"}}
-        <nav id="{{.RefName}}">
-            {{range .Menu.Entries}}
-            <a href="{{.RefURL}}">
-                <img src="{{.Image}}" alt=""/>{{.Name}}
-            </a>
-            {{end}}
+        <input type="checkbox" id="menu_button"/>
+        <nav id="main_menu">
+            {{range .Entries}}<a href="{{.RefURL}}" class="main_menu_item" {{if .Active}}id="active_menu_entry"{{end}}>
+                <img src="{{.Image}}" alt=""/>
+                <span>{{.Name}}</span>
+            </a>{{end}}
         </nav>
-        <script src="/js/default/main_menu.js"></script>
+        <label for="menu_button" id="menu_button_label">
+            <img src="/theme/default/img/menu-open.png" alt="" id="mb_open"/>
+            <img src="/theme/default/img/menu-close.png" alt="" id="mb_close"/>
+        </label>
     {{end}}

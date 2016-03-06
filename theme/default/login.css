@@ -1,0 +1,50 @@
+#login_form {
+    width: 90%;
+    margin: 0 auto;
+}
+
+#login_form input {
+    display: block;
+    margin: 0.25em 0;
+    width: 100%;
+    padding: 0.4em 0.1em;
+    text-align: center;
+    border: 1px solid #d0d0d0;
+    font-size: 1.2em;
+}
+
+#login_form #submit {
+    color: white;
+    font-weight: bold;
+    background: #17d193;
+    border: none;
+    border-bottom: 2px solid #07a063;
+    padding: 1em 0.4em;
+}
+
+#login_form #submit:hover {
+    background: #07b073;
+    border-bottom: 2px solid #009053;
+}
+
+#login_form ~ #message {
+    margin-top: 1em;
+    color: #db5343;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/******************************************************************************
+ * Desktop Screens
+ ******************************************************************************/
+@media only screen and (min-width: 640px) {
+    #login_form input {
+        margin: 0.25em auto;
+        width: 20em;
+        font-size: 0.85em;
+    }
+
+    #login_form #submit {
+        padding: 0.4em 0.1em;
+    }
+}

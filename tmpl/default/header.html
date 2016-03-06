@@ -1,3 +1,5 @@
-	{{define "header"}}
-        {{template "menu_main" .Domain.Template.Widget "main_menu"}}
-    {{end}}
+{{define "header"}}
+    <div id="header">
+        {{template "menu_main" .Menu "main_menu" true}}    
+    </div>
+{{end}}

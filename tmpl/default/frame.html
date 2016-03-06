@@ -1,26 +1,27 @@
+<!doctype html>
+<html>
 
 <head>
-	<title>{{.Title}}</title>
+	<title>{{.PageTitle}}</title>
 	<meta charset="utf-8">
-	<meta name="title" content="{{.Domain.Meta.Title}}">
-	<meta name="keywords" content="{{.Domain.Meta.Keywords}}">
-	<meta name="description" content="{{.Domain.Meta.Description}}">
-	<meta name="language" content="{{.Domain.Meta.Language}}">
-	<meta name="page-topic" content="{{.Domain.Meta.PageTopic}}">
-	<meta name="revisit-after" content="{{.Domain.Meta.RevisitAfter}}">
-	<meta name="robots" content="{{.Domain.Meta.Robots}}">
-	<link rel="stylesheet" type="text/css" href="/theme/default/style.css"/>
+
+	<meta name="title" content="{{.MetaTitle}}">
+	<meta name="keywords" content="{{.MetaKeywords}}">
+	<meta name="description" content="{{.MetaDescription}}">
+	<meta name="language" content="{{.MetaLanguage}}">
+	<meta name="page-topic" content="{{.MetaPageTopic}}">
+	<meta name="revisit-after" content="{{.MetaRevisit}}">
+	<meta name="robots" content="{{.MetaRobots}}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 	<script src="/js/default/site.js"></script>
+	<link rel="stylesheet" href="/theme/default/style.css"/>
 </head>
 
 <body>
-	<div id="header">
-		{{template "header" .}}
-	</div>
-    <div id="main_area">
-		{{template "content" .}}
-	</div>
-	<div id="footer">
-		{{template "footer" .Domain.Template.Widget "footer_text"}}
-	</div>
+	{{template "header" .}}
+    {{template "content" .}}
+	{{template "footer" .}}
 </body>
+
+</html>

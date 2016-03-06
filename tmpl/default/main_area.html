@@ -1,6 +1,7 @@
-    {{define "content"}}
-        <div>
-            <h1>{{.Title}}</h1>
-            {{.Content}}
-        </div>
-    {{end}}
+{{define "content"}}
+    <div id="main_area">
+        <h1>{{.PageTitle}}</h1>
+        {{.PageContent}}        
+    	{{if .HasMessage}}<div id="message">{{.Message}}</div>{{end}}
+    </div>
+{{end}}
