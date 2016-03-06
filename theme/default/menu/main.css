@@ -27,7 +27,7 @@
     display: none;
 }
 
-#main_menu #active_menu_entry {
+#main_menu .active {
     color: #191c20;
 }
 
@@ -109,7 +109,7 @@
         text-align: center;
     }
 
-    #main_menu #active_menu_entry {
+    #main_menu .active {
         border-bottom: 1px solid #191c20;
     }
 }
