@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"sail/storage/psqldb"
+	"sail/storage/schema"
 	"sail/widget"
 )
 
@@ -15,7 +16,7 @@ type Query struct {
 // ByID prepares the query to select the widget that matches the given id.
 func (q *Query) ByID(ids ...uint32) *Query {
 	for _, id := range ids {
-		q.query.AddAttr(widgetID, id, psqldb.OpOr)
+		q.query.AddAttr(schema.WidgetID, id, psqldb.OpOr)
 	}
 	return q
 }
@@ -35,18 +36,19 @@ func (q *Query) Descending() *Query {
 // Widgets executes the query and returns all matching widget objects.
 func (q *Query) Widgets() ([]*widget.Widget, error) {
 	q.query.Table = "sl_widget"
-	q.query.Proj = widgetAttrs
+	q.query.Proj = schema.WidgetAttrs
 	return q.scanWidgets(q.query.Execute())
 }
 
 // Menu executes the query, collecting information for one menu widget.
 func (q *Query) Menu() (*widget.Menu, error) {
 	stmt := "sl_widget_menu join (select %s,%s from sl_page) as p on %s=%s"
-	q.query.Table = fmt.Sprintf(stmt, expPageID, expPageURL, expPageID, menuEntryReferenceID)
-	q.query.Proj = menuAttrs + "," + expPageURL
+	q.query.Table = fmt.Sprintf(stmt,
+		schema.PageID, schema.PageURL, schema.PageID, schema.MenuEntryRefID)
+	q.query.Proj = schema.MenuAttrs + "," + schema.PageURL
 
 	if o := q.query.Order(); o != "" {
-		q.query.SetOrderStmt("order by " + menuEntryPosition + o)
+		q.query.SetOrderStmt("order by " + schema.MenuEntryPosition + o)
 	}
 	return q.scanMenu(q.query.Execute())
 }
@@ -54,7 +56,7 @@ func (q *Query) Menu() (*widget.Menu, error) {
 // TextField executes the query, providing a text widget in return.
 func (q *Query) TextField() (*widget.Text, error) {
 	q.query.Table = "sl_widget_text"
-	q.query.Proj = textContent
+	q.query.Proj = schema.TextContent
 	return q.scanTextField(q.query.Execute())
 }
 

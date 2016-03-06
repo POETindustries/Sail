@@ -3,6 +3,7 @@ package userstore
 import (
 	"database/sql"
 	"sail/storage/psqldb"
+	"sail/storage/schema"
 	"sail/user"
 )
 
@@ -14,13 +15,13 @@ type Query struct {
 // ByID prepares the query to select the pages that matches the id(s).
 func (q *Query) ByID(ids ...uint32) *Query {
 	for _, id := range ids {
-		q.query.AddAttr(userID, id, psqldb.OpOr)
+		q.query.AddAttr(schema.UserID, id, psqldb.OpOr)
 	}
 	return q
 }
 
 func (q *Query) ByName(name string) *Query {
-	q.query.AddAttr(userName, name, psqldb.OpAnd)
+	q.query.AddAttr(schema.UserName, name, psqldb.OpAnd)
 	return q
 }
 
@@ -28,7 +29,7 @@ func (q *Query) ByName(name string) *Query {
 // user objects.
 func (q *Query) Users() ([]*user.User, error) {
 	q.query.Table = "sl_user"
-	q.query.Proj = userAttrs
+	q.query.Proj = schema.UserAttrs
 	return q.scanUsers(q.query.Execute())
 }
 

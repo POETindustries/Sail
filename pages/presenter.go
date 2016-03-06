@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"html/template"
 	"sail/cache"
-	"sail/domains"
 	"sail/page"
+	"sail/templates"
 	"sail/widget"
 	"strings"
 )
@@ -22,6 +22,7 @@ import (
 type Presenter struct {
 	HasMessage bool
 	Message    string
+	FallbackID uint32
 
 	page   *page.Page
 	markup *bytes.Buffer
@@ -29,7 +30,7 @@ type Presenter struct {
 }
 
 func (p *Presenter) Compile() (*bytes.Buffer, error) {
-	err := p.page.Domain.Template.Execute(p.markup, p)
+	err := p.page.Template.Execute(p.markup, p)
 	return p.markup, err
 }
 
@@ -54,36 +55,36 @@ func (p *Presenter) PageContent() template.HTML {
 
 // MetaTitle returns the page title for use in the html <meta> tag
 // within the <head> area.
-func (p *Presenter) MetaTitle() string { return p.page.Domain.Meta.Title }
+func (p *Presenter) MetaTitle() string { return p.page.Meta.Title }
 
 // MetaKeywords returns the keywords for use in the html <meta> tag
 // within the <head> area.
-func (p *Presenter) MetaKeywords() string { return p.page.Domain.Meta.Keywords }
+func (p *Presenter) MetaKeywords() string { return p.page.Meta.Keywords }
 
 // MetaDescription returns the page's description for use in the html
 // <meta> tag within the <head> area.
-func (p *Presenter) MetaDescription() string { return p.page.Domain.Meta.Description }
+func (p *Presenter) MetaDescription() string { return p.page.Meta.Description }
 
 // MetaLanguage returns the language value for use in the html <meta>
 // tag within the <head> area.
-func (p *Presenter) MetaLanguage() string { return p.page.Domain.Meta.Language }
+func (p *Presenter) MetaLanguage() string { return p.page.Meta.Language }
 
 // MetaPageTopic returns the page-topic value for use in the html
 // <meta> tag within the <head> area.
-func (p *Presenter) MetaPageTopic() string { return p.page.Domain.Meta.PageTopic }
+func (p *Presenter) MetaPageTopic() string { return p.page.Meta.PageTopic }
 
 // MetaRevisit returns the desired crawler revisit value for use in
 //the html <meta> tag within the <head> area.
-func (p *Presenter) MetaRevisit() string { return p.page.Domain.Meta.RevisitAfter }
+func (p *Presenter) MetaRevisit() string { return p.page.Meta.RevisitAfter }
 
 // MetaRobots returns the desired robots value for use in the html
 // <meta> tag within the <head> area.
-func (p *Presenter) MetaRobots() string { return p.page.Domain.Meta.Robots }
+func (p *Presenter) MetaRobots() string { return p.page.Meta.Robots }
 
 // Widget returns a pointer to the widget designated by the name
 // parameter. If no such widget exists, an empty widget is returned.
 func (p *Presenter) Widget(name string) (w *widget.Widget) {
-	if w = p.page.Domain.Template.Widgets[name]; w == nil {
+	if w = p.page.Template.Widgets[name]; w == nil {
 		return widget.New()
 	}
 	return
@@ -122,7 +123,10 @@ func (p *Presenter) TextWidget(name string) template.HTML {
 // New creates a new presenter object with all necessary fields properly
 // initialized.
 func New() *Presenter {
-	return &Presenter{page: page.New(), markup: bytes.NewBufferString("")}
+	return &Presenter{
+		FallbackID: 1,
+		page:       page.New(),
+		markup:     bytes.NewBufferString("")}
 }
 
 func NewFromCache(url string) *Presenter {
@@ -137,16 +141,16 @@ func NewFromCache(url string) *Presenter {
 // corresponding page data. It is guaranteed to retun a functioning
 // presenter object even if the url parameter does not lead to any data.
 func NewWithURL(url string, cacheEnabled bool) *Presenter {
-	if len(url) <= 1 {
-		return NewWithID(1)
-	}
 	presenter := New()
+	if len(url) <= 1 {
+		return NewWithID(presenter.FallbackID)
+	}
 	presenter.url = url
 	pages, err := fetchByURL(url)
 	if len(pages) == 0 || err != nil {
-		return NewWithID(1)
+		return NewWithID(presenter.FallbackID)
 	}
-	pages[0].Domain = domains.FromCache(pages[0].Domain.ID)
+	pages[0].Template = templates.FromCache(pages[0].Template.ID)
 	presenter.page = pages[0]
 	if cacheEnabled {
 		cache.Instance().PushPage(pages[0])
@@ -164,7 +168,7 @@ func NewWithID(id uint32) *Presenter {
 	if len(pages) == 0 || err != nil {
 		presenter.page = load404()
 	} else {
-		pages[0].Domain = domains.FromCache(pages[0].Domain.ID)
+		pages[0].Template = templates.FromCache(pages[0].Template.ID)
 		presenter.page = pages[0]
 		presenter.url = pages[0].URL
 	}

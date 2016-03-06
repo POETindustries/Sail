@@ -1,6 +1,8 @@
 package templates
 
 import (
+	"fmt"
+	"sail/cache"
 	"sail/conf"
 	"sail/errors"
 	"sail/storage/templatestore"
@@ -32,8 +34,18 @@ func BuildWithID(ids ...uint32) []*tmpl.Template {
 			t.Widgets[w.RefName] = w
 		}
 		t.Compile()
+		cache.Instance().PushTemplate(t)
+		fmt.Printf("template added to cache: %d\n", t.ID)
 	}
 	return templates
+}
+
+func FromCache(id uint32) *tmpl.Template {
+	if t := cache.Instance().Template(id); t != nil {
+		fmt.Printf("found template in cache: %d\n", id)
+		return t
+	}
+	return BuildWithID(id)[0]
 }
 
 func fetchByID(ids ...uint32) ([]*tmpl.Template, error) {

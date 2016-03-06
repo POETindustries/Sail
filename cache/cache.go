@@ -1,14 +1,14 @@
 package cache
 
 import (
-	"sail/domain"
 	"sail/page"
+	"sail/tmpl"
 )
 
 type cache struct {
-	pages   map[string]*page.Page
-	domains map[uint32]*domain.Domain
-	markup  map[string][]byte
+	pages     map[string]*page.Page
+	templates map[uint32]*tmpl.Template
+	markup    map[string][]byte
 }
 
 var instance *cache
@@ -20,8 +20,8 @@ func Instance() *cache {
 	return instance
 }
 
-func (c *cache) Domain(id uint32) *domain.Domain {
-	return c.domains[id]
+func (c *cache) Template(id uint32) *tmpl.Template {
+	return c.templates[id]
 }
 
 func (c *cache) Page(url string) *page.Page {
@@ -32,8 +32,8 @@ func (c *cache) Markup(url string) []byte {
 	return c.markup[url]
 }
 
-func (c *cache) PushDomain(d *domain.Domain) {
-	c.domains[d.ID] = d
+func (c *cache) PushTemplate(t *tmpl.Template) {
+	c.templates[t.ID] = t
 }
 
 func (c *cache) PushPage(p *page.Page) {
@@ -47,10 +47,10 @@ func (c *cache) PushMarkup(url string, m []byte) {
 // PopDomain removes the domain with the given id from the cache.
 // If there are cached pages that depend on the domain, they, too,
 // are deleted from their respective caches.
-func (c *cache) PopDomain(id uint32) {
+func (c *cache) PopTemplate(id uint32) {
 	var urls []string
 	for _, p := range c.pages {
-		if p.Domain.ID == id {
+		if p.Template.ID == id {
 			urls = append(urls, p.URL)
 		}
 	}
@@ -58,7 +58,7 @@ func (c *cache) PopDomain(id uint32) {
 		c.PopPage(url)
 		c.PopMarkup(url)
 	}
-	delete(c.domains, id)
+	delete(c.templates, id)
 }
 
 // PopPage removes the given page from the cache. If there is
@@ -77,7 +77,7 @@ func (c *cache) PopMarkup(url string) {
 func new() *cache {
 	c := cache{}
 	c.pages = make(map[string]*page.Page)
-	c.domains = make(map[uint32]*domain.Domain)
+	c.templates = make(map[uint32]*tmpl.Template)
 	c.markup = make(map[string][]byte)
 
 	return &c

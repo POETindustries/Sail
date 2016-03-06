@@ -17,7 +17,7 @@ func LoginPage(req *http.Request) (*bytes.Buffer, *http.Cookie) {
 	cookie, _ := req.Cookie("session")
 	if cookie != nil && session.DB().Has(cookie.Value) {
 		session.DB().Start(cookie.Value)
-		return bytes.NewBufferString("All well, session found"), nil
+		return office(req), nil
 	}
 	if ok, msg := loginConfirm(req); !ok {
 		return loginPage(msg), nil
@@ -26,7 +26,7 @@ func LoginPage(req *http.Request) (*bytes.Buffer, *http.Cookie) {
 	session.DB().Add(s)
 	c := http.Cookie{Name: "session", Value: s.ID}
 
-	return bytes.NewBufferString("All well, session created"), &c
+	return office(req), &c
 }
 
 func loginConfirm(req *http.Request) (bool, string) {
@@ -42,11 +42,20 @@ func loginConfirm(req *http.Request) (bool, string) {
 }
 
 func loginPage(msg string) *bytes.Buffer {
-	presenter := pages.NewFromCache("/office")
+	presenter := pages.NewFromCache("/login")
 	if msg != "" {
 		presenter.Message = msg
 		presenter.HasMessage = true
 	}
+	if markup, err := presenter.Compile(); err == nil {
+		return markup
+	}
+	return bytes.NewBufferString(tmpl.NOTFOUND404)
+}
+
+func office(req *http.Request) *bytes.Buffer {
+	println(req.URL.RequestURI())
+	presenter := pages.NewWithURL(req.URL.RequestURI(), false)
 	if markup, err := presenter.Compile(); err == nil {
 		return markup
 	}

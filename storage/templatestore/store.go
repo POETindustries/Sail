@@ -3,6 +3,7 @@ package templatestore
 import (
 	"database/sql"
 	"sail/storage/psqldb"
+	"sail/storage/schema"
 	"sail/tmpl"
 )
 
@@ -14,7 +15,7 @@ type Query struct {
 // ByID prepares the query to select the page that matches the given id.
 func (q *Query) ByID(ids ...uint32) *Query {
 	for _, id := range ids {
-		q.query.AddAttr(templateID, id, psqldb.OpOr)
+		q.query.AddAttr(schema.TemplateID, id, psqldb.OpOr)
 	}
 	return q
 }
@@ -22,7 +23,7 @@ func (q *Query) ByID(ids ...uint32) *Query {
 // Templates executes the query and returns all matching widget objects.
 func (q *Query) Templates() ([]*tmpl.Template, error) {
 	q.query.Table = "sl_template"
-	q.query.Proj = templateAttrs
+	q.query.Proj = schema.TemplateAttrs
 	return q.scanTemplates(q.query.Execute())
 }
 
@@ -30,7 +31,7 @@ func (q *Query) Templates() ([]*tmpl.Template, error) {
 // used in this template.
 func (q *Query) WidgetIDs() ([]uint32, error) {
 	q.query.Table = "sl_template_widgets"
-	q.query.Proj = expWidgetID
+	q.query.Proj = schema.WidgetID
 	return q.scanWidgetIDs(q.query.Execute())
 }
 
