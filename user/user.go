@@ -1,18 +1,27 @@
 package user
 
-type User struct {
-	ID        uint32
-	Name      string
-	Pass      string
-	FirstName string
-	LastName  string
-	Email     string
-	Phone     string
+import (
+	"fmt"
+	"sail/storage/userstore"
 
-	CDate   string
-	ExpDate string
+	"golang.org/x/crypto/bcrypt"
+)
+
+// Verify returns true if user and password match entries in the
+// user database.
+func Verify(user, pass string) bool {
+	users, err := userstore.Get().ByName(user).Users()
+	if err != nil || len(users) == 0 {
+		return false
+	}
+	p := []byte(pass)
+	h := []byte(users[0].Pass)
+	return bcrypt.CompareHashAndPassword(h, p) == nil
 }
 
-func New() *User {
-	return &User{}
+func encrypt(s string) string {
+	if k, err := bcrypt.GenerateFromPassword([]byte(s), 8); err == nil {
+		return fmt.Sprintf("%s\n", k)
+	}
+	return ""
 }
