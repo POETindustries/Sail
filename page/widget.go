@@ -1,34 +1,34 @@
-package widgets
+package page
 
 import (
 	"sail/conf"
 	"sail/errors"
+	"sail/page/data"
 	"sail/storage/widgetstore"
-	"sail/widget"
 )
 
-// BuildWithID returns widgets that match the given parameter(s).
+// WidgetWithID returns widgets that match the given parameter(s).
 //
 // It should be used for fetching one or more widgets for rendering
 // and is guaranteed to contain at least one correctly set up widget
 // at the first position of the returned slice.
-func BuildWithID(id ...uint32) []*widget.Widget {
-	w, err := fetchByID(id...)
+func WidgetsWithID(id ...uint32) []*data.Widget {
+	w, err := fetchWidgetByID(id...)
 	if err != nil || len(w) < 1 {
 		errors.Log(err, conf.Instance().DevMode)
-		return []*widget.Widget{widget.New()}
+		return []*data.Widget{data.NewWidget()}
 	}
-	if err = fetchData(w); err != nil {
+	if err = fetchWidgetData(w); err != nil {
 		errors.Log(err, conf.Instance().DevMode)
 	}
 	return w
 }
 
-func fetchByID(id ...uint32) ([]*widget.Widget, error) {
+func fetchWidgetByID(id ...uint32) ([]*data.Widget, error) {
 	return widgetstore.Get().ByID(id...).Widgets()
 }
 
-func fetchData(widgets []*widget.Widget) (err error) {
+func fetchWidgetData(widgets []*data.Widget) (err error) {
 	for _, w := range widgets {
 		switch w.Type {
 		case "menu":
@@ -44,10 +44,10 @@ func fetchData(widgets []*widget.Widget) (err error) {
 	return
 }
 
-func fetchMenuData(id uint32) (*widget.Menu, error) {
+func fetchMenuData(id uint32) (*data.Menu, error) {
 	return widgetstore.Get().ByID(id).Ascending().Menu()
 }
 
-func fetchTextData(id uint32) (*widget.Text, error) {
+func fetchTextData(id uint32) (*data.Text, error) {
 	return widgetstore.Get().ByID(id).TextField()
 }

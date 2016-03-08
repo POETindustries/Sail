@@ -1,30 +1,29 @@
-package cache
+package page
 
 import (
-	"sail/page"
-	"sail/tmpl"
+	"sail/page/data"
 )
 
 type cache struct {
-	pages     map[string]*page.Page
-	templates map[uint32]*tmpl.Template
+	pages     map[string]*data.Page
+	templates map[uint32]*data.Template
 	markup    map[string][]byte
 }
 
 var instance *cache
 
-func Instance() *cache {
+func Cache() *cache {
 	if instance == nil {
 		instance = new()
 	}
 	return instance
 }
 
-func (c *cache) Template(id uint32) *tmpl.Template {
+func (c *cache) Template(id uint32) *data.Template {
 	return c.templates[id]
 }
 
-func (c *cache) Page(url string) *page.Page {
+func (c *cache) Page(url string) *data.Page {
 	return c.pages[url]
 }
 
@@ -32,11 +31,11 @@ func (c *cache) Markup(url string) []byte {
 	return c.markup[url]
 }
 
-func (c *cache) PushTemplate(t *tmpl.Template) {
+func (c *cache) PushTemplate(t *data.Template) {
 	c.templates[t.ID] = t
 }
 
-func (c *cache) PushPage(p *page.Page) {
+func (c *cache) PushPage(p *data.Page) {
 	c.pages[p.URL] = p
 }
 
@@ -76,8 +75,8 @@ func (c *cache) PopMarkup(url string) {
 
 func new() *cache {
 	c := cache{}
-	c.pages = make(map[string]*page.Page)
-	c.templates = make(map[uint32]*tmpl.Template)
+	c.pages = make(map[string]*data.Page)
+	c.templates = make(map[uint32]*data.Template)
 	c.markup = make(map[string][]byte)
 
 	return &c

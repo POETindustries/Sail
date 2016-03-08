@@ -1,14 +1,11 @@
-package templates
+package page
 
 import (
 	"fmt"
-	"sail/cache"
 	"sail/conf"
 	"sail/errors"
+	"sail/page/data"
 	"sail/storage/templatestore"
-	"sail/tmpl"
-	"sail/widget"
-	"sail/widgets"
 )
 
 // BuildWithID returns templates that match the given id(s).
@@ -16,11 +13,11 @@ import (
 // It should be used to prepare one or more templates for rendering
 // and is guaranteed to contain at least one correctly set up template
 // at the first position of the returned slice.
-func BuildWithID(ids ...uint32) []*tmpl.Template {
-	templates, err := fetchByID(ids...)
+func BuildWithID(ids ...uint32) []*data.Template {
+	templates, err := fetchTemplateByID(ids...)
 	if err != nil || len(templates) < 1 {
 		errors.Log(err, conf.Instance().DevMode)
-		return []*tmpl.Template{tmpl.New()}
+		return []*data.Template{data.NewTemplate()}
 	}
 	for _, t := range templates {
 		widgetIDs, err := fetchWidgetIDs(t.ID)
@@ -29,26 +26,26 @@ func BuildWithID(ids ...uint32) []*tmpl.Template {
 			t.WidgetIDs = []uint32{}
 		}
 		t.WidgetIDs = widgetIDs
-		widgets := widgets.BuildWithID(t.WidgetIDs...)
+		widgets := WidgetsWithID(t.WidgetIDs...)
 		for _, w := range widgets {
 			t.Widgets[w.RefName] = w
 		}
 		t.Compile()
-		cache.Instance().PushTemplate(t)
+		Cache().PushTemplate(t)
 		fmt.Printf("template added to cache: %d\n", t.ID)
 	}
 	return templates
 }
 
-func FromCache(id uint32) *tmpl.Template {
-	if t := cache.Instance().Template(id); t != nil {
+func TemplateFromCache(id uint32) *data.Template {
+	if t := Cache().Template(id); t != nil {
 		fmt.Printf("found template in cache: %d\n", id)
 		return t
 	}
 	return BuildWithID(id)[0]
 }
 
-func fetchByID(ids ...uint32) ([]*tmpl.Template, error) {
+func fetchTemplateByID(ids ...uint32) ([]*data.Template, error) {
 	return templatestore.Get().ByID(ids...).Templates()
 }
 
@@ -56,6 +53,6 @@ func fetchWidgetIDs(id uint32) ([]uint32, error) {
 	return templatestore.Get().ByID(id).WidgetIDs()
 }
 
-func fetchWidgets(ids ...uint32) []*widget.Widget {
-	return widgets.BuildWithID(ids...)
+func fetchWidgets(ids ...uint32) []*data.Widget {
+	return WidgetsWithID(ids...)
 }
