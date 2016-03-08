@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"sail/storage/psqldb"
 	"sail/storage/schema"
-	"sail/user"
+	"sail/user/data"
 )
 
 // Query collects all information needed for querying the database.
@@ -27,21 +27,21 @@ func (q *Query) ByName(name string) *Query {
 
 // Users sends the query to the database and returns all matching
 // user objects.
-func (q *Query) Users() ([]*user.User, error) {
+func (q *Query) Users() ([]*data.User, error) {
 	q.query.Table = "sl_user"
 	q.query.Proj = schema.UserAttrs
 	return q.scanUsers(q.query.Execute())
 }
 
-func (q *Query) scanUsers(data *sql.Rows, err error) ([]*user.User, error) {
+func (q *Query) scanUsers(rows *sql.Rows, err error) ([]*data.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	users := []*user.User{}
-	defer data.Close()
-	for data.Next() {
-		u := user.New()
-		if err = data.Scan(&u.ID, &u.Name, &u.Pass, &u.FirstName, &u.LastName,
+	users := []*data.User{}
+	defer rows.Close()
+	for rows.Next() {
+		u := data.New()
+		if err = rows.Scan(&u.ID, &u.Name, &u.Pass, &u.FirstName, &u.LastName,
 			&u.Email, &u.Phone, &u.CDate, &u.ExpDate); err != nil {
 			return nil, err
 		}

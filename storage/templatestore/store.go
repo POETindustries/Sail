@@ -2,9 +2,9 @@ package templatestore
 
 import (
 	"database/sql"
+	"sail/page/data"
 	"sail/storage/psqldb"
 	"sail/storage/schema"
-	"sail/tmpl"
 )
 
 // Query collects all information needed for querying the database.
@@ -21,7 +21,7 @@ func (q *Query) ByID(ids ...uint32) *Query {
 }
 
 // Templates executes the query and returns all matching widget objects.
-func (q *Query) Templates() ([]*tmpl.Template, error) {
+func (q *Query) Templates() ([]*data.Template, error) {
 	q.query.Table = "sl_template"
 	q.query.Proj = schema.TemplateAttrs
 	return q.scanTemplates(q.query.Execute())
@@ -35,15 +35,15 @@ func (q *Query) WidgetIDs() ([]uint32, error) {
 	return q.scanWidgetIDs(q.query.Execute())
 }
 
-func (q *Query) scanTemplates(data *sql.Rows, err error) ([]*tmpl.Template, error) {
+func (q *Query) scanTemplates(rows *sql.Rows, err error) ([]*data.Template, error) {
 	if err != nil {
 		return nil, err
 	}
-	ts := []*tmpl.Template{}
-	defer data.Close()
-	for data.Next() {
-		t := tmpl.New()
-		if err = data.Scan(&t.ID, &t.Name); err != nil {
+	var ts []*data.Template
+	defer rows.Close()
+	for rows.Next() {
+		t := data.NewTemplate()
+		if err = rows.Scan(&t.ID, &t.Name); err != nil {
 			return nil, err
 		}
 		ts = append(ts, t)

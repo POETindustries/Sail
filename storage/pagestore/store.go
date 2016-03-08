@@ -2,7 +2,7 @@ package pagestore
 
 import (
 	"database/sql"
-	"sail/page"
+	"sail/page/data"
 	"sail/storage/psqldb"
 	"sail/storage/schema"
 )
@@ -38,21 +38,21 @@ func (q *Query) ByID(ids ...uint32) *Query {
 
 // Pages sends the query to the database and returns all matching
 // page objects.
-func (q *Query) Pages() ([]*page.Page, error) {
+func (q *Query) Pages() ([]*data.Page, error) {
 	q.query.Table = "sl_page natural join sl_meta"
 	q.query.Proj = schema.PageAttrs + "," + schema.MetaAttrs
 	return q.scanPages(q.query.Execute())
 }
 
-func (q *Query) scanPages(data *sql.Rows, err error) ([]*page.Page, error) {
+func (q *Query) scanPages(rows *sql.Rows, err error) ([]*data.Page, error) {
 	if err != nil {
 		return nil, err
 	}
-	pages := []*page.Page{}
-	defer data.Close()
-	for data.Next() {
-		p := page.New()
-		if err = data.Scan(&p.ID, &p.Title, &p.Content, &p.Meta.ID,
+	pages := []*data.Page{}
+	defer rows.Close()
+	for rows.Next() {
+		p := data.NewPage()
+		if err = rows.Scan(&p.ID, &p.Title, &p.Content, &p.Meta.ID,
 			&p.Template.ID, &p.URL, &p.Status, &p.Owner, &p.CDate,
 			&p.EDate, &p.Meta.Title, &p.Meta.Keywords, &p.Meta.Description,
 			&p.Meta.Language, &p.Meta.PageTopic, &p.Meta.RevisitAfter,
