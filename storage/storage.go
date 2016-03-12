@@ -5,8 +5,8 @@ import (
 	"os"
 	"sail/conf"
 	"sail/errors"
-	. "sail/page/schema"
-	. "sail/user/schema"
+	pageschema "sail/page/schema"
+	userschema "sail/user/schema"
 
 	// sqlite database driver
 	_ "github.com/mattn/go-sqlite3"
@@ -20,8 +20,8 @@ var createInstructs = []string{
 	userschema.InitUser,
 	pageschema.CreateWidget,
 	pageschema.InitWidget,
-	pageschema.CreateWidgetMenu,
-	pageschema.InitWidgetMenu,
+	pageschema.CreateWidgetNav,
+	pageschema.InitWidgetNav,
 	pageschema.CreateWidgetText,
 	pageschema.CreateTemplate,
 	pageschema.InitTemplate,
@@ -29,8 +29,8 @@ var createInstructs = []string{
 	pageschema.InitTemplateWidgets,
 	pageschema.CreateMeta,
 	pageschema.InitMeta,
-	pageschema.CreatePage,
-	pageschema.InitPage}
+	pageschema.CreateContent,
+	pageschema.InitContent}
 
 // DB returns a pointer to the database handle singleton.
 func DB() *sql.DB {
@@ -41,19 +41,21 @@ func DB() *sql.DB {
 }
 
 func dbInit() bool {
-	loc := "db/"
+	loc := conf.Instance().Cwd + "db/"
 	if _, err := os.Stat(loc); err != nil {
 		os.MkdirAll(loc, 0700)
 	}
-	db, _ = sql.Open("sqlite3", loc+"panoptiq.db")
+	db, _ = sql.Open("sqlite3", loc+"sail.db")
 	return db.Ping() == nil
 }
 
 // ExecCreateInstructs takes care of first-time setup of the datastore.
 func ExecCreateInstructs() (err error) {
-	for _, instruct := range createInstructs {
-		if _, err = DB().Exec(instruct); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+	if conf.Instance().FirstRun {
+		for _, instruct := range createInstructs {
+			if _, err = DB().Exec(instruct); err != nil {
+				errors.Log(err, conf.Instance().DevMode)
+			}
 		}
 	}
 	return

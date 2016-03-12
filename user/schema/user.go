@@ -12,24 +12,21 @@ const (
 	UserExpDate   = "user_expdate"
 )
 
-const UserAttrs = UserID + "," + UserName + "," + UserPass + "," +
-	UserFirstName + "," + UserLastName + "," + UserEmail + "," +
-	UserPhone + "," + UserCDate + "," + UserExpDate
+var UserAttrs = [...]string{UserID, UserName, UserPass, UserFirstName,
+	UserLastName, UserEmail, UserPhone, UserCDate, UserExpDate}
 
 const CreateUser = `create table if not exists sl_user(
-    ` + UserID + ` serial primary key not null,
-    ` + UserName + ` varchar(31) not null,
-    ` + UserPass + ` varchar(63) not null,
-    ` + UserFirstName + ` varchar(63) not null default '',
-    ` + UserLastName + ` varchar(63) not null default '',
-    ` + UserEmail + ` varchar(63) not null default '',
-    ` + UserPhone + ` varchar(31) not null default '',
-    ` + UserCDate + ` varchar(31) not null default '2015-09-19 10:34:12',
-    ` + UserExpDate + ` varchar(31) not null default '2020-09-19 10:34:12');`
+    ` + UserID + ` integer primary key not null,
+    ` + UserName + ` text not null,
+    ` + UserPass + ` text not null,
+    ` + UserFirstName + ` text not null default '',
+    ` + UserLastName + ` text not null default '',
+    ` + UserEmail + ` text not null default '',
+    ` + UserPhone + ` text not null default '',
+    ` + UserCDate + ` text not null default '2015-09-19 10:34:12',
+    ` + UserExpDate + ` text not null default '2020-09-19 10:34:12');`
 
-const InitUser = `do $$ begin
-    	if not exists (select ` + UserID + ` from sl_user)
-        then insert into sl_user
+const InitUser = `insert into sl_user
         values(
         1,
         'admin',
@@ -39,6 +36,4 @@ const InitUser = `do $$ begin
         'admin@sail.example.com',
         '',
         '2015-09-19 10:34:12',
-        '2020-09-19 10:34:12');
-        end if;
-    	end $$`
+        '2020-09-19 10:34:12');`

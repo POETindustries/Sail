@@ -14,23 +14,18 @@ const (
 
 // WidgetAttrs is a convenient string for queries of the type
 // 'select * from'.
-const WidgetAttrs = WidgetID + "," + WidgetName + "," + WidgetRefName + "," +
-	WidgetType
+var WidgetAttrs = [...]string{WidgetID, WidgetName, WidgetRefName, WidgetType}
 
 const CreateWidget = `create table if not exists sl_widget(
-    ` + WidgetID + ` serial not null primary key,
-	` + WidgetName + ` varchar(31) not null,
-	` + WidgetRefName + ` varchar(31) not null,
-    ` + WidgetType + ` varchar(31) not null default 'nav');`
+    ` + WidgetID + ` integer not null primary key,
+	` + WidgetName + ` text not null,
+	` + WidgetRefName + ` text not null,
+    ` + WidgetType + ` text not null default 'nav');`
 
-const InitWidget = `do $$ begin
-	if not exists (select ` + WidgetID + ` from sl_widget)
-    then insert into sl_widget
+const InitWidget = `insert into sl_widget
 	(` + WidgetName + `,` + WidgetRefName + `)
 	values
-	('Main Menu', 'main_menu');
-    end if;
-	end $$`
+	('Main Menu', 'main_menu');`
 
 /********************************************
  * nav widget info
@@ -40,26 +35,23 @@ const (
 	NavEntryID       = "entry_id"
 	NavWidgetID      = WidgetID
 	NavEntryName     = "entry_name"
-	NavEntryRefID    = PageID
+	NavEntryRefID    = ContentID
 	NavEntrySubmenu  = "submenu"
 	NavEntryPosition = "position"
 )
 
-const NavAttrs = NavEntryID + "," + NavEntryName + "," +
-	NavEntryRefID + "," + NavEntrySubmenu + "," +
-	NavEntryPosition
+var NavAttrs = [...]string{NavEntryID, NavEntryName, NavEntryRefID,
+	NavEntrySubmenu, NavEntryPosition}
 
 const CreateWidgetNav = `create table if not exists sl_widget_nav(
-    ` + NavEntryID + ` serial primary key not null,
+    ` + NavEntryID + ` integer primary key not null,
 	` + NavWidgetID + ` integer not null,
-    ` + NavEntryName + ` varchar(31) not null default 'entry',
+    ` + NavEntryName + ` text not null default 'entry',
     ` + NavEntryRefID + ` integer not null default 1,
     ` + NavEntrySubmenu + ` integer not null default 0,
     ` + NavEntryPosition + ` integer not null default 10);`
 
-const InitWidgetNav = `do $$ begin
-	if not exists (select ` + NavEntryID + ` from sl_widget_nav)
-    then insert into sl_widget_nav(
+const InitWidgetNav = `insert into sl_widget_nav(
 	` + NavWidgetID + `,
 	` + NavEntryName + `,
 	` + NavEntryRefID + `,
@@ -67,9 +59,7 @@ const InitWidgetNav = `do $$ begin
 	values
 	(1, 'Home', 1, 0),
 	(1, 'About', 4, 10),
-	(1, 'Login', 3, 100);
-    end if;
-	end $$`
+	(1, 'Login', 3, 100);`
 
 /********************************************
  * text widget info
@@ -80,8 +70,8 @@ const (
 	TextContent = "content"
 )
 
-const TextAttrs = TextID + "," + TextContent
+var TextAttrs = [...]string{TextID, TextContent}
 
 const CreateWidgetText = `create table if not exists sl_widget_text(
-    ` + TextID + ` integer primary key not null,
+    ` + TextID + ` integer not null,
     ` + TextContent + ` text not null default '');`

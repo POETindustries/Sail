@@ -11,22 +11,20 @@ const (
 	MetaRobots      = "meta_robots"
 )
 
-const MetaAttrs = MetaTitle + "," + MetaKeywords + "," + MetaDescription + "," +
-	MetaLanguage + "," + MetaPageTopic + "," + MetaRevisit + "," + MetaRobots
+var MetaAttrs = [...]string{MetaTitle, MetaKeywords, MetaDescription,
+	MetaLanguage, MetaPageTopic, MetaRevisit, MetaRobots}
 
 const CreateMeta = `create table if not exists sl_meta(
-    ` + MetaID + ` serial primary key not null,
-    ` + MetaTitle + ` varchar(63) not null default '',
-    ` + MetaKeywords + ` varchar(127) not null default'',
+    ` + MetaID + ` integer primary key not null,
+    ` + MetaTitle + ` text not null default '',
+    ` + MetaKeywords + ` text not null default'',
     ` + MetaDescription + ` text not null default '',
-    ` + MetaLanguage + ` varchar(31) not null default '',
+    ` + MetaLanguage + ` text not null default '',
     ` + MetaPageTopic + ` text not null default '',
-    ` + MetaRevisit + ` varchar(31) not null default '',
-    ` + MetaRobots + ` varchar(31) not null default '');`
+    ` + MetaRevisit + ` text not null default '',
+    ` + MetaRobots + ` text not null default '');`
 
-const InitMeta = `do $$ begin
-	if not exists (select ` + MetaID + ` from sl_meta)
-    then insert into sl_meta values(
+const InitMeta = `insert into sl_meta values(
     1,
     'Sail',
     'cms,content management system,go,golang',
@@ -42,6 +40,4 @@ const InitMeta = `do $$ begin
 	'',
 	'',
 	'',
-	'noindex, nofollow');
-    end if;
-	end $$`
+	'noindex, nofollow');`
