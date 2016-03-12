@@ -5,8 +5,7 @@ import (
 	"os"
 	"sail/conf"
 	"sail/errors"
-	. "sail/page/content/schema"
-	. "sail/page/template/schema"
+	. "sail/page/schema"
 	. "sail/user/schema"
 
 	// sqlite database driver

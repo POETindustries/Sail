@@ -21,7 +21,7 @@ const CreateWidget = `create table if not exists sl_widget(
     ` + WidgetID + ` serial not null primary key,
 	` + WidgetName + ` varchar(31) not null,
 	` + WidgetRefName + ` varchar(31) not null,
-    ` + WidgetType + ` varchar(31) not null default 'menu');`
+    ` + WidgetType + ` varchar(31) not null default 'nav');`
 
 const InitWidget = `do $$ begin
 	if not exists (select ` + WidgetID + ` from sl_widget)
@@ -33,37 +33,37 @@ const InitWidget = `do $$ begin
 	end $$`
 
 /********************************************
- * menu widget info
+ * nav widget info
  ********************************************/
 
 const (
-	MenuEntryID       = "entry_id"
-	MenuWidgetID      = WidgetID
-	MenuEntryName     = "entry_name"
-	MenuEntryRefID    = "entry_ref_id"
-	MenuEntrySubmenu  = "submenu"
-	MenuEntryPosition = "position"
+	NavEntryID       = "entry_id"
+	NavWidgetID      = WidgetID
+	NavEntryName     = "entry_name"
+	NavEntryRefID    = PageID
+	NavEntrySubmenu  = "submenu"
+	NavEntryPosition = "position"
 )
 
-const MenuAttrs = MenuEntryID + "," + MenuEntryName + "," +
-	MenuEntryRefID + "," + MenuEntrySubmenu + "," +
-	MenuEntryPosition
+const NavAttrs = NavEntryID + "," + NavEntryName + "," +
+	NavEntryRefID + "," + NavEntrySubmenu + "," +
+	NavEntryPosition
 
-const CreateWidgetMenu = `create table if not exists sl_widget_menu(
-    ` + MenuEntryID + ` serial primary key not null,
-	` + MenuWidgetID + ` integer not null,
-    ` + MenuEntryName + ` varchar(31) not null default 'entry',
-    ` + MenuEntryRefID + ` integer not null default 1,
-    ` + MenuEntrySubmenu + ` integer not null default 0,
-    ` + MenuEntryPosition + ` integer not null default 10);`
+const CreateWidgetNav = `create table if not exists sl_widget_nav(
+    ` + NavEntryID + ` serial primary key not null,
+	` + NavWidgetID + ` integer not null,
+    ` + NavEntryName + ` varchar(31) not null default 'entry',
+    ` + NavEntryRefID + ` integer not null default 1,
+    ` + NavEntrySubmenu + ` integer not null default 0,
+    ` + NavEntryPosition + ` integer not null default 10);`
 
-const InitWidgetMenu = `do $$ begin
-	if not exists (select ` + MenuEntryID + ` from sl_widget_menu)
-    then insert into sl_widget_menu(
-	` + MenuWidgetID + `,
-	` + MenuEntryName + `,
-	` + MenuEntryRefID + `,
-	` + MenuEntryPosition + `)
+const InitWidgetNav = `do $$ begin
+	if not exists (select ` + NavEntryID + ` from sl_widget_nav)
+    then insert into sl_widget_nav(
+	` + NavWidgetID + `,
+	` + NavEntryName + `,
+	` + NavEntryRefID + `,
+	` + NavEntryPosition + `)
 	values
 	(1, 'Home', 1, 0),
 	(1, 'About', 4, 10),

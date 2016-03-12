@@ -2,7 +2,7 @@ package template
 
 import (
 	"database/sql"
-	"sail/page/template/schema"
+	"sail/page/schema"
 )
 
 // Query collects all information needed for querying the database.

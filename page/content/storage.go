@@ -2,7 +2,7 @@ package content
 
 import (
 	"database/sql"
-	"sail/page/content/schema"
+	"sail/page/schema"
 )
 
 // Query collects all information needed for querying the database.
