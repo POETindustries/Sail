@@ -13,7 +13,7 @@ const (
 	ContentEditDate   = "content_edate"
 )
 
-var ContentAttrs = [...]string{ContentID, ContentTitle, ContentContent,
+var ContentAttrs = []string{ContentID, ContentTitle, ContentContent,
 	ContentMetaID, ContentTemplateID, ContentURL, ContentStatus, ContentOwner,
 	ContentCreateDate, ContentEditDate}
 

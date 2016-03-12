@@ -14,7 +14,7 @@ const (
 
 // WidgetAttrs is a convenient string for queries of the type
 // 'select * from'.
-var WidgetAttrs = [...]string{WidgetID, WidgetName, WidgetRefName, WidgetType}
+var WidgetAttrs = []string{WidgetID, WidgetName, WidgetRefName, WidgetType}
 
 const CreateWidget = `create table if not exists sl_widget(
     ` + WidgetID + ` integer not null primary key,
@@ -40,7 +40,7 @@ const (
 	NavEntryPosition = "position"
 )
 
-var NavAttrs = [...]string{NavEntryID, NavEntryName, NavEntryRefID,
+var NavAttrs = []string{NavEntryID, NavEntryName, NavEntryRefID,
 	NavEntrySubmenu, NavEntryPosition}
 
 const CreateWidgetNav = `create table if not exists sl_widget_nav(
@@ -70,7 +70,7 @@ const (
 	TextContent = "content"
 )
 
-var TextAttrs = [...]string{TextID, TextContent}
+var TextAttrs = []string{TextID, TextContent}
 
 const CreateWidgetText = `create table if not exists sl_widget_text(
     ` + TextID + ` integer not null,

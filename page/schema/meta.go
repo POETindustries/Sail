@@ -11,7 +11,7 @@ const (
 	MetaRobots      = "meta_robots"
 )
 
-var MetaAttrs = [...]string{MetaTitle, MetaKeywords, MetaDescription,
+var MetaAttrs = []string{MetaTitle, MetaKeywords, MetaDescription,
 	MetaLanguage, MetaPageTopic, MetaRevisit, MetaRobots}
 
 const CreateMeta = `create table if not exists sl_meta(

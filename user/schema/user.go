@@ -12,7 +12,7 @@ const (
 	UserExpDate   = "user_expdate"
 )
 
-var UserAttrs = [...]string{UserID, UserName, UserPass, UserFirstName,
+var UserAttrs = []string{UserID, UserName, UserPass, UserFirstName,
 	UserLastName, UserEmail, UserPhone, UserCDate, UserExpDate}
 
 const CreateUser = `create table if not exists sl_user(

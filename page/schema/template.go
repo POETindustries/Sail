@@ -6,7 +6,7 @@ const (
 	TemplateWidgetID = WidgetID
 )
 
-var TemplateAttrs = [...]string{TemplateID, TemplateName}
+var TemplateAttrs = []string{TemplateID, TemplateName}
 
 const CreateTemplate = `create table if not exists sl_template(
     ` + TemplateID + ` integer primary key not null,
