@@ -46,8 +46,8 @@ func (t *Template) Execute(wr io.Writer, data interface{}) (err error) {
 	return
 }
 
-// Compile parses the template files pointed at by the template.
-func (t *Template) Compile() {
+// Parse parses the template files pointed at by the template.
+func (t *Template) Parse() {
 	if t.Name == "404" {
 		t.template, _ = template.New("frame").Parse(NOTFOUND404)
 	} else {

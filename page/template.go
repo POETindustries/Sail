@@ -30,7 +30,7 @@ func BuildWithID(ids ...uint32) []*data.Template {
 		for _, w := range widgets {
 			t.Widgets[w.RefName] = w
 		}
-		t.Compile()
+		t.Parse()
 		Cache().PushTemplate(t)
 		fmt.Printf("template added to cache: %d\n", t.ID)
 	}
