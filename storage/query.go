@@ -65,7 +65,7 @@ func (q *Query) Asc() *Query {
 	return q
 }
 
-func (q *Query) Attrs(attrs []string) *Query {
+func (q *Query) Attrs(attrs ...string) *Query {
 	q.attrs = attrs
 	return q
 }
