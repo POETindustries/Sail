@@ -1,4 +1,4 @@
-package widgetstore
+package widget
 
 import (
 	"database/sql"

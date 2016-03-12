@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"sail/page"
-	"sail/page/data"
 )
 
 type Response struct {

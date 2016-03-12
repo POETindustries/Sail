@@ -1,10 +1,8 @@
-package pagestore
+package content
 
 import (
 	"database/sql"
-	"sail/page/data"
-	"sail/storage/psqldb"
-	"sail/storage/schema"
+	"sail/page/content/schema"
 )
 
 // Query collects all information needed for querying the database.

@@ -1,12 +1,13 @@
 package page
 
 import (
-	"sail/page/data"
+	"sail/page/content"
+	"sail/page/template"
 )
 
 type cache struct {
-	pages     map[string]*data.Page
-	templates map[uint32]*data.Template
+	pages     map[string]*content.Page
+	templates map[uint32]*template.Template
 	markup    map[string][]byte
 }
 
@@ -75,8 +76,8 @@ func (c *cache) PopMarkup(url string) {
 
 func new() *cache {
 	c := cache{}
-	c.pages = make(map[string]*data.Page)
-	c.templates = make(map[uint32]*data.Template)
+	c.pages = make(map[string]*content.Page)
+	c.templates = make(map[uint32]*template.Template)
 	c.markup = make(map[string][]byte)
 
 	return &c

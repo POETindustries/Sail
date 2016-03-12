@@ -6,7 +6,6 @@ import (
 	"sail/conf"
 	"sail/response"
 	"sail/storage"
-	"sail/storage/psqldb"
 	"sail/user"
 	"sail/user/session"
 	"time"

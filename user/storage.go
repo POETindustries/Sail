@@ -1,10 +1,8 @@
-package userstore
+package user
 
 import (
 	"database/sql"
-	"sail/storage/psqldb"
-	"sail/storage/schema"
-	"sail/user/data"
+	"sail/user/schema"
 )
 
 // Query collects all information needed for querying the database.

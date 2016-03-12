@@ -5,8 +5,9 @@ import (
 	"os"
 	"sail/conf"
 	"sail/errors"
-	pageschema "sail/page/schema"
-	userschema "sail/user/schema"
+	. "sail/page/content/schema"
+	. "sail/page/template/schema"
+	. "sail/user/schema"
 
 	// sqlite database driver
 	_ "github.com/mattn/go-sqlite3"

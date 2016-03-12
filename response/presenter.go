@@ -3,7 +3,6 @@ package response
 import (
 	"bytes"
 	"html/template"
-	"sail/page/data"
 	"strings"
 )
 

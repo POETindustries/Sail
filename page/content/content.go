@@ -41,3 +41,17 @@ func NewPage() *Page {
 		Meta:     NewMeta(),
 		Template: NewTemplate()}
 }
+
+func FetchPageByURL(urls ...string) ([]*data.Page, error) {
+	return Get().ByURL(urls...).Pages()
+}
+
+func FetchPageByID(ids ...uint32) ([]*data.Page, error) {
+	return Get().ByID(ids...).Pages()
+}
+
+func Load404() *data.Page {
+	p := NewPage()
+	p.ID, p.Title = 0, "Sorry about that"
+	return p
+}

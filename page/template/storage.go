@@ -1,10 +1,8 @@
-package templatestore
+package template
 
 import (
 	"database/sql"
-	"sail/page/data"
-	"sail/storage/psqldb"
-	"sail/storage/schema"
+	"sail/page/template/schema"
 )
 
 // Query collects all information needed for querying the database.
