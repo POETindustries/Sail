@@ -1,4 +1,4 @@
-package data
+package content
 
 // NOTFOUND404 is a very basic web page signaling a 404 error.
 // It contails the bare minimum necessary for a syntactically correct html web

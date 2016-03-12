@@ -7,6 +7,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type User struct {
+	ID        uint32
+	Name      string
+	Pass      string
+	FirstName string
+	LastName  string
+	Email     string
+	Phone     string
+
+	CDate   string
+	ExpDate string
+}
+
+func New() *User {
+	return &User{}
+}
+
 // Verify returns true if user and password match entries in the
 // user database.
 func Verify(user, pass string) bool {
