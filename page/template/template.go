@@ -46,14 +46,11 @@ func ByID(id uint32) *Template {
 // writing the output to wr. If an error occurs during execution, it
 // is the responsibility of the caller to handle partially written
 // output.
-func (t *Template) Execute(wr io.Writer, data interface{}) (err error) {
+func (t *Template) Execute(wr io.Writer, data interface{}) error {
 	if t.template == nil {
-		err = errors.NilPointer()
-	} else {
-		err = t.template.ExecuteTemplate(wr, "frame.html", data)
+		t.Parse()
 	}
-	errors.Log(err, conf.Instance().DevMode)
-	return
+	return t.template.ExecuteTemplate(wr, "frame.html", data)
 }
 
 // Parse parses the template files pointed at by the template.

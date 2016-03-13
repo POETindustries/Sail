@@ -18,6 +18,6 @@ type Meta struct {
 	Robots       string
 }
 
-func NewMeta() *Meta {
+func New() *Meta {
 	return &Meta{}
 }
