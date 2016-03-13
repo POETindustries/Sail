@@ -2,69 +2,42 @@ package content
 
 import (
 	"database/sql"
+	"fmt"
+	"sail/conf"
+	"sail/errors"
 	"sail/page/schema"
+	"sail/storage"
 )
 
-// Query collects all information needed for querying the database.
-type Query struct {
-	query *psqldb.Query
+func fromStorageByURL(url string) []*Content {
+	t := "sl_content natural join sl_meta"
+	a := append(schema.ContentAttrs, schema.MetaAttrs...)
+	rows := storage.Get().In(t).Attrs(a...).Equals(schema.ContentURL, url).Exec()
+	return scan(rows.(*sql.Rows))
 }
 
-// Visible prepares the query to select all pages that are visible
-// and accessible from the general internet.
-func (q *Query) Visible() *Query {
-	q.query.AddAttr(schema.PageStatus, -1, "")
-	return q
+func fromStorageByID(id uint32) []*Content {
+	t := "sl_content natural join sl_meta"
+	a := append(schema.ContentAttrs, schema.MetaAttrs...)
+	rows := storage.Get().In(t).Attrs(a...).Equals(schema.ContentID, id).Exec()
+	return scan(rows.(*sql.Rows))
 }
 
-// ByURL prepares the query to select only those pages that match the
-// given url(s).
-func (q *Query) ByURL(urls ...string) *Query {
-	for _, url := range urls {
-		q.query.AddAttr(schema.PageURL, url, "")
-	}
-	return q
-}
-
-// ByID prepares the query to select the pages that matches the id(s).
-func (q *Query) ByID(ids ...uint32) *Query {
-	for _, id := range ids {
-		q.query.AddAttr(schema.PageID, id, psqldb.OpOr)
-	}
-	return q
-}
-
-// Pages sends the query to the database and returns all matching
-// page objects.
-func (q *Query) Pages() ([]*data.Page, error) {
-	q.query.Table = "sl_page natural join sl_meta"
-	q.query.Proj = schema.PageAttrs + "," + schema.MetaAttrs
-	return q.scanPages(q.query.Execute())
-}
-
-func (q *Query) scanPages(rows *sql.Rows, err error) ([]*data.Page, error) {
-	if err != nil {
-		return nil, err
-	}
-	pages := []*data.Page{}
+func scan(rows *sql.Rows) []*Content {
 	defer rows.Close()
+	var cs []*Content
 	for rows.Next() {
-		p := data.NewPage()
-		if err = rows.Scan(&p.ID, &p.Title, &p.Content, &p.Meta.ID,
-			&p.Template.ID, &p.URL, &p.Status, &p.Owner, &p.CDate,
-			&p.EDate, &p.Meta.Title, &p.Meta.Keywords, &p.Meta.Description,
-			&p.Meta.Language, &p.Meta.PageTopic, &p.Meta.RevisitAfter,
-			&p.Meta.Robots); err != nil {
-			return nil, err
+		c := New()
+		if err := rows.Scan(&c.ID, &c.Title, &c.Content, &c.Meta.ID,
+			&c.TemplateID, &c.URL, &c.Status, &c.Owner, &c.CDate,
+			&c.EDate, &c.Meta.Title, &c.Meta.Keywords, &c.Meta.Description,
+			&c.Meta.Language, &c.Meta.PageTopic, &c.Meta.RevisitAfter,
+			&c.Meta.Robots); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return nil
 		}
-		pages = append(pages, p)
+		fmt.Printf("%+v\n", c)
+		cs = append(cs, c)
 	}
-	return pages, nil
-}
-
-// Get starts building the query that gets sent to the database.
-//
-// TODO: describe how queries should be built using method chaining.
-func Get() *Query {
-	return &Query{query: &psqldb.Query{}}
+	return cs
 }
