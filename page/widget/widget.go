@@ -1,8 +1,6 @@
-package data
+package widget
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Widget is a small piece of software that can be embedded into a web page.
 // It performs specific tasks or holds specific information or functionality.
@@ -34,7 +32,7 @@ type Widget struct {
 }
 
 // NewWidget creates and returns a new widget object.
-func NewWidget() *Widget {
+func New() *Widget {
 	return &Widget{}
 }
 
@@ -44,35 +42,18 @@ func (w *Widget) String() string {
 	return fmt.Sprintf(str, w.Name, w.ID, w.RefName, w.Type, w.Data)
 }
 
-// Menu contains ordered, clickable elements.
-type Menu struct {
-	Entries []*MenuEntry
-}
-
-// String prints the menu's data in an easily readable format.
-func (m *Menu) String() string {
-	return fmt.Sprintf("MENU: {%+v}", m.Entries)
-}
-
-// MenuEntry contains all information about a specific menu entry.
-type MenuEntry struct {
-	ID      uint32
-	Name    string
-	Image   string
-	RefID   uint32
-	RefURL  string
-	Submenu uint32
-	Pos     uint16
-	Active  bool
-}
-
-// String prints the entry's data in an easily readable format.
-func (e *MenuEntry) String() string {
-	str := "ENTRY '%s': {ID:%d | Image:%s | RefID:%d | RefURL:%s | Pos:%d | Active:%t}"
-	return fmt.Sprintf(str, e.Name, e.ID, e.Image, e.RefID, e.RefURL, e.Pos, e.Active)
-}
-
-// Text implements WidgetData. It holds arbitrary text for display.
-type Text struct {
-	Content string
+// ByIDs returns widgets that match the given parameter(s).
+//
+// It should be used for fetching one or more widgets for rendering
+// and is guaranteed to contain at least one correctly set up widget
+// at the first position of the returned slice.
+func ByIDs(ids ...uint32) []*Widget {
+	ws := fromStorageByID(ids...)
+	if len(ws) < 1 {
+		return []*Widget{New()}
+	}
+	for _, w := range ws {
+		fetchData(w)
+	}
+	return ws
 }

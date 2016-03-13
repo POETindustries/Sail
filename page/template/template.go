@@ -1,4 +1,4 @@
-package data
+package template
 
 import (
 	"fmt"
@@ -6,14 +6,9 @@ import (
 	"io"
 	"sail/conf"
 	"sail/errors"
+	"sail/page/fallback"
+	"sail/page/widget"
 )
-
-var funcMap = template.FuncMap{
-	"even": even}
-
-func even(val int) bool {
-	return val%2 == 0
-}
 
 // Template is the data structure that contains all data necessary
 // to render the template files and all widgets contained within.
@@ -22,40 +17,52 @@ type Template struct {
 	Name      string
 	WidgetIDs []uint32
 	template  *template.Template
-	Widgets   map[string]*Widget
+	Widgets   map[string]*widget.Widget
 }
 
-// NewTemplate creates a new Template object
-func NewTemplate() *Template {
+// New creates a new Template object
+func New() *Template {
 	return &Template{
 		Name:    "404",
-		Widgets: make(map[string]*Widget)}
+		Widgets: make(map[string]*widget.Widget)}
+}
+
+// ByID returns the template that matches the given id.
+//
+// It should be used to prepare one template for rendering
+// and is guaranteed to return a pointer to a valid template.
+func ByID(id uint32) *Template {
+	ts := fromStorageByID(id)
+	if len(ts) < 1 {
+		if id == 1 {
+			return New()
+		}
+		return ByID(1)
+	}
+	return ts[0]
 }
 
 // Execute applies a parsed template to the specified data object,
 // writing the output to wr. If an error occurs during execution, it
 // is the responsibility of the caller to handle partially written
 // output.
-func (t *Template) Execute(wr io.Writer, data interface{}) (err error) {
+func (t *Template) Execute(wr io.Writer, data interface{}) error {
 	if t.template == nil {
-		err = errors.NilPointer()
-	} else {
-		err = t.template.ExecuteTemplate(wr, "frame.html", data)
+		t.Parse()
 	}
-	errors.Log(err, conf.Instance().DevMode)
-	return
+	return t.template.ExecuteTemplate(wr, "frame.html", data)
 }
 
 // Parse parses the template files pointed at by the template.
 func (t *Template) Parse() {
 	if t.Name == "404" {
-		t.template, _ = template.New("frame").Parse(NOTFOUND404)
+		t.template, _ = template.New("frame").Parse(fallback.NOTFOUND404)
 	} else {
 		dir := conf.Instance().TmplDir + t.Name
 		tpl, err := template.New("").Funcs(funcMap).ParseGlob(dir + "/*.html")
 		if err != nil {
 			errors.Log(err, conf.Instance().DevMode)
-			tpl, _ = template.New("frame").Parse(NOTFOUND404)
+			tpl, _ = template.New("frame").Parse(fallback.NOTFOUND404)
 		}
 		t.template = tpl
 	}

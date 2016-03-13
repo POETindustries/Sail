@@ -1,9 +1,14 @@
-package response
+package page
 
 import (
 	"bytes"
 	"html/template"
-	"sail/page/data"
+	"sail/conf"
+	"sail/errors"
+	"sail/page/content"
+	"sail/page/fallback"
+	tpl "sail/page/template"
+	"sail/page/widget"
 	"strings"
 )
 
@@ -16,81 +21,83 @@ import (
 // functions and fields of type bool are safe for use as conditions
 // inside templates.
 type Presenter struct {
-	HasMessage bool
-	Message    string
-	FallbackID uint32
+	Message string
 
-	page   *data.Page
-	markup *bytes.Buffer
-	url    string
+	content  *content.Content
+	template *tpl.Template
+	url      string
 }
 
-// New creates a new presenter object with all necessary fields properly
-// initialized.
-func NewPresenter() *Presenter {
+// New creates a new presenter object with all necessary
+// fields properly initialized.
+func New(cnt *content.Content, tmpl *tpl.Template, url string) *Presenter {
 	return &Presenter{
-		FallbackID: 1,
-		page:       data.NewPage(),
-		markup:     bytes.NewBufferString("")}
+		content:  cnt,
+		template: tmpl,
+		url:      url}
 }
 
-func (p *Presenter) Compile() (*bytes.Buffer, error) {
-	err := p.page.Template.Execute(p.markup, p)
-	return p.markup, err
+func (p *Presenter) Compile() *bytes.Buffer {
+	var markup bytes.Buffer
+	if err := p.template.Execute(&markup, p); err != nil {
+		errors.Log(err, conf.Instance().DevMode)
+		return bytes.NewBufferString(fallback.NOTFOUND404)
+	}
+	return &markup
 }
 
 // PageTitle returns the title of the currently held page object.
-func (p *Presenter) PageTitle() string { return p.page.Title }
+func (p *Presenter) PageTitle() string { return p.content.Title }
 
 // PageOwner returns the name of the page's owner.
-func (p *Presenter) PageOwner() string { return p.page.Owner }
+func (p *Presenter) PageOwner() string { return p.content.Owner }
 
 // PageEditDate returns a format string for the date the page was
 // edited last.
-func (p *Presenter) PageEditDate() string { return p.page.EDate }
+func (p *Presenter) PageEditDate() string { return p.content.EDate }
 
 // PageCreateDate returns a string-formatted representation of the
 // date the page was created.
-func (p *Presenter) PageCreateDate() string { return p.page.CDate }
+func (p *Presenter) PageCreateDate() string { return p.content.CDate }
 
 // PageContent returns the page's contents in an html-encoded format.
 func (p *Presenter) PageContent() template.HTML {
-	return template.HTML(p.page.Content)
+	return template.HTML(p.content.Content)
 }
 
 // MetaTitle returns the page title for use in the html <meta> tag
 // within the <head> area.
-func (p *Presenter) MetaTitle() string { return p.page.Meta.Title }
+func (p *Presenter) MetaTitle() string { return p.content.Meta.Title }
 
 // MetaKeywords returns the keywords for use in the html <meta> tag
 // within the <head> area.
-func (p *Presenter) MetaKeywords() string { return p.page.Meta.Keywords }
+func (p *Presenter) MetaKeywords() string { return p.content.Meta.Keywords }
 
 // MetaDescription returns the page's description for use in the html
 // <meta> tag within the <head> area.
-func (p *Presenter) MetaDescription() string { return p.page.Meta.Description }
+func (p *Presenter) MetaDescription() string { return p.content.Meta.Description }
 
 // MetaLanguage returns the language value for use in the html <meta>
 // tag within the <head> area.
-func (p *Presenter) MetaLanguage() string { return p.page.Meta.Language }
+func (p *Presenter) MetaLanguage() string { return p.content.Meta.Language }
 
 // MetaPageTopic returns the page-topic value for use in the html
 // <meta> tag within the <head> area.
-func (p *Presenter) MetaPageTopic() string { return p.page.Meta.PageTopic }
+func (p *Presenter) MetaPageTopic() string { return p.content.Meta.PageTopic }
 
 // MetaRevisit returns the desired crawler revisit value for use in
 //the html <meta> tag within the <head> area.
-func (p *Presenter) MetaRevisit() string { return p.page.Meta.RevisitAfter }
+func (p *Presenter) MetaRevisit() string { return p.content.Meta.RevisitAfter }
 
 // MetaRobots returns the desired robots value for use in the html
 // <meta> tag within the <head> area.
-func (p *Presenter) MetaRobots() string { return p.page.Meta.Robots }
+func (p *Presenter) MetaRobots() string { return p.content.Meta.Robots }
 
 // Widget returns a pointer to the widget designated by the name
 // parameter. If no such widget exists, an empty widget is returned.
-func (p *Presenter) Widget(name string) (w *data.Widget) {
-	if w = p.page.Template.Widgets[name]; w == nil {
-		return data.NewWidget()
+func (p *Presenter) Widget(name string) (w *widget.Widget) {
+	if w = p.template.Widgets[name]; w == nil {
+		return widget.New()
 	}
 	return
 }
@@ -99,11 +106,11 @@ func (p *Presenter) Widget(name string) (w *data.Widget) {
 // It is guaranteed to return an object of the correct type; if the
 // desired object does not exist, an empty object is returned with
 // all necessary components minimally initialized.
-func (p *Presenter) Menu(name string, isMain bool) *data.Menu {
+func (p *Presenter) NavMenu(name string, isMain bool) *widget.Nav {
 	w := p.Widget(name)
-	m, ok := w.Data.(*data.Menu)
+	m, ok := w.Data.(*widget.Nav)
 	if !ok {
-		return &data.Menu{Entries: []*data.MenuEntry{}}
+		return &widget.Nav{Entries: []*widget.NavEntry{}}
 	}
 	if isMain {
 		for _, e := range m.Entries {
@@ -118,7 +125,7 @@ func (p *Presenter) Menu(name string, isMain bool) *data.Menu {
 // type; if the desired object doesn't exist, returns an empty string.
 func (p *Presenter) TextWidget(name string) template.HTML {
 	w := p.Widget(name)
-	t, ok := w.Data.(*data.Text)
+	t, ok := w.Data.(*widget.Text)
 	if ok {
 		return template.HTML(t.Content)
 	}

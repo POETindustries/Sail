@@ -1,4 +1,4 @@
-package data
+package meta
 
 // Meta holds the meta information of a web page. It is used to store values
 // for display in an html page's <head> block. This struct holds values that
@@ -18,6 +18,6 @@ type Meta struct {
 	Robots       string
 }
 
-func NewMeta() *Meta {
+func New() *Meta {
 	return &Meta{}
 }

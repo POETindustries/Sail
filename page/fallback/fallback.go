@@ -1,4 +1,4 @@
-package data
+package fallback
 
 // NOTFOUND404 is a very basic web page signaling a 404 error.
 // It contails the bare minimum necessary for a syntactically correct html web
@@ -15,29 +15,3 @@ const NOTFOUND404 = `
 		<p>PAGE NOT FOUND</p>
 	</body>
 </html>`
-
-// Page contains the information needed to generate a web page for display.
-// This is the basic struct that contains all information needed to generate
-// a correct and complete html page. It is the responsibility of the other
-// functions and methods in package page to make sure its fields are
-// properly initialized.
-type Page struct {
-	ID       uint32
-	Title    string
-	URL      string
-	Content  string
-	Meta     *Meta
-	Template *Template
-
-	Status int8
-	Owner  string
-	CDate  string
-	EDate  string
-}
-
-// NewPage creates a new Page object with usable defaults.
-func NewPage() *Page {
-	return &Page{
-		Meta:     NewMeta(),
-		Template: NewTemplate()}
-}
