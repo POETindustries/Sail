@@ -20,7 +20,7 @@ func main() {
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
 		http.HandleFunc("/login", loginHandler)
-		http.HandleFunc("/favicon.ico", iconHandler)
+		http.Handle("/favicon.ico", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/files/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/theme/", http.FileServer(http.Dir(config.Cwd)))
@@ -42,10 +42,6 @@ func frontendHandler(wr http.ResponseWriter, req *http.Request) {
 
 	t2 := time.Now().Nanosecond()
 	fmt.Printf("Time to serve page: %d microseconds\n", (t2-t1)/1000)
-}
-
-func iconHandler(wr http.ResponseWriter, req *http.Request) {
-	http.ServeFile(wr, req, conf.Instance().Cwd+"/favicon.ico")
 }
 
 func backendHandler(wr http.ResponseWriter, req *http.Request) {
