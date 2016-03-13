@@ -1,12 +1,10 @@
 package response
 
 import (
-	"bytes"
 	"net/http"
 	"sail/page"
 	"sail/page/cache"
 	"sail/page/content"
-	"sail/page/fallback"
 	"sail/page/template"
 	"sail/page/widget"
 )
@@ -16,9 +14,12 @@ type Response struct {
 	FallbackURL string
 	Message     string
 	URL         string
+	Presenter   page.Presenter
 
 	response http.ResponseWriter
 	request  *http.Request
+	content  *content.Content
+	template *template.Template
 }
 
 func New(wr http.ResponseWriter, req *http.Request) *Response {
@@ -31,26 +32,40 @@ func New(wr http.ResponseWriter, req *http.Request) *Response {
 }
 
 func (r *Response) Serve() {
-	buf := bytes.NewBufferString(fallback.NOTFOUND404)
-	if markup := cache.DB().Markup(r.URL); markup != nil {
-		buf = bytes.NewBuffer(markup)
-	} else {
-		cnt := content.ByURL(r.URL)
+	r.Presenter.SetURL(r.URL)
+	r.Presenter.SetMessage(r.Message)
+	m := r.Presenter.Compile()
+	m.WriteTo(r.response)
+	/* cache.DB().PushMarkup(r.URL, m.Bytes()) disable for now*/
+}
+
+func (r *Response) Content() *content.Content {
+	if r.content == nil {
+		cnt := cache.DB().Content(r.URL)
 		if cnt == nil {
-			if cnt = content.ByURL(r.FallbackURL); cnt == nil {
-				cnt = content.ByID(r.FallbackID)
+			if cnt = content.ByURL(r.URL); cnt == nil {
+				if cnt = content.ByURL(r.FallbackURL); cnt == nil {
+					cnt = content.ByID(r.FallbackID)
+				}
 			}
 		}
-		tmpl := cache.DB().Template(cnt.TemplateID)
+		cache.DB().PushContent(cnt)
+		r.content = cnt
+	}
+	return r.content
+}
+
+func (r *Response) Template() *template.Template {
+	if r.template == nil {
+		tmpl := cache.DB().Template(r.Content().TemplateID)
 		if tmpl == nil {
-			tmpl = template.ByID(cnt.TemplateID)
+			tmpl = template.ByID(r.Content().TemplateID)
 			for _, w := range widget.ByIDs(tmpl.WidgetIDs...) {
 				tmpl.Widgets[w.RefName] = w
 			}
 		}
-		presenter := page.New(cnt, tmpl, cnt.URL)
-		presenter.Message = r.Message
-		buf = presenter.Compile()
+		cache.DB().PushTemplate(tmpl)
+		r.template = tmpl
 	}
-	buf.WriteTo(r.response)
+	return r.template
 }
