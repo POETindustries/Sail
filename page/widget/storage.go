@@ -3,112 +3,93 @@ package widget
 import (
 	"database/sql"
 	"fmt"
-	"sail/page/data"
-	"sail/storage/psqldb"
-	"sail/storage/schema"
+	"sail/conf"
+	"sail/errors"
+	"sail/page/schema"
+	"sail/storage"
 )
 
-// Query collects all information needed for querying the database.
-type Query struct {
-	query *psqldb.Query
-}
-
-// ByID prepares the query to select the widget that matches the given id.
-func (q *Query) ByID(ids ...uint32) *Query {
-	for _, id := range ids {
-		q.query.AddAttr(schema.WidgetID, id, psqldb.OpOr)
+func fromStorageByID(ids ...uint32) []*Widget {
+	query := storage.Get().In("sl_widget").Attrs(schema.WidgetAttrs...)
+	if len(ids) == 1 {
+		query.Equals(schema.WidgetID, ids[0])
+	} else if len(ids) > 1 {
+		// query.EqualsMany(schema.WidgetID, ids)
 	}
-	return q
+	rows := query.Exec()
+	return scanWidget(rows.(*sql.Rows))
 }
 
-// Ascending prepares the query for table-specific ordering.
-func (q *Query) Ascending() *Query {
-	q.query.Ascending()
-	return q
-}
-
-// Descending prepares the query for table-specific ordering.
-func (q *Query) Descending() *Query {
-	q.query.Descending()
-	return q
-}
-
-// Widgets executes the query and returns all matching widget objects.
-func (q *Query) Widgets() ([]*data.Widget, error) {
-	q.query.Table = "sl_widget"
-	q.query.Proj = schema.WidgetAttrs
-	return q.scanWidgets(q.query.Execute())
-}
-
-// Menu executes the query, collecting information for one menu data.
-func (q *Query) Menu() (*data.Menu, error) {
-	stmt := "sl_widget_menu join (select %s,%s from sl_page) as p on %s=%s"
-	q.query.Table = fmt.Sprintf(stmt,
-		schema.PageID, schema.PageURL, schema.PageID, schema.MenuEntryRefID)
-	q.query.Proj = schema.MenuAttrs + "," + schema.PageURL
-
-	if o := q.query.Order(); o != "" {
-		q.query.SetOrderStmt("order by " + schema.MenuEntryPosition + o)
+func fetchData(widget *Widget) {
+	switch widget.Type {
+	case "nav":
+		widget.Data = fetchNavData(widget.ID)
+	case "text":
+		widget.Data = fetchTextData(widget.ID)
 	}
-	return q.scanMenu(q.query.Execute())
 }
 
-// TextField executes the query, providing a text widget in return.
-func (q *Query) TextField() (*data.Text, error) {
-	q.query.Table = "sl_widget_text"
-	q.query.Proj = schema.TextContent
-	return q.scanTextField(q.query.Execute())
+func fetchNavData(id uint32) *Nav {
+	stmt := "sl_widget_nav natural join (select %s,%s from sl_content)"
+	t := fmt.Sprintf(stmt, schema.ContentID, schema.ContentURL)
+	a := append(schema.NavAttrs, schema.ContentURL)
+	rows := storage.Get().In(t).Attrs(a...).
+		Equals(schema.NavWidgetID, id).Exec()
+	return scanNav(rows.(*sql.Rows))
 }
 
-func (q *Query) scanWidgets(rows *sql.Rows, err error) ([]*data.Widget, error) {
-	if err != nil {
-		return nil, err
+func fetchTextData(id uint32) *Text {
+	rows := storage.Get().In("sl_widget_text").Equals(schema.TextID, id).Exec()
+	ts := scanText(rows.(*sql.Rows))
+	if len(ts) < 1 {
+		// could return &Text{}, but nil is consistent with other
+		// funcs. It needs to be seen whether this is a good idea.
+		return nil
 	}
-	widgets := []*data.Widget{}
+	return ts[0]
+}
+
+func scanWidget(rows *sql.Rows) []*Widget {
 	defer rows.Close()
+	var ws []*Widget
 	for rows.Next() {
-		w := data.NewWidget()
-		if err = rows.Scan(&w.ID, &w.Name, &w.RefName, &w.Type); err != nil {
-			return nil, err
+		w := New()
+		if err := rows.Scan(&w.ID, &w.Name, &w.RefName, &w.Type); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return nil
 		}
-		widgets = append(widgets, w)
+		fmt.Printf("%+v\n", w)
+		ws = append(ws, w)
 	}
-	return widgets, nil
+	return ws
 }
 
-func (q *Query) scanMenu(rows *sql.Rows, err error) (*data.Menu, error) {
-	if err != nil {
-		return nil, err
-	}
-	menu := data.Menu{}
+func scanNav(rows *sql.Rows) *Nav {
 	defer rows.Close()
+	n := Nav{}
 	for rows.Next() {
-		e := data.MenuEntry{}
-		if err = rows.Scan(&e.ID, &e.Name, &e.RefID, &e.Submenu, &e.Pos, &e.RefURL); err != nil {
-			return nil, err
+		e := NavEntry{}
+		if err := rows.Scan(&e.ID, &e.Name, &e.RefID, &e.Submenu, &e.Pos,
+			&e.RefURL); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return nil
 		}
-		menu.Entries = append(menu.Entries, &e)
+		n.Entries = append(n.Entries, &e)
 	}
-	return &menu, nil
+	fmt.Printf("%+v\n", n)
+	return &n
 }
 
-func (q *Query) scanTextField(rows *sql.Rows, err error) (*data.Text, error) {
-	if err != nil {
-		return nil, err
-	}
-	text := data.Text{}
+func scanText(rows *sql.Rows) []*Text {
 	defer rows.Close()
+	var ts []*Text
 	for rows.Next() {
-		if err = rows.Scan(&text.Content); err != nil {
-			return nil, err
+		t := Text{}
+		if err := rows.Scan(&t.Content); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return nil
 		}
+		ts = append(ts, &t)
 	}
-	return &text, nil
-}
-
-// Get starts building the query that gets sent to the database.
-//
-// TODO: describe how queries should be built using method chaining.
-func Get() *Query {
-	return &Query{query: &psqldb.Query{}}
+	return ts
 }
