@@ -35,8 +35,8 @@ func (r *Response) Serve() {
 	r.Presenter.SetURL(r.URL)
 	r.Presenter.SetMessage(r.Message)
 	m := r.Presenter.Compile()
+	//cache.DB().PushMarkup(r.URL, m.Bytes())
 	m.WriteTo(r.response)
-	/* cache.DB().PushMarkup(r.URL, m.Bytes()) disable for now*/
 }
 
 func (r *Response) Content() *content.Content {
@@ -49,7 +49,7 @@ func (r *Response) Content() *content.Content {
 				}
 			}
 		}
-		cache.DB().PushContent(cnt)
+		//cache.DB().PushContent(cnt)
 		r.content = cnt
 	}
 	return r.content
@@ -64,7 +64,7 @@ func (r *Response) Template() *template.Template {
 				tmpl.Widgets[w.RefName] = w
 			}
 		}
-		cache.DB().PushTemplate(tmpl)
+		//cache.DB().PushTemplate(tmpl)
 		r.template = tmpl
 	}
 	return r.template
