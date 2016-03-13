@@ -22,10 +22,10 @@ import (
 // inside templates.
 type Presenter struct {
 	Message string
+	URL     string
 
 	content  *content.Content
 	template *tpl.Template
-	url      string
 }
 
 // New creates a new presenter object with all necessary
@@ -34,7 +34,7 @@ func New(cnt *content.Content, tmpl *tpl.Template, url string) *Presenter {
 	return &Presenter{
 		content:  cnt,
 		template: tmpl,
-		url:      url}
+		URL:      url}
 }
 
 func (p *Presenter) Compile() *bytes.Buffer {
@@ -114,7 +114,7 @@ func (p *Presenter) NavMenu(name string, isMain bool) *widget.Nav {
 	}
 	if isMain {
 		for _, e := range m.Entries {
-			e.Active = strings.HasPrefix(p.url, e.RefURL)
+			e.Active = strings.HasPrefix(p.URL, e.RefURL)
 		}
 	}
 	return m
