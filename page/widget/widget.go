@@ -2,6 +2,10 @@ package widget
 
 import "fmt"
 
+type Data interface {
+	Copy() Data
+}
+
 // Widget is a small piece of software that can be embedded into a web page.
 // It performs specific tasks or holds specific information or functionality.
 //
@@ -28,12 +32,21 @@ type Widget struct {
 	Name    string
 	RefName string
 	Type    string
-	Data    interface{}
+	Data    Data
 }
 
 // NewWidget creates and returns a new widget object.
 func New() *Widget {
 	return &Widget{}
+}
+
+func (w *Widget) Copy() *Widget {
+	return &Widget{
+		ID:      w.ID,
+		Name:    w.Name,
+		RefName: w.RefName,
+		Type:    w.Type,
+		Data:    w.Data.Copy()}
 }
 
 // String prints the widget's data in an easily readable format.

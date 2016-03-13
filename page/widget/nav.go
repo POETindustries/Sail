@@ -8,6 +8,14 @@ type Nav struct {
 	Entries []*NavEntry
 }
 
+func (n *Nav) Copy() Data {
+	var es []*NavEntry
+	for _, e := range n.Entries {
+		es = append(es, e.Copy())
+	}
+	return &Nav{Entries: es}
+}
+
 // String prints the menu's data in an easily readable format.
 func (m *Nav) String() string {
 	return fmt.Sprintf("NAV: {%+v}", m.Entries)
@@ -23,6 +31,18 @@ type NavEntry struct {
 	Submenu uint32
 	Pos     uint16
 	Active  bool
+}
+
+func (e *NavEntry) Copy() *NavEntry {
+	return &NavEntry{
+		ID:      e.ID,
+		Name:    e.Name,
+		Image:   e.Image,
+		RefID:   e.RefID,
+		RefURL:  e.RefURL,
+		Submenu: e.Submenu,
+		Pos:     e.Pos,
+		Active:  e.Active}
 }
 
 // String prints the entry's data in an easily readable format.

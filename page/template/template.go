@@ -42,6 +42,18 @@ func ByID(id uint32) *Template {
 	return ts[0]
 }
 
+func (t *Template) Copy() *Template {
+	ws := make(map[string]*widget.Widget)
+	for k, v := range t.Widgets {
+		ws[k] = v.Copy()
+	}
+	return &Template{
+		ID:        t.ID,
+		Name:      t.Name,
+		WidgetIDs: t.WidgetIDs,
+		Widgets:   ws}
+}
+
 // Execute applies a parsed template to the specified data object,
 // writing the output to wr. If an error occurs during execution, it
 // is the responsibility of the caller to handle partially written

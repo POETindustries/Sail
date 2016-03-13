@@ -4,3 +4,7 @@ package widget
 type Text struct {
 	Content string
 }
+
+func (t *Text) Copy() Data {
+	return &Text{Content: t.Content}
+}
