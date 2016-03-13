@@ -2,19 +2,23 @@
 <html>
 
 <head>
-	<title>{{.PageTitle}}</title>
+	<title>Sail | Office</title>
 	<meta charset="utf-8">
-	<meta name="title" content="{{.MetaTitle}}">
-	<meta name="robots" content="{{.MetaRobots}}">
+	<meta name="title" content="Sail Office">
+	<meta name="robots" content="nofollow, noindex">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/theme/default-backend/style.css"/>
 </head>
 
 <body>
 	<div id="main_area">
-		SHIT JUST GOT REAL!
+		{{if eq .URL "/office/login"}}
+		{{template "login" .}}
+		{{else if eq .URL "/office/"}}
+		{{template "home" .}}
+		{{end}}
+		{{if .Message}}<div id="message">{{.Message}}</div>{{end}}
 	</div>
-
 </body>
 
 </html>
