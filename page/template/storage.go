@@ -2,72 +2,54 @@ package template
 
 import (
 	"database/sql"
+	"sail/conf"
+	"sail/errors"
 	"sail/page/schema"
+	"sail/storage"
 )
 
-// Query collects all information needed for querying the database.
-type Query struct {
-	query *psqldb.Query
-}
-
-// ByID prepares the query to select the page that matches the given id.
-func (q *Query) ByID(ids ...uint32) *Query {
-	for _, id := range ids {
-		q.query.AddAttr(schema.TemplateID, id, psqldb.OpOr)
+func fromStorageByID(ids ...uint32) []*Template {
+	query := storage.Get().In("sl_template").Attrs(schema.TemplateAttrs...)
+	if len(ids) == 1 {
+		query.Equals(schema.TemplateID, ids[0])
+	} else if len(ids) > 1 {
+		// query.EqualsMany(schema.TemplateID, ids)
 	}
-	return q
-}
-
-// Templates executes the query and returns all matching widget objects.
-func (q *Query) Templates() ([]*data.Template, error) {
-	q.query.Table = "sl_template"
-	q.query.Proj = schema.TemplateAttrs
-	return q.scanTemplates(q.query.Execute())
-}
-
-// WidgetIDs executes the query and returns the ids of all widgets
-// used in this template.
-func (q *Query) WidgetIDs() ([]uint32, error) {
-	q.query.Table = "sl_template_widgets"
-	q.query.Proj = schema.WidgetID
-	return q.scanWidgetIDs(q.query.Execute())
-}
-
-func (q *Query) scanTemplates(rows *sql.Rows, err error) ([]*data.Template, error) {
-	if err != nil {
-		return nil, err
+	rows := query.Exec()
+	ts := scanTemplate(rows.(*sql.Rows))
+	for _, t := range ts {
+		rows = storage.Get().In("sl_template_widgets").
+			Equals(schema.TemplateID, t.ID).
+			Attrs(schema.TemplateWidgetID).Exec()
+		t.WidgetIDs = scanWidgetID(rows.(*sql.Rows))
 	}
-	var ts []*data.Template
+	return ts
+}
+
+func scanTemplate(rows *sql.Rows) []*Template {
 	defer rows.Close()
+	var ts []*Template
 	for rows.Next() {
-		t := data.NewTemplate()
-		if err = rows.Scan(&t.ID, &t.Name); err != nil {
-			return nil, err
+		t := New()
+		if err := rows.Scan(&t.ID, &t.Name); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return nil
 		}
 		ts = append(ts, t)
 	}
-	return ts, nil
+	return ts
 }
 
-func (q *Query) scanWidgetIDs(data *sql.Rows, err error) ([]uint32, error) {
-	if err != nil {
-		return nil, err
-	}
-	var ids []uint32
-	defer data.Close()
-	for data.Next() {
-		var id uint32
-		if err = data.Scan(&id); err != nil {
-			return nil, err
+func scanWidgetID(rows *sql.Rows) []uint32 {
+	defer rows.Close()
+	var ws []uint32
+	for rows.Next() {
+		var w uint32
+		if err := rows.Scan(&w); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return nil
 		}
-		ids = append(ids, id)
+		ws = append(ws, w)
 	}
-	return ids, nil
-}
-
-// Get starts building the query that gets sent to the database.
-//
-// TODO: describe how queries should be built using method chaining.
-func Get() *Query {
-	return &Query{query: &psqldb.Query{}}
+	return ws
 }
