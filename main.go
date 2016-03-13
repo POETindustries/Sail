@@ -6,6 +6,8 @@ import (
 	"sail/conf"
 	"sail/response"
 	"sail/storage"
+	"sail/user"
+	"sail/user/session"
 	"time"
 )
 
@@ -14,8 +16,8 @@ func main() {
 	if storage.DB() != nil {
 		storage.ExecCreateInstructs()
 		http.HandleFunc("/", frontendHandler)
-		//http.HandleFunc("/office/", backendHandler)
-		//http.HandleFunc("/login", loginHandler)
+		http.HandleFunc("/office/", backendHandler)
+		http.HandleFunc("/login", loginHandler)
 		http.HandleFunc("/favicon.ico", iconHandler)
 		http.Handle("/files/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
@@ -39,9 +41,8 @@ func iconHandler(wr http.ResponseWriter, req *http.Request) {
 	http.ServeFile(wr, req, conf.Instance().Cwd+"/favicon.ico")
 }
 
-/*
 func backendHandler(wr http.ResponseWriter, req *http.Request) {
-	if psqldb.Instance().Verify() {
+	if storage.DB().Ping() == nil {
 		cookie, _ := req.Cookie("session")
 		if cookie != nil && session.DB().Has(cookie.Value) {
 			session.DB().Start(cookie.Value)
@@ -49,6 +50,7 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 			r.FallbackURL = "/office/home"
 			r.Serve()
 		} else {
+			println("no dice")
 			loginHandler(wr, req)
 		}
 	}
@@ -70,6 +72,6 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 		}
 		r.Message = "Wrong login credentials!"
 	}
-	r.URL = "/logn"
+	r.URL = "/login"
 	r.Serve()
-}*/
+}
