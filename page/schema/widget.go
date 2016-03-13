@@ -58,8 +58,7 @@ const InitWidgetNav = `insert into sl_widget_nav(
 	` + NavEntryPosition + `)
 	values
 	(1, 'Home', 1, 0),
-	(1, 'About', 4, 10),
-	(1, 'Login', 3, 100);`
+	(1, 'About', 2, 10);`
 
 /********************************************
  * text widget info

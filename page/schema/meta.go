@@ -32,12 +32,4 @@ const InitMeta = `insert into sl_meta values(
     'en',
     'cms',
     '1 month',
-    'index, follow'),(
-	2,
-	'Sail Backend',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'noindex, nofollow');`
+    'index, follow');`

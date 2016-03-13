@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sail/conf"
+	"sail/page/backend"
 	"sail/page/cache"
 	"sail/page/frontend"
 	"sail/response"
@@ -19,7 +20,6 @@ func main() {
 		storage.ExecCreateInstructs()
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
-		http.HandleFunc("/login", loginHandler)
 		http.Handle("/favicon.ico", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/files/", http.FileServer(http.Dir(config.Cwd)))
 		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
@@ -50,11 +50,10 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 		if cookie != nil && session.DB().Has(cookie.Value) {
 			session.DB().Start(cookie.Value)
 			r := response.New(wr, req)
-			r.FallbackURL = "/office/home"
-			r.Presenter = frontend.New(r.Content(), r.Template())
+			r.FallbackURL = "/office"
+			r.Presenter = backend.New()
 			r.Serve()
 		} else {
-			println("no dice")
 			loginHandler(wr, req)
 		}
 	}
@@ -70,14 +69,14 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 			session.DB().Add(s)
 			c := http.Cookie{Name: "session", Value: s.ID}
 			http.SetCookie(wr, &c)
-			r.FallbackURL = "/office/home"
-			r.Presenter = frontend.New(r.Content(), r.Template())
+			r.FallbackURL = "/office"
+			r.Presenter = backend.New()
 			r.Serve()
 			return
 		}
 		r.Message = "Wrong login credentials!"
 	}
-	r.URL = "/login"
-	r.Presenter = frontend.New(r.Content(), r.Template())
+	r.URL = "/office/login"
+	r.Presenter = backend.New()
 	r.Serve()
 }

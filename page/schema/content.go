@@ -29,12 +29,6 @@ const CreateContent = `create table if not exists sl_content(
 	` + ContentCreateDate + ` text not null default '2015-09-19 10:34:12',
 	` + ContentEditDate + ` text not null default '2015-09-19 10:34:12');`
 
-const contentLogin = `<form id="login_form" action="/office/" method="POST">
-	<input type="text" placeholder="User Name" name="user">
-	<input type="password" placeholder="Password" name="pass">
-	<input type="submit" value="Submit" id="submit">
-</form>`
-
 const InitContent = `insert into sl_content(
 	` + ContentTitle + `,
 	` + ContentContent + `,
@@ -43,6 +37,4 @@ const InitContent = `insert into sl_content(
 	` + ContentTemplateID + `)
 	values
 	('Home', 'Welcome to Sail', '/home', 1, 1),
-	('Office', '', '/office/home', 2, 2),
-	('Login', '` + contentLogin + `', '/login', 1, 1),
 	('About Sail', 'Go where the wind blows.', '/about', 1, 1);`
