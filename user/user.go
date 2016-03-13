@@ -23,15 +23,23 @@ func New() *User {
 	return &User{}
 }
 
+func ByName(name string) *User {
+	us := fromStorageByName(name)
+	if len(us) < 1 {
+		return nil
+	}
+	return us[0]
+}
+
 // Verify returns true if user and password match entries in the
 // user database.
 func Verify(user, pass string) bool {
-	users, err := userstore.Get().ByName(user).Users()
-	if err != nil || len(users) == 0 {
+	u := ByName(user)
+	if u == nil {
 		return false
 	}
 	p := []byte(pass)
-	h := []byte(users[0].Pass)
+	h := []byte(u.Pass)
 	return bcrypt.CompareHashAndPassword(h, p) == nil
 }
 
