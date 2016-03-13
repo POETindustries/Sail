@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"sail/conf"
+	"sail/page/cache"
+	"sail/page/frontend"
 	"sail/response"
 	"sail/storage"
 	"sail/user"
@@ -29,8 +31,13 @@ func main() {
 func frontendHandler(wr http.ResponseWriter, req *http.Request) {
 	t1 := time.Now().Nanosecond()
 
-	if storage.DB().Ping() == nil {
-		response.New(wr, req).Serve()
+	if markup := cache.DB().Markup(req.URL.Path); markup != nil {
+		wr.Write(markup)
+	} else if storage.DB().Ping() == nil {
+		r := response.New(wr, req)
+		r.Presenter = frontend.New(r.Content(), r.Template())
+		r.URL = r.Content().URL
+		r.Serve()
 	}
 
 	t2 := time.Now().Nanosecond()
@@ -48,6 +55,7 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 			session.DB().Start(cookie.Value)
 			r := response.New(wr, req)
 			r.FallbackURL = "/office/home"
+			r.Presenter = frontend.New(r.Content(), r.Template())
 			r.Serve()
 		} else {
 			println("no dice")
@@ -67,11 +75,13 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 			c := http.Cookie{Name: "session", Value: s.ID}
 			http.SetCookie(wr, &c)
 			r.FallbackURL = "/office/home"
+			r.Presenter = frontend.New(r.Content(), r.Template())
 			r.Serve()
 			return
 		}
 		r.Message = "Wrong login credentials!"
 	}
 	r.URL = "/login"
+	r.Presenter = frontend.New(r.Content(), r.Template())
 	r.Serve()
 }
