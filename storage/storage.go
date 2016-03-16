@@ -1,26 +1,59 @@
 package storage
 
 import (
+	"database/sql"
+	"os"
 	"sail/conf"
 	"sail/errors"
-	"sail/storage/psqldb"
-	"sail/storage/domainstore"
-	"sail/storage/pagestore"
-	"sail/storage/templatestore"
-	"sail/storage/widgetstore"
+	pageschema "sail/page/schema"
+	userschema "sail/user/schema"
+
+	// sqlite database driver
+	_ "github.com/mattn/go-sqlite3"
 )
 
-var createInstructs = [][]string{
-	widgetstore.CreateInstructs,
-	templatestore.CreateInstructs,
-	domainstore.CreateInstructs,
-	pagestore.CreateInstructs}
+const version = 1
+
+var db *sql.DB
+var createInstructs = []string{
+	userschema.CreateUser,
+	userschema.InitUser,
+	pageschema.CreateWidget,
+	pageschema.InitWidget,
+	pageschema.CreateWidgetNav,
+	pageschema.InitWidgetNav,
+	pageschema.CreateWidgetText,
+	pageschema.CreateTemplate,
+	pageschema.InitTemplate,
+	pageschema.CreateTemplateWidgets,
+	pageschema.InitTemplateWidgets,
+	pageschema.CreateMeta,
+	pageschema.InitMeta,
+	pageschema.CreateContent,
+	pageschema.InitContent}
+
+// DB returns a pointer to the database handle singleton.
+func DB() *sql.DB {
+	if db == nil && !dbInit() {
+		panic("storage: Database init failed")
+	}
+	return db
+}
+
+func dbInit() bool {
+	loc := conf.Instance().Cwd + "db/"
+	if _, err := os.Stat(loc); err != nil {
+		os.MkdirAll(loc, 0700)
+	}
+	db, _ = sql.Open("sqlite3", loc+"sail.db")
+	return db.Ping() == nil
+}
 
 // ExecCreateInstructs takes care of first-time setup of the datastore.
 func ExecCreateInstructs() (err error) {
-	for _, instructs := range createInstructs {
-		for _, instruct := range instructs {
-			if _, err = psqldb.Instance().DB.Exec(instruct); err != nil {
+	if conf.Instance().FirstRun {
+		for _, instruct := range createInstructs {
+			if _, err = DB().Exec(instruct); err != nil {
 				errors.Log(err, conf.Instance().DevMode)
 			}
 		}
