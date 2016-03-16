@@ -1,0 +1,114 @@
+/* MAIN MENU CSS FILE */
+
+#main_menu {
+    background-color: #1793d1;
+    width: 100%;
+}
+
+.main_menu_item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #f0f0f0;
+    transition: 0.2s;
+}
+
+.main_menu_item:hover {
+    color: #191c20;
+}
+
+#menu_button {
+    display: none;
+}
+
+.main_menu_item img {
+    display: none;
+}
+
+#main_menu .active {
+    color: #191c20;
+}
+
+/*******************************************************************************
+ * Mobile screens
+ ******************************************************************************/
+@media only screen and (max-width: 785px) {
+    #main_menu {
+        position: fixed;
+        top: -1000px;
+        transition: 0.5s;
+        padding-top: 4em;
+        overflow-y: auto;
+        height: 100vh;
+    }
+
+    .main_menu_item {
+        display: block;
+        line-height: 3em;
+        font-size: 1em;
+        padding: 0 1em;
+    }
+
+    #menu_button:checked ~ #main_menu {
+        top: 0;
+    }
+
+    #menu_button:checked ~ label {
+        transform: rotate(-180deg);
+    }
+
+    #menu_button:checked ~ label #mb_open {
+        display: none;
+    }
+
+    #menu_button:checked ~ label #mb_close {
+        display: inline-block;
+    }
+
+    #menu_button_label {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 1.6em;
+        height: 1.6em;
+        transition: 0.5s;
+        margin: 0.5em 1em;
+    }
+
+    #mb_open, #mb_close {
+        height: 100%;
+        width: auto;
+    }
+
+    #mb_close {
+        display: none;
+    }
+}
+
+/*******************************************************************************
+ * Desktop screens
+ ******************************************************************************/
+@media only screen and (min-width: 786px) {
+    #menu_button_label {
+        display: none;
+    }
+
+    #main_menu {
+        display: table;
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 0.5em;
+    }
+
+    .main_menu_item {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 1em 1.2em 0;
+        display: table-cell;
+        text-align: center;
+    }
+
+    #main_menu .active {
+        border-bottom: 1px solid #191c20;
+    }
+}
