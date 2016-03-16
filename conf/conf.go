@@ -46,7 +46,7 @@ func new() *Config {
 		JsDir:     cwd + "/static/js/",
 		ThemeDir:  cwd + "/static/theme/"}
 
-	if err := instance.load("development.conf"); err != nil {
+	if err := instance.load("config.json"); err != nil {
 		errors.Log(err, true)
 
 		instance.DBUser = dbUser
