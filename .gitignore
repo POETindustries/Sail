@@ -1,7 +1,0 @@
-/sail
-*.test.*
-*.swp
-/.project
-/files
-/development.conf
-/db
