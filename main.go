@@ -20,10 +20,10 @@ func main() {
 		storage.ExecCreateInstructs()
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
-		http.Handle("/favicon.ico", http.FileServer(http.Dir(config.Cwd)))
-		http.Handle("/files/", http.FileServer(http.Dir(config.Cwd)))
-		http.Handle("/js/", http.FileServer(http.Dir(config.Cwd)))
-		http.Handle("/theme/", http.FileServer(http.Dir(config.Cwd)))
+		http.Handle("/favicon.ico", http.FileServer(http.Dir(config.StaticDir)))
+		http.Handle("/files/", http.FileServer(http.Dir(config.StaticDir)))
+		http.Handle("/js/", http.FileServer(http.Dir(config.StaticDir)))
+		http.Handle("/theme/", http.FileServer(http.Dir(config.StaticDir)))
 		http.ListenAndServe(":8080", nil)
 	}
 }

@@ -17,11 +17,12 @@ const devMode = true
 const firstRun = false
 
 type Config struct {
-	Cwd      string
-	TmplDir  string
-	ImgDir   string
-	JsDir    string
-	ThemeDir string
+	Cwd       string
+	StaticDir string
+	TmplDir   string
+	ImgDir    string
+	JsDir     string
+	ThemeDir  string
 
 	DBUser string `json:"db_user"`
 	DBPass string `json:"db_password"`
@@ -38,11 +39,12 @@ func new() *Config {
 	cwd, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
 	instance = &Config{
-		Cwd:      cwd + "/",
-		TmplDir:  cwd + "/tmpl/",
-		ImgDir:   cwd + "/img/",
-		JsDir:    cwd + "/js/",
-		ThemeDir: cwd + "/theme/"}
+		Cwd:       cwd + "/",
+		StaticDir: cwd + "/static/",
+		TmplDir:   cwd + "/static/tmpl/",
+		ImgDir:    cwd + "/static/img/",
+		JsDir:     cwd + "/static/js/",
+		ThemeDir:  cwd + "/static/theme/"}
 
 	if err := instance.load("development.conf"); err != nil {
 		errors.Log(err, true)
