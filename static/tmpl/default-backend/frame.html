@@ -11,14 +11,14 @@
 </head>
 
 <body>
-	<div id="main_area">
-		{{if eq .URL "/office/login"}}
-		{{template "login" .}}
-		{{else if eq .URL "/office/"}}
-		{{template "home" .}}
-		{{end}}
-		{{if .Message}}<div id="message">{{.Message}}</div>{{end}}
-	</div>
+	{{if eq .URL "/office/login"}}
+	{{template "login" .}}
+	{{else}}
+	{{template "header" .}}
+	{{template "sidebar" .}}
+	{{template "main" .}}
+	{{end}}
+	{{if .Message}}<div id="message">{{.Message}}</div>{{end}}
 </body>
 
 </html>

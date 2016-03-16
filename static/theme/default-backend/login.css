@@ -1,6 +1,11 @@
+#header {
+	font-size: 1.2em;
+	text-align: center;
+}
+
 #login_form {
     width: 90%;
-    margin: 0 auto;
+    margin: 5em auto 0;
 }
 
 #login_form input {
@@ -38,6 +43,14 @@
  * Desktop Screens
  ******************************************************************************/
 @media only screen and (min-width: 640px) {
+	#header {
+		font-size: 1em;
+	}
+
+	#login_form {
+		margin-top: 6em;
+	}
+
     #login_form input {
         margin: 0.25em auto;
         width: 20em;
