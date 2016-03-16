@@ -44,7 +44,7 @@ func Verify(user, pass string) bool {
 }
 
 func encrypt(s string) string {
-	if k, err := bcrypt.GenerateFromPassword([]byte(s), 8); err == nil {
+	if k, err := bcrypt.GenerateFromPassword([]byte(s), 12); err == nil {
 		return fmt.Sprintf("%s\n", k)
 	}
 	return ""
