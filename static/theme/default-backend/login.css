@@ -1,14 +1,14 @@
-#header {
+#sail-backend-header {
 	font-size: 1.2em;
 	text-align: center;
 }
 
-#login_form {
+#sail-backend-login-form {
     width: 90%;
     margin: 5em auto 0;
 }
 
-#login_form input {
+#sail-backend-login-form input {
     display: block;
     margin: 0.25em 0;
     width: 100%;
@@ -18,7 +18,7 @@
     font-size: 1.2em;
 }
 
-#login_form #submit {
+#sail-backend-login-form #submit {
     color: white;
     font-weight: bold;
     background: #17d193;
@@ -27,12 +27,12 @@
     padding: 1em 0.4em;
 }
 
-#login_form #submit:hover {
+#sail-backend-login-form #submit:hover {
     background: #07b073;
     border-bottom: 2px solid #009053;
 }
 
-#login_form ~ #message {
+#sail-backend-login-form ~ #message {
     margin-top: 1em;
     color: #db5343;
     font-weight: bold;
@@ -43,21 +43,21 @@
  * Desktop Screens
  ******************************************************************************/
 @media only screen and (min-width: 640px) {
-	#header {
+	#sail-backend-header {
 		font-size: 1em;
 	}
 
-	#login_form {
+	#sail-backend-login-form {
 		margin-top: 6em;
 	}
 
-    #login_form input {
+    #sail-backend-login-form input {
         margin: 0.25em auto;
         width: 20em;
         font-size: 0.85em;
     }
 
-    #login_form #submit {
+    #sail-backend-login-form #submit {
         padding: 0.4em 0.1em;
     }
 }
