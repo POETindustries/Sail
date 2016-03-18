@@ -18,6 +18,10 @@ var db *sql.DB
 var createInstructs = []string{
 	userschema.CreateUser,
 	userschema.InitUser,
+	userschema.CreateGroup,
+	userschema.InitGroup,
+	userschema.CreateGroupMembers,
+	userschema.InitGroupMembers,
 	pageschema.CreateWidget,
 	pageschema.InitWidget,
 	pageschema.CreateWidgetNav,
