@@ -39,11 +39,19 @@
     font-size: 1.2em;
 }
 
+#sail-message {
+	margin-top: 1em;
+	color: #db5343;
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
 /******************************************************************************
  * Desktop Screens
  ******************************************************************************/
 @media only screen and (min-width: 640px) {
-	#sail-backend-header {
+	#sail-backend-header,
+	#sail-message {
 		font-size: 1em;
 	}
 
