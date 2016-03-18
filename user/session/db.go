@@ -37,6 +37,10 @@ func (db *Database) User(id string) string {
 	return db.sessions[id].User
 }
 
+func (db *Database) Get(id string) *Session {
+	return db.sessions[id]
+}
+
 func (db *Database) Lang(id string) string {
 	return db.sessions[id].Lang
 }

@@ -51,7 +51,7 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 			session.DB().Start(cookie.Value)
 			r := response.New(wr, req)
 			r.FallbackURL = "/office"
-			r.Presenter = backend.New()
+			r.Presenter = backend.New(session.DB().Get(cookie.Value))
 			r.Serve()
 		} else {
 			loginHandler(wr, req)
@@ -70,13 +70,13 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 			c := http.Cookie{Name: "session", Value: s.ID}
 			http.SetCookie(wr, &c)
 			r.FallbackURL = "/office"
-			r.Presenter = backend.New()
+			r.Presenter = backend.New(s)
 			r.Serve()
 			return
 		}
 		r.Message = "Wrong login credentials!"
 	}
 	r.URL = "/office/login"
-	r.Presenter = backend.New()
+	r.Presenter = backend.New(nil)
 	r.Serve()
 }
