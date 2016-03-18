@@ -9,7 +9,7 @@ import (
 type User struct {
 	ID        uint32
 	Name      string
-	Pass      string
+	pass      string
 	FirstName string
 	LastName  string
 	Email     string
@@ -39,7 +39,7 @@ func Verify(user, pass string) bool {
 		return false
 	}
 	p := []byte(pass)
-	h := []byte(u.Pass)
+	h := []byte(u.pass)
 	return bcrypt.CompareHashAndPassword(h, p) == nil
 }
 
