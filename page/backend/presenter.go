@@ -6,6 +6,7 @@ import (
 	"sail/errors"
 	"sail/page/fallback"
 	"sail/page/template"
+	"sail/user"
 	"sail/user/session"
 )
 
@@ -18,7 +19,9 @@ import (
 // functions and fields of type bool are safe for use as conditions
 // inside templates.
 type Presenter struct {
-	session  *session.Session
+	Session *session.Session
+	User    *user.User
+
 	msg      string
 	url      string
 	template *template.Template
@@ -27,11 +30,12 @@ type Presenter struct {
 // New creates a new presenter object with all necessary
 // fields properly initialized.
 func New(s *session.Session) *Presenter {
-	t := template.New()
-	t.Name = "default-backend"
-	return &Presenter{
-		session:  s,
-		template: t}
+	p := &Presenter{Session: s, template: template.New()}
+	p.template.Name = "default-backend"
+	if s != nil {
+		p.User = user.ByName(s.User)
+	}
+	return p
 }
 
 func (p *Presenter) Compile() *bytes.Buffer {
@@ -52,7 +56,7 @@ func (p *Presenter) SetMessage(msg string) {
 }
 
 func (p *Presenter) URL() string {
-	if p.url == "/office/login" && p.session != nil {
+	if p.url == "/office/login" && p.Session != nil {
 		return "/office/"
 	}
 	return p.url
