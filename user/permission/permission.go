@@ -21,6 +21,10 @@ type Permission struct {
 	mode Mode
 }
 
+func New(domain Domain, mode Mode) *Permission {
+	return &Permission{id: domain, mode: mode}
+}
+
 func (p *Permission) Cr() bool {
 	return p.mode|Create == p.mode
 }
