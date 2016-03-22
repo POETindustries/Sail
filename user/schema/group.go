@@ -16,7 +16,7 @@ const CreateGroup = `create table if not exists sl_group(
 	` + GroupPermMaintenance + ` integer not null default 0,
 	` + GroupPermUsers + ` integer not null default 0);`
 
-const InitGroup = `insert into sl_group values(1,"Admins",1,1);`
+const InitGroup = `insert into sl_group values(1,"Admins",7,7);`
 
 const CreateGroupMembers = `create table if not exists sl_group_members(
 	` + GroupID + ` integer not null,
