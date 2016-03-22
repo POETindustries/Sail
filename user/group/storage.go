@@ -17,19 +17,42 @@ func fromStorageByID(id ...uint32) []*Group {
 		// query.EqualsMany(schema.GroupID, id)
 	}
 	rows := query.Exec()
-	return scanGroup(rows.(*sql.Rows))
+	gs := scanGroup(rows.(*sql.Rows))
+	for _, g := range gs {
+		g.users = fetchMembers(g.ID)
+	}
+	return gs
+}
+
+func fetchMembers(id uint32) map[uint32]bool {
+	rows := storage.Get().In("sl_group_members").Attrs(schema.UserID).
+		Equals(schema.GroupID, id).Exec().(*sql.Rows)
+	return scanMembers(rows)
 }
 
 func scanGroup(rows *sql.Rows) []*Group {
 	defer rows.Close()
 	var gs []*Group
 	for rows.Next() {
-		g := Group{}
+		g := New()
 		if err := rows.Scan(&g.ID, &g.Name, &g.perm[permission.Maintenance],
 			&g.perm[permission.Users]); err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 		}
-		gs = append(gs, &g)
+		gs = append(gs, g)
 	}
 	return gs
+}
+
+func scanMembers(rows *sql.Rows) map[uint32]bool {
+	defer rows.Close()
+	ms := make(map[uint32]bool)
+	for rows.Next() {
+		var id uint32
+		if err := rows.Scan(&id); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+		}
+		ms[id] = true
+	}
+	return ms
 }

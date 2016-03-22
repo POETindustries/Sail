@@ -1,19 +1,41 @@
 package group
 
-import "fmt"
+import "sail/user/permission"
 
 type cache struct {
-	groups []*Group
+	groups map[uint32]*Group
 }
 
 var cacheInstance *cache
 
 func Cache() *cache {
 	if cacheInstance == nil {
-		cacheInstance = &cache{groups: fromStorageByID()}
-		for _, g := range cacheInstance.groups {
-			fmt.Printf("%+v", g)
+		gs := make(map[uint32]*Group)
+		for _, g := range fromStorageByID() {
+			gs[g.ID] = g
 		}
+		cacheInstance = &cache{groups: gs}
 	}
 	return cacheInstance
+}
+
+func (c *cache) At(id uint32) *Group {
+	return c.groups[id]
+}
+
+func (c *cache) Permission(uid uint32, domain permission.Domain) *permission.Permission {
+	return permission.New(domain, c.Mode(uid, domain))
+
+}
+
+func (c *cache) Mode(uid uint32, domain permission.Domain) (m permission.Mode) {
+	for _, g := range c.groups {
+		if _, ok := g.users[uid]; ok {
+			m = m | g.Mode(domain)
+			if m == 7 {
+				break
+			}
+		}
+	}
+	return
 }
