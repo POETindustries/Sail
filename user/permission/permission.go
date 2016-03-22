@@ -7,6 +7,7 @@ const (
 	Users       Domain = 0x0000
 	Maintenance Domain = 0x0001
 )
+const DomainCount = 2
 
 const (
 	Create Mode = 0x01
