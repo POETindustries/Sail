@@ -1,25 +1,32 @@
 package group
 
+type PermissionDomain uint32
+type PermissionMode uint8
+
 const (
-	PermUsers       = 0x00000001
-	PermMaintenance = 0x00000002
+	PermUsers       PermissionDomain = 0x00000001
+	PermMaintenance PermissionDomain = 0x00000002
+)
+
+const (
+	ModeCreate PermissionMode = 0x01
+	ModeUpdate PermissionMode = 0x02
+	ModeDelete PermissionMode = 0x04
 )
 
 type Permission struct {
-	id     uint32
-	create bool
-	update bool
-	delete bool
+	id   PermissionDomain
+	mode PermissionMode
 }
 
 func (p *Permission) Cr() bool {
-	return p.create
+	return p.mode|ModeCreate == p.mode
 }
 
 func (p *Permission) U() bool {
-	return p.update
+	return p.mode|ModeUpdate == p.mode
 }
 
 func (p *Permission) D() bool {
-	return p.delete
+	return p.mode|ModeDelete == p.mode
 }
