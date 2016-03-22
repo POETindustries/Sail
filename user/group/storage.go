@@ -5,7 +5,7 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/storage"
-	"sail/user/permission"
+	"sail/user/rights"
 	"sail/user/schema"
 )
 
@@ -35,8 +35,8 @@ func scanGroup(rows *sql.Rows) []*Group {
 	var gs []*Group
 	for rows.Next() {
 		g := New()
-		if err := rows.Scan(&g.ID, &g.Name, &g.perm[permission.Maintenance],
-			&g.perm[permission.Users]); err != nil {
+		if err := rows.Scan(&g.ID, &g.Name, &g.perm[rights.Maintenance],
+			&g.perm[rights.Users]); err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 		}
 		gs = append(gs, g)

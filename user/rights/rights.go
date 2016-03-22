@@ -1,4 +1,4 @@
-package permission
+package rights
 
 type Domain uint16
 type Mode uint8
@@ -16,7 +16,7 @@ const (
 )
 
 // Permission is a lightweight datastructure for passing
-// permission information around between packages.
+// rights information around between packages.
 type Permission struct {
 	id   Domain
 	mode Mode
