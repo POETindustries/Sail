@@ -34,11 +34,13 @@ type Presenter struct {
 
 // New creates a new presenter object with all necessary
 // fields properly initialized.
-func New(s *session.Session) *Presenter {
-	p := &Presenter{Session: s, template: template.New()}
+func New(s *session.Session, u *user.User) *Presenter {
+	p := &Presenter{Session: s, User: u, template: template.New()}
 	p.template.Name = "default-backend"
-	if s != nil {
-		p.User = user.ByName(s.User)
+	if u != nil {
+		p.mainMenu = p.buildNav(p.User.ID)
+	} else if s != nil {
+		p.User = user.ByName(p.Session.User)
 		p.mainMenu = p.buildNav(p.User.ID)
 	}
 	return p
