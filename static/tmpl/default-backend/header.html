@@ -1,3 +1,15 @@
 {{define "header"}}
-    <div id="header"></div>
+<div id="sail-backend-header">
+    {{template "main-menu" .MainMenu}}
+</div>
+{{end}}
+
+{{define "main-menu"}}
+<nav id="sail-backend-nav">
+    {{range .Entries}}
+    <a class="sail-backend-nav-entry{{if .Active}} active{{end}}" href="{{.RefURL}}">
+        {{.Name}}
+    </a>
+    {{end}}
+</nav>
 {{end}}

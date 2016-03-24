@@ -24,7 +24,7 @@ func scanUser(rows *sql.Rows) []*User {
 	var us []*User
 	for rows.Next() {
 		u := User{}
-		if err := rows.Scan(&u.ID, &u.Name, &u.Pass, &u.FirstName, &u.LastName,
+		if err := rows.Scan(&u.ID, &u.Name, &u.pass, &u.FirstName, &u.LastName,
 			&u.Email, &u.Phone, &u.CDate, &u.ExpDate); err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 			return nil
