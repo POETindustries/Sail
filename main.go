@@ -74,21 +74,22 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 	u := req.PostFormValue("user")
 	p := req.PostFormValue("pass")
 	r := response.New(wr, req)
-	if u != "" && p != "" {
-		if user, ok := user.Verify(u, p); ok {
-			s := session.New(req, req.PostFormValue("user"))
-			session.DB().Add(s)
-			c := http.Cookie{Name: "session", Value: s.ID}
-			http.SetCookie(wr, &c)
-			r.FallbackURL = "/office/"
-			r.Presenter = backend.New(s, user)
-			s.Start()
-			r.Serve()
-			return
+	if usr, ok := user.Verify(u, p); ok {
+		sess := session.New(req, req.PostFormValue("user"))
+		session.DB().Add(sess)
+		c := http.Cookie{Name: "session", Value: sess.ID}
+		http.SetCookie(wr, &c)
+		if b := group.NewBouncer(req); !b.Pass(usr.ID) {
+			b.Sanitize("/office/", "")
 		}
-		r.Message = "Wrong login credentials!"
+		r.URL = req.URL.Path
+		r.Presenter = backend.New(sess, usr)
+	} else {
+		if u != "" || p != "" {
+			r.Message = "Wrong login credentials!"
+		}
+		r.URL = "/office/login"
+		r.Presenter = backend.New(nil, nil)
 	}
-	r.URL = "/office/login"
-	r.Presenter = backend.New(nil, nil)
 	r.Serve()
 }
