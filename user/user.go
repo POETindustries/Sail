@@ -43,8 +43,11 @@ func ByName(name string) *User {
 // User object is returned in order to give the opportunity to use it
 // right away instead of fetching anew a few lines later.
 func Verify(user, pass string) (u *User, ok bool) {
-	if u = ByName(user); u != nil {
-		ok = bcrypt.CompareHashAndPassword([]byte(u.pass), []byte(pass)) == nil
+	if user != "" && pass != "" {
+		if u = ByName(user); u != nil {
+			err := bcrypt.CompareHashAndPassword([]byte(u.pass), []byte(pass))
+			ok = (err == nil)
+		}
 	}
 	return
 }
