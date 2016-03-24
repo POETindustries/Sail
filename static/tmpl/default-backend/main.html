@@ -2,6 +2,10 @@
 <div id="sail-backend-content">
 	{{if eq .URL "/office/"}}
 		{{template "home" .}}
+	{{else if eq .URL "/office/users"}}
+		{{template "users"}}
+	{{else if eq .URL "/office/settings"}}
+		{{template "site-settings"}}
 	{{else}}
 		{{template "stub" .}}
 	{{end}}
