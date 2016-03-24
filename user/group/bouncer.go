@@ -55,6 +55,9 @@ func (b *Bouncer) PassBySession(s *session.Session) bool {
 	return b.Pass(u.ID)
 }
 
+// Sanitize cleans the Bouncer's request object of unwanted and
+// invalid content. It expects the path of a content object that
+// should be requested instead of the offending url.
 func (b *Bouncer) Sanitize(path string) {
 	b.req.URL.Path = path
 	b.req.URL.RawQuery = ""

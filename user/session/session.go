@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+// Session represents a user session and contains information for
+// correctly displaying localization information and other session-
+// related data.
 type Session struct {
 	ID   string
 	User string
@@ -17,6 +20,8 @@ type Session struct {
 	Time time.Time
 }
 
+// New returns a new Session and sets its internal state according
+// to the given request and user data.
 func New(req *http.Request, user string) (s *Session) {
 	s = &Session{User: user}
 	s.setLang(req.Header.Get("Accept-Language"))
@@ -26,6 +31,7 @@ func New(req *http.Request, user string) (s *Session) {
 	return
 }
 
+// Start resets the Session's timer to the current time.
 func (s *Session) Start() {
 	s.Time = time.Now()
 }
