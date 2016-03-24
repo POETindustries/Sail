@@ -1,3 +1,17 @@
 {{define "main"}}
-<div id="sail-backend-content"></div>
+<div id="sail-backend-content">
+	{{if eq .URL "/office/"}}
+		{{template "home" .}}
+	{{else if eq .URL "/office/users"}}
+		{{template "users"}}
+	{{else if eq .URL "/office/settings"}}
+		{{template "site-settings"}}
+	{{else}}
+		{{template "stub" .}}
+	{{end}}
+</div>
+{{end}}
+
+{{define "stub"}}
+<p>SHIT JUST GOT REAL!</p>
 {{end}}
