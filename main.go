@@ -84,6 +84,7 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 		}
 		r.URL = req.URL.Path
 		r.Presenter = backend.New(sess, usr)
+		sess.Start()
 	} else {
 		if u != "" || p != "" {
 			r.Message = "Wrong login credentials!"
