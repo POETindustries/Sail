@@ -52,7 +52,6 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 		cookie, _ := req.Cookie("session")
 		if cookie != nil && session.DB().Has(cookie.Value) {
 			s := session.DB().Get(cookie.Value)
-			session.DB().Start(s.ID)
 			u := user.ByName(s.User)
 			if b := group.NewBouncer(req); !b.Pass(u.ID) {
 				b.Sanitize("/office/", "")
@@ -60,6 +59,7 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 			r := response.New(wr, req)
 			r.FallbackURL = "/office/"
 			r.Presenter = backend.New(s, u)
+			s.Start()
 			r.Serve()
 		} else {
 			loginHandler(wr, req)
@@ -82,6 +82,7 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 			http.SetCookie(wr, &c)
 			r.FallbackURL = "/office/"
 			r.Presenter = backend.New(s, user)
+			s.Start()
 			r.Serve()
 			return
 		}

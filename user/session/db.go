@@ -50,7 +50,7 @@ func (db *Database) Has(id string) bool {
 }
 
 func (db *Database) Start(id string) {
-	db.sessions[id].Time = time.Now()
+	db.sessions[id].Start()
 }
 
 // Clean removes all expired sessions.

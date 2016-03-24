@@ -26,6 +26,10 @@ func New(req *http.Request, user string) (s *Session) {
 	return
 }
 
+func (s *Session) Start() {
+	s.Time = time.Now()
+}
+
 func (s *Session) setLang(lang string) {
 	s.Lang = strings.Split(lang, ",")[0]
 }
