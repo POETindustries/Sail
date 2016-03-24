@@ -30,7 +30,7 @@ func (b *Bouncer) Pass(uid uint32) bool {
 	if err != nil {
 		return true
 	}
-	p := Cache().Permission(uid, d)
+	p := All().Permission(uid, d)
 	return b.validateGET(p) && b.validatePOST(p)
 }
 

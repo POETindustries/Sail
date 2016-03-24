@@ -86,10 +86,10 @@ func (p *Presenter) buildNav(uid uint32) *widget.Nav {
 	user := &widget.NavEntry{ID: 2, Name: "Users & Groups", RefURL: "/office/users"}
 	settings := &widget.NavEntry{ID: 3, Name: "Settings", RefURL: "/office/settings"}
 	nav := widget.Nav{Entries: []*widget.NavEntry{home}}
-	if group.Cache().Mode(uid, rights.Users) > 1 {
+	if group.All().Mode(uid, rights.Users) > 1 {
 		nav.Entries = append(nav.Entries, user)
 	}
-	if group.Cache().Mode(uid, rights.Maintenance) > 1 {
+	if group.All().Mode(uid, rights.Maintenance) > 1 {
 		nav.Entries = append(nav.Entries, settings)
 	}
 	return &nav
