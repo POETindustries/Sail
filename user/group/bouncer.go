@@ -2,6 +2,7 @@ package group
 
 import (
 	"net/http"
+	"net/url"
 	"sail/user"
 	"sail/user/rights"
 	"sail/user/session"
@@ -26,7 +27,11 @@ func NewBouncer(req *http.Request) *Bouncer {
 // Pass checks for access violations with the given user id.
 func (b *Bouncer) Pass(uid uint32) bool {
 	d, err := rights.Dom(b.req.URL.Path)
-	return err != nil || Cache().Permission(uid, d).R()
+	if err != nil {
+		return true
+	}
+	p := Cache().Permission(uid, d)
+	return b.validateGET(p) && b.validatePOST(p)
 }
 
 // PassByCookie checks for access violations with the information
@@ -50,8 +55,33 @@ func (b *Bouncer) PassBySession(s *session.Session) bool {
 	return b.Pass(u.ID)
 }
 
-func (b *Bouncer) Sanitize(path, query string) {
+func (b *Bouncer) Sanitize(path string) {
 	b.req.URL.Path = path
-	b.req.URL.RawQuery = query
+	b.req.URL.RawQuery = ""
 	b.req.PostForm = nil
+	b.req.Form = nil
+}
+
+func (b *Bouncer) validateGET(p *rights.Permission) bool {
+	return b.validate(b.req.URL.Query(), p)
+}
+
+func (b *Bouncer) validatePOST(p *rights.Permission) bool {
+	return b.validate(b.req.PostForm, p)
+}
+
+func (b *Bouncer) validate(vals url.Values, p *rights.Permission) bool {
+	if !p.R() {
+		return false
+	}
+	if !p.C() {
+		// TODO: implement test for create-operations
+	}
+	if !p.U() {
+		// TODO: implement test for update-operations
+	}
+	if !p.D() {
+		// TODO: implement test for delete-operations
+	}
+	return true
 }

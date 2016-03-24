@@ -54,7 +54,7 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 			s := session.DB().Get(cookie.Value)
 			u := user.ByName(s.User)
 			if b := group.NewBouncer(req); !b.Pass(u.ID) {
-				b.Sanitize("/office/", "")
+				b.Sanitize("/office/")
 			}
 			r := response.New(wr, req)
 			r.FallbackURL = "/office/"
@@ -80,7 +80,7 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 		c := http.Cookie{Name: "session", Value: sess.ID}
 		http.SetCookie(wr, &c)
 		if b := group.NewBouncer(req); !b.Pass(usr.ID) {
-			b.Sanitize("/office/", "")
+			b.Sanitize("/office/")
 		}
 		r.URL = req.URL.Path
 		r.Presenter = backend.New(sess, usr)
