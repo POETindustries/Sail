@@ -46,16 +46,16 @@ func frontendHandler(wr http.ResponseWriter, req *http.Request) {
 }
 
 func backendHandler(wr http.ResponseWriter, req *http.Request) {
+	t1 := time.Now().Nanosecond()
+
 	if storage.DB().Ping() == nil {
 		cookie, _ := req.Cookie("session")
 		if cookie != nil && session.DB().Has(cookie.Value) {
 			s := session.DB().Get(cookie.Value)
 			session.DB().Start(s.ID)
 			u := user.ByName(s.User)
-			if !group.NewBouncer(req).PassByUser(u.ID) {
-				req.URL.Path = "/office/"
-				req.URL.RawQuery = ""
-				req.PostForm = nil
+			if b := group.NewBouncer(req); !b.Pass(u.ID) {
+				b.Sanitize("/office/", "")
 			}
 			r := response.New(wr, req)
 			r.FallbackURL = "/office/"
@@ -65,6 +65,9 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 			loginHandler(wr, req)
 		}
 	}
+
+	t2 := time.Now().Nanosecond()
+	fmt.Printf("Time to serve page: %d microseconds\n", (t2-t1)/1000)
 }
 
 func loginHandler(wr http.ResponseWriter, req *http.Request) {
