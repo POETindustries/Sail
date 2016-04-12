@@ -36,7 +36,8 @@ func scanGroup(rows *sql.Rows) []*Group {
 	for rows.Next() {
 		g := New()
 		if err := rows.Scan(&g.ID, &g.Name, &g.perm[rights.Maintenance],
-			&g.perm[rights.Users]); err != nil {
+			&g.perm[rights.Users], &g.perm[rights.Content],
+			&g.perm[rights.Config]); err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 		}
 		gs = append(gs, g)

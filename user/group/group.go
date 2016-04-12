@@ -10,7 +10,7 @@ type Group struct {
 	Name string
 
 	users map[uint32]bool
-	perm  [2]rights.Mode
+	perm  [4]rights.Mode
 }
 
 // New returns an empty Group object.

@@ -6,10 +6,12 @@ type Domain uint16
 type Mode uint8
 
 const (
-	Users       Domain = 0x0000
-	Maintenance Domain = 0x0001
+	Content     Domain = 0
+	Users       Domain = 1
+	Config      Domain = 2
+	Maintenance Domain = 3
 )
-const DomainCount = 2
+const DomainCount = 4
 
 const (
 	Create Mode = 0x01
@@ -18,8 +20,10 @@ const (
 )
 
 var paths = [][]string{
+	[]string{"/office/content"},
 	[]string{"/office/users"},
-	[]string{"/office/settings"}}
+	[]string{"/office/config"},
+	[]string{"/office/maintenance"}}
 
 // Permission is a lightweight datastructure for passing
 // rights information around between packages.
