@@ -82,15 +82,29 @@ func (p *Presenter) MainMenu() *widget.Nav {
 }
 
 func (p *Presenter) buildNav(uid uint32) *widget.Nav {
-	home := &widget.NavEntry{ID: 1, Name: "Home", RefURL: "/office/"}
-	user := &widget.NavEntry{ID: 2, Name: "Users & Groups", RefURL: "/office/users"}
-	settings := &widget.NavEntry{ID: 3, Name: "Settings", RefURL: "/office/settings"}
+	home := &widget.NavEntry{
+		ID: 1, Name: "Home", RefURL: "/office/"}
+	content := &widget.NavEntry{
+		ID: 2, Name: "Content", RefURL: "/office/content"}
+	user := &widget.NavEntry{
+		ID: 3, Name: "Users & Groups", RefURL: "/office/users"}
+	config := &widget.NavEntry{
+		ID: 4, Name: "Configuration", RefURL: "/office/config"}
+	maintenance := &widget.NavEntry{
+		ID: 5, Name: "Maintenance", RefURL: "/office/maintenance"}
+
 	nav := widget.Nav{Entries: []*widget.NavEntry{home}}
+	if group.All().Mode(uid, rights.Content) > 1 {
+		nav.Entries = append(nav.Entries, content)
+	}
 	if group.All().Mode(uid, rights.Users) > 1 {
 		nav.Entries = append(nav.Entries, user)
 	}
+	if group.All().Mode(uid, rights.Config) > 1 {
+		nav.Entries = append(nav.Entries, config)
+	}
 	if group.All().Mode(uid, rights.Maintenance) > 1 {
-		nav.Entries = append(nav.Entries, settings)
+		nav.Entries = append(nav.Entries, maintenance)
 	}
 	return &nav
 }
