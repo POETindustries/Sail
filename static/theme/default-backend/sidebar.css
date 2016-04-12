@@ -1,23 +1,25 @@
-#sail-backend-header {
+#sail-backend-sidebar {
 	position: fixed;
+	left: 0;
 	top: 0;
-	z-index: 50;
-	width: 100%;
-	padding: 1em;
-	background-color: #494c60;
-	color: #f8f8f8;
+	width: 12em;
+	height: 100vh;
+	padding-top: 4rem;
+	z-index: 20;
+	background: #c0c0c0;
 }
 
-/* main menu */ /*
+/* main menu */
 #sail-backend-nav {
 	text-align: left;
 }
 
 #sail-backend-nav a {
+	display: block;
 	text-decoration: none;
 	text-transform: uppercase;
-	color: #c0c0c0;
-	margin: 0 1em;
+	color: #404040;
+	padding: .5rem 1rem;
 }
 
 #sail-backend-nav a:hover {
@@ -26,4 +28,5 @@
 
 #sail-backend-nav .active {
 	color: #ffffff;
-}*/
+	background: #1793d1;
+}
