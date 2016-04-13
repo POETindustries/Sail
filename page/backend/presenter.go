@@ -46,6 +46,10 @@ func New(s *session.Session, u *user.User) *Presenter {
 	return p
 }
 
+// Compile creates html markup from the prsenter's template
+// and the data stored in the presenter at the time of
+// compilation. The resulting markup is ready to be sent
+// as response to the last http request.
 func (p *Presenter) Compile() *bytes.Buffer {
 	var markup bytes.Buffer
 	if err := p.template.Execute(&markup, p); err != nil {
@@ -55,10 +59,14 @@ func (p *Presenter) Compile() *bytes.Buffer {
 	return &markup
 }
 
+// Message returns the currently saved message or an empty
+// string if no message is set.
 func (p *Presenter) Message() string {
 	return p.msg
 }
 
+// SetMessage allows passing a message from processing the
+// request to the presenter for displaying in the web page.
 func (p *Presenter) SetMessage(msg string) {
 	p.msg = msg
 }
