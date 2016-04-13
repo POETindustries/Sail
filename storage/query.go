@@ -54,7 +54,7 @@ func (q *Query) All() *Query {
 }
 
 func (q *Query) And() *Query {
-	if len(q.selection) > 1 {
+	if len(q.selection) > 0 {
 		q.selection = append(q.selection, and)
 	}
 	return q
