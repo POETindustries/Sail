@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"sail/conf"
 	"sail/errors"
+	"sail/file"
 	"sail/page/fallback"
 	"sail/page/template"
 	"sail/page/widget"
@@ -22,8 +23,9 @@ import (
 // functions and fields of type bool are safe for use as conditions
 // inside templates.
 type Presenter struct {
-	Session *session.Session
-	User    *user.User
+	Session     *session.Session
+	User        *user.User
+	FileManager *file.Manager
 
 	msg string
 	url string
@@ -82,7 +84,12 @@ func (p *Presenter) URL() string {
 // SetURL should be used to change the presenter's internal
 // url after it has already been initialized.
 func (p *Presenter) SetURL(url string) {
-	p.url = url
+	if p.url != url {
+		p.url = url
+		if p.url == "/office/content" {
+			p.FileManager = file.NewManager("/")
+		}
+	}
 }
 
 // MainMenu returns available menu entry data, depending on
