@@ -3,8 +3,10 @@ package frontend
 import (
 	"bytes"
 	"html/template"
+	"regexp"
 	"sail/conf"
 	"sail/errors"
+	"sail/file"
 	"sail/page/content"
 	"sail/page/fallback"
 	tpl "sail/page/template"
@@ -41,7 +43,9 @@ func (p *Presenter) Compile() *bytes.Buffer {
 		errors.Log(err, conf.Instance().DevMode)
 		return bytes.NewBufferString(fallback.NOTFOUND404)
 	}
-	return &markup
+	b := markup.Bytes()
+	p.replaceInternalLinks(&b)
+	return bytes.NewBuffer(b)
 }
 
 func (p *Presenter) Message() string {
@@ -144,4 +148,15 @@ func (p *Presenter) TextWidget(name string) template.HTML {
 		return template.HTML(t.Content)
 	}
 	return template.HTML("")
+}
+
+func (p *Presenter) replaceInternalLinks(markup *[]byte) {
+	r, _ := regexp.Compile("=\"uuid/[0-9]+\"")
+	refs := make(map[string]bool)
+	for _, r := range r.FindAll(*markup, -1) {
+		refs[string(r[2:len(r)-1])] = true
+	}
+	for k := range refs {
+		*markup = bytes.Replace(*markup, []byte(k), file.StaticAddr(k), -1)
+	}
 }
