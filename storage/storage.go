@@ -24,6 +24,7 @@ var createInstructs = []string{
 	userschema.CreateGroupMembers,
 	userschema.InitGroupMembers,
 	fileschema.CreateFile,
+	fileschema.InitFile,
 	pageschema.CreateWidget,
 	pageschema.InitWidget,
 	pageschema.CreateWidgetNav,

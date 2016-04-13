@@ -5,6 +5,7 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/file/schema"
+	cSchema "sail/page/schema"
 	"sail/storage"
 )
 
@@ -22,4 +23,25 @@ func fromStorageGetAddr(uuid string, public bool) (addr string) {
 		}
 	}
 	return
+}
+
+func fromStorageAsContent(dir string) []*File {
+	rows := storage.Get().In("sl_content").
+		Attrs(cSchema.ContentTitle, cSchema.ContentURL, cSchema.ContentStatus).
+		Equals(cSchema.ContentParent, dir).Exec()
+	return scanContent(rows.(*sql.Rows))
+}
+
+func scanContent(rows *sql.Rows) []*File {
+	defer rows.Close()
+	var fs []*File
+	for rows.Next() {
+		f := File{mimeType: 1}
+		if err := rows.Scan(&f.Name, &f.Address, &f.status); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return nil
+		}
+		fs = append(fs, &f)
+	}
+	return fs
 }

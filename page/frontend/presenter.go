@@ -150,13 +150,13 @@ func (p *Presenter) TextWidget(name string) template.HTML {
 	return template.HTML("")
 }
 
-func (p *Presenter) replaceInternalLinks(markup *[]byte) {
+func (p *Presenter) replaceInternalLinks(mk *[]byte) {
 	r, _ := regexp.Compile("=\"uuid/[0-9]+\"")
 	refs := make(map[string]bool)
-	for _, r := range r.FindAll(*markup, -1) {
+	for _, r := range r.FindAll(*mk, -1) {
 		refs[string(r[2:len(r)-1])] = true
 	}
 	for k := range refs {
-		*markup = bytes.Replace(*markup, []byte(k), file.StaticAddr(k), -1)
+		*mk = bytes.Replace(*mk, []byte(k), []byte(file.StaticAddr(k)), -1)
 	}
 }

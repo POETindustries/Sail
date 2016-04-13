@@ -1,7 +1,8 @@
 package file
 
-var mime = [4]string{
+var mime = [5]string{
 	"directory",
+	"text/html",
 	"text/plain",
 	"image/jpeg",
 	"image/png"}
