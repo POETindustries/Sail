@@ -2,7 +2,6 @@ package content
 
 import (
 	"database/sql"
-	"fmt"
 	"sail/conf"
 	"sail/errors"
 	"sail/page/schema"
@@ -36,7 +35,6 @@ func scan(rows *sql.Rows) []*Content {
 			errors.Log(err, conf.Instance().DevMode)
 			return nil
 		}
-		fmt.Printf("%+v\n", c)
 		cs = append(cs, c)
 	}
 	return cs

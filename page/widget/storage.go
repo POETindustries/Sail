@@ -58,7 +58,6 @@ func scanWidget(rows *sql.Rows) []*Widget {
 			errors.Log(err, conf.Instance().DevMode)
 			return nil
 		}
-		fmt.Printf("%+v\n", w)
 		ws = append(ws, w)
 	}
 	return ws
@@ -76,7 +75,6 @@ func scanNav(rows *sql.Rows) *Nav {
 		}
 		n.Entries = append(n.Entries, &e)
 	}
-	fmt.Printf("%+v\n", n)
 	return &n
 }
 

@@ -190,7 +190,6 @@ func (q *Query) build() (query string) {
 	case modeDelete:
 		query = q.buildDelete()
 	}
-	println(q.String())
 	return
 }
 
