@@ -18,7 +18,7 @@
 	{{template "sidebar" .}}
 	<div id="sail-backend-main">
 	{{if eq .URL "/office/content"}}
-		{{template "content" .}}
+		{{template "content" .FileManager}}
 	{{else if eq .URL "/office/users"}}
 		{{template "users" .}}
 	{{else if eq .URL "/office/config"}}
