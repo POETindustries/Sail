@@ -28,7 +28,7 @@ func scan(rows *sql.Rows) []*Content {
 	for rows.Next() {
 		c := New()
 		if err := rows.Scan(&c.ID, &c.Title, &c.Content, &c.Meta.ID,
-			&c.TemplateID, &c.URL, &c.Status, &c.Owner, &c.CDate,
+			&c.TemplateID, &c.URL, &c.Parent, &c.Status, &c.Owner, &c.CDate,
 			&c.EDate, &c.Meta.Title, &c.Meta.Keywords, &c.Meta.Description,
 			&c.Meta.Language, &c.Meta.PageTopic, &c.Meta.RevisitAfter,
 			&c.Meta.Robots); err != nil {

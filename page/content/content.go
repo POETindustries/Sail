@@ -11,6 +11,7 @@ type Content struct {
 	ID         uint32
 	Title      string
 	URL        string
+	Parent     string
 	Content    string
 	Meta       *meta.Meta
 	TemplateID uint32
