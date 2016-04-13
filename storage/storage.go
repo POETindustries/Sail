@@ -5,6 +5,7 @@ import (
 	"os"
 	"sail/conf"
 	"sail/errors"
+	fileschema "sail/file/schema"
 	pageschema "sail/page/schema"
 	userschema "sail/user/schema"
 
@@ -22,6 +23,7 @@ var createInstructs = []string{
 	userschema.InitGroup,
 	userschema.CreateGroupMembers,
 	userschema.InitGroupMembers,
+	fileschema.CreateFile,
 	pageschema.CreateWidget,
 	pageschema.InitWidget,
 	pageschema.CreateWidgetNav,
@@ -44,15 +46,6 @@ func DB() *sql.DB {
 	return db
 }
 
-func dbInit() bool {
-	loc := conf.Instance().Cwd + "db/"
-	if _, err := os.Stat(loc); err != nil {
-		os.MkdirAll(loc, 0700)
-	}
-	db, _ = sql.Open("sqlite3", loc+"sail.db")
-	return db.Ping() == nil
-}
-
 // ExecCreateInstructs takes care of first-time setup of the datastore.
 func ExecCreateInstructs() (err error) {
 	if conf.Instance().FirstRun {
@@ -63,4 +56,13 @@ func ExecCreateInstructs() (err error) {
 		}
 	}
 	return
+}
+
+func dbInit() bool {
+	loc := conf.Instance().Cwd + "db/"
+	if _, err := os.Stat(loc); err != nil {
+		os.MkdirAll(loc, 0700)
+	}
+	db, _ = sql.Open("sqlite3", loc+"sail.db")
+	return db.Ping() == nil
 }
