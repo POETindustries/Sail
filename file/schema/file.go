@@ -14,5 +14,5 @@ const CreateFile = `create table if not exists sl_file(
 	` + FileID + ` integer primary key not null,
 	` + FileAddr + ` text not null default '',
 	` + FileName + ` text not null default 'File',
-	` + FileType + ` integer not null default '1'
+	` + FileType + ` integer not null default '1',
 	` + FileStatus + ` integer not null default '0');`
