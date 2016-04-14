@@ -102,7 +102,7 @@ func (q *Query) In(table string) *Query {
 }
 
 func (q *Query) Or() *Query {
-	if len(q.selection) > 1 {
+	if len(q.selection) > 0 {
 		q.selection = append(q.selection, or)
 	}
 	return q
