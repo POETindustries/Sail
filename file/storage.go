@@ -28,7 +28,8 @@ func fromStorageGetAddr(uuid string, public bool) (addr string) {
 func fromStorageAsContent(dir string) []*File {
 	rows := storage.Get().In("sl_content").
 		Attrs(cSchema.ContentTitle, cSchema.ContentURL, cSchema.ContentStatus).
-		Equals(cSchema.ContentParent, dir).Exec()
+		Equals(cSchema.ContentParent, dir).Or().Equals(cSchema.ContentURL, dir).
+		Exec()
 	return scanContent(rows.(*sql.Rows))
 }
 
