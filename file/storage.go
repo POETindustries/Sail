@@ -5,7 +5,7 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/file/schema"
-	cSchema "sail/page/schema"
+	cSchema "sail/object/schema"
 	"sail/storage"
 )
 

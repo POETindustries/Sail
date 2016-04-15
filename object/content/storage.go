@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"sail/conf"
 	"sail/errors"
-	"sail/page/schema"
+	"sail/object/schema"
 	"sail/storage"
 )
 

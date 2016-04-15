@@ -7,10 +7,10 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/object"
-	"sail/page/content"
-	"sail/page/fallback"
-	tpl "sail/page/template"
-	"sail/page/widget"
+	"sail/object/content"
+	"sail/object/fallback"
+	tpl "sail/object/template"
+	"sail/object/widget"
 	"strings"
 )
 

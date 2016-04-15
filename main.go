@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sail/backend"
 	"sail/conf"
-	"sail/page/backend"
-	"sail/page/cache"
-	"sail/page/frontend"
+	"sail/frontend"
+	"sail/object/cache"
 	"sail/response"
 	"sail/storage"
 	"sail/user"

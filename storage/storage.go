@@ -7,7 +7,7 @@ import (
 	"sail/errors"
 	fileschema "sail/file/schema"
 	objectschema "sail/object/schema"
-	pageschema "sail/page/schema"
+	pageschema "sail/object/schema"
 	userschema "sail/user/schema"
 
 	// sqlite database driver

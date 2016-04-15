@@ -1,8 +1,8 @@
 package cache
 
 import (
-	"sail/page/content"
-	"sail/page/template"
+	"sail/object/content"
+	"sail/object/template"
 )
 
 type cache struct {

@@ -1,6 +1,6 @@
 package content
 
-import "sail/page/meta"
+import "sail/object/meta"
 
 // Content contains the information needed to generate a web page for display.
 // This is the basic struct that contains all information needed to generate

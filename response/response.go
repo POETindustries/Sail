@@ -2,11 +2,10 @@ package response
 
 import (
 	"net/http"
-	"sail/page"
-	"sail/page/cache"
-	"sail/page/content"
-	"sail/page/template"
-	"sail/page/widget"
+	"sail/object/cache"
+	"sail/object/content"
+	"sail/object/template"
+	"sail/object/widget"
 )
 
 type Response struct {
@@ -14,7 +13,7 @@ type Response struct {
 	FallbackURL string
 	Message     string
 	URL         string
-	Presenter   page.Presenter
+	Presenter   Presenter
 
 	response http.ResponseWriter
 	request  *http.Request
