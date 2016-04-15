@@ -38,5 +38,5 @@ const InitContent = `insert into sl_content(
 	` + ContentMetaID + `,
 	` + ContentTemplateID + `)
 	values
-	('Home', '<p>Welcome to Sail</p><img width="200px" src="uuid/1"/>', '/home', 1, 1),
+	('Home', '<p>Welcome to Sail</p><img width="200px" src="uuid/3"/>', '/home', 1, 1),
 	('About Sail', '<p>Go where the wind blows.</p>', '/about', 1, 1);`

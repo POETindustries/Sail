@@ -11,7 +11,6 @@ import (
 	"sail/object/fallback"
 	tpl "sail/object/template"
 	"sail/object/widget"
-	"strings"
 )
 
 // Presenter initiates page creation and loading for handling requests
@@ -120,7 +119,7 @@ func (p *Presenter) Widget(name string) (w *widget.Widget) {
 	return
 }
 
-// Menu returns the menu identified by the name, if possible.
+// NavMenu returns the menu identified by the name, if possible.
 // It is guaranteed to return an object of the correct type; if the
 // desired object does not exist, an empty object is returned with
 // all necessary components minimally initialized.
@@ -132,7 +131,7 @@ func (p *Presenter) NavMenu(name string, isMain bool) *widget.Nav {
 	}
 	if isMain {
 		for _, e := range m.Entries {
-			e.Active = strings.HasPrefix(p.url, e.RefURL)
+			e.Active = (p.content.ID == e.RefID)
 		}
 	}
 	return m

@@ -30,9 +30,10 @@ func fetchData(widget *Widget) {
 }
 
 func fetchNavData(id uint32) *Nav {
-	stmt := "sl_widget_nav natural join (select %s,%s from sl_content)"
-	t := fmt.Sprintf(stmt, schema.ContentID, schema.ContentURL)
-	a := append(schema.NavAttrs, schema.ContentURL)
+	//stmt := "sl_widget_nav natural join (select %s,%s from sl_content)"
+	stmt := "sl_widget_nav natural join (select %s,%s from sl_object)"
+	t := fmt.Sprintf(stmt, schema.ObjectID, schema.ObjectMachineName)
+	a := append(schema.NavAttrs, schema.ObjectMachineName)
 	rows := storage.Get().In(t).Attrs(a...).
 		Equals(schema.NavWidgetID, id).Exec()
 	return scanNav(rows.(*sql.Rows))
@@ -73,6 +74,7 @@ func scanNav(rows *sql.Rows) *Nav {
 			errors.Log(err, conf.Instance().DevMode)
 			return nil
 		}
+		e.RefURL = fmt.Sprintf("uuid/%d", e.RefID)
 		n.Entries = append(n.Entries, &e)
 	}
 	return &n
