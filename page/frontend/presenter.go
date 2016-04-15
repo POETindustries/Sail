@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"sail/conf"
 	"sail/errors"
-	"sail/file"
+	"sail/object"
 	"sail/page/content"
 	"sail/page/fallback"
 	tpl "sail/page/template"
@@ -157,6 +157,6 @@ func (p *Presenter) replaceInternalLinks(mk *[]byte) {
 		refs[string(r[2:len(r)-1])] = true
 	}
 	for k := range refs {
-		*mk = bytes.Replace(*mk, []byte(k), []byte(file.StaticAddr(k)), -1)
+		*mk = bytes.Replace(*mk, []byte(k), []byte(object.StaticAddr(k)), -1)
 	}
 }

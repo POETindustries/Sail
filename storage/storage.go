@@ -6,6 +6,7 @@ import (
 	"sail/conf"
 	"sail/errors"
 	fileschema "sail/file/schema"
+	objectschema "sail/object/schema"
 	pageschema "sail/page/schema"
 	userschema "sail/user/schema"
 
@@ -37,7 +38,9 @@ var createInstructs = []string{
 	pageschema.CreateMeta,
 	pageschema.InitMeta,
 	pageschema.CreateContent,
-	pageschema.InitContent}
+	pageschema.InitContent,
+	objectschema.CreateObject,
+	objectschema.InitObject}
 
 // DB returns a pointer to the database handle singleton.
 func DB() *sql.DB {
