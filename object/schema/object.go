@@ -2,7 +2,6 @@ package schema
 
 const (
 	ObjectID          = "object_id"
-	ObjectRefID       = "object_ref_id"
 	ObjectName        = "object_name"
 	ObjectMachineName = "object_machine_name"
 	ObjectParent      = "object_parent"
@@ -12,15 +11,15 @@ const (
 	ObjectOwner       = "object_owner"
 	ObjectCreateDate  = "object_create_date"
 	ObjectEditDate    = "object_edit_date"
+	ObjectURLCache    = "object_url_cache"
 )
 
-var ObjectAttrs = []string{ObjectID, ObjectRefID, ObjectName, ObjectMachineName,
+var ObjectAttrs = []string{ObjectID, ObjectName, ObjectMachineName,
 	ObjectParent, ObjectTypeMajor, ObjectTypeMinor, ObjectStatus, ObjectOwner,
-	ObjectCreateDate, ObjectEditDate}
+	ObjectCreateDate, ObjectEditDate, ObjectURLCache}
 
 const CreateObject = `create table sl_object(
 	` + ObjectID + ` integer primary key not null,
-	` + ObjectRefID + ` integer not null default 0,
 	` + ObjectName + ` text not null,
 	` + ObjectMachineName + ` text not null,
 	` + ObjectParent + ` integer not null default 0,
@@ -29,17 +28,18 @@ const CreateObject = `create table sl_object(
 	` + ObjectStatus + ` integer not null default 0,
 	` + ObjectOwner + ` integer not null default 1,
 	` + ObjectCreateDate + ` text not null default '2015-09-19 10:34:12',
-	` + ObjectEditDate + ` text not null default '2015-09-19 10:34:12');`
+	` + ObjectEditDate + ` text not null default '2015-09-19 10:34:12',
+	` + ObjectURLCache + ` text not null default '');`
 
 const InitObject = `insert into sl_object (
-	` + ObjectRefID + `,
 	` + ObjectName + `,
 	` + ObjectMachineName + `,
 	` + ObjectTypeMajor + `,
 	` + ObjectTypeMinor + `,
-	` + ObjectStatus + `
+	` + ObjectStatus + `,
+	` + ObjectURLCache + `
 	)
 	values
-	(1,'Home','home',1,1,1),
-	(2,'About Sail','about',1,1,1),
-	(0,'Gopher','files/img/gopher.png',2,2,1);`
+	('Home','home',1,1,1, '/home'),
+	('About Sail','about',1,1,1, '/about'),
+	('Gopher','files/img/gopher.png',2,2,1, '/files/img/gopher.png');`
