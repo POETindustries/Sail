@@ -22,6 +22,10 @@ type File struct {
 	eDate         string
 }
 
+func (f *File) hasChildren() bool {
+	return fromStorageChildCount(f.ID) > 0
+}
+
 func (f *File) Status() string {
 	if f.status == 0 {
 		return "private"

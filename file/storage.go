@@ -12,8 +12,18 @@ func fromStorageChildren(id uint32) []*File {
 	rows := storage.Get().In("sl_object").Attrs(schema.ObjectAttrs...).
 		Equals(schema.ObjectParent, id).And().
 		Equals(schema.ObjectTypeMajor, Text).And().
-		Equals(schema.ObjectTypeMinor, Html).Exec()
+		Equals(schema.ObjectTypeMinor, Html).
+		Order(schema.ObjectName).Asc().Exec()
 	return scanChildren(rows.(*sql.Rows))
+}
+
+func fromStorageChildCount(id uint32) (count uint32) {
+	rows := storage.Get().In("sl_object").Attrs("count("+schema.ObjectParent+")").
+		Equals(schema.ObjectParent, id).Exec().(*sql.Rows)
+	defer rows.Close()
+	rows.Next()
+	rows.Scan(&count)
+	return
 }
 
 func scanChildren(rows *sql.Rows) []*File {

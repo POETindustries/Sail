@@ -1,9 +1,6 @@
 package file
 
-import (
-	"fmt"
-	"strings"
-)
+import "strings"
 
 // Manager represents website's content as a collection
 // of browsable directories and files. Its purpose is the
@@ -19,12 +16,10 @@ type Manager struct {
 func NewManager(dir string, id uint32) *Manager {
 	fm := Manager{PWD: dir, wdID: id}
 	fm.populate()
-	fmt.Printf("%+v\n", fm.Files)
 	return &fm
 }
 
 func (m *Manager) Icon(file *File) string {
-	println(file.mimeTypeMajor, file.mimeTypeMinor)
 	return strings.Split(mime[file.mimeTypeMajor][file.mimeTypeMinor], "/")[1]
 }
 
@@ -33,4 +28,10 @@ func (m *Manager) populate() {
 	// 1. every content entity that has f.wd as parent
 	// 2. inspect the actual os level file system
 	m.Files = fromStorageChildren(m.wdID)
+	for _, f := range m.Files {
+		if f.hasChildren() {
+			f.mimeTypeMajor = Directory
+			f.mimeTypeMinor = Folder
+		}
+	}
 }
