@@ -3,6 +3,7 @@ package frontend
 import (
 	"bytes"
 	"html/template"
+	"net/url"
 	"regexp"
 	"sail/conf"
 	"sail/errors"
@@ -54,6 +55,10 @@ func (p *Presenter) Message() string {
 
 func (p *Presenter) SetMessage(msg string) {
 	p.msg = msg
+}
+
+func (p *Presenter) SetQuery(query url.Values) {
+	// TODO: implement query handling
 }
 
 func (p *Presenter) URL() string {

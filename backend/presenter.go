@@ -2,6 +2,7 @@ package backend
 
 import (
 	"bytes"
+	"net/url"
 	"sail/conf"
 	"sail/errors"
 	"sail/file"
@@ -27,8 +28,9 @@ type Presenter struct {
 	User        *user.User
 	FileManager *file.Manager
 
-	msg string
-	url string
+	msg   string
+	url   string
+	query url.Values
 
 	template *template.Template
 	mainMenu *widget.Nav
@@ -73,6 +75,10 @@ func (p *Presenter) SetMessage(msg string) {
 	p.msg = msg
 }
 
+func (p *Presenter) SetQuery(query url.Values) {
+	p.query = query
+}
+
 // URL returns the url currently associated with the presenter.
 func (p *Presenter) URL() string {
 	if p.url == "/office/login" && p.Session != nil {
@@ -87,7 +93,7 @@ func (p *Presenter) SetURL(url string) {
 	if p.url != url {
 		p.url = url
 		if p.url == "/office/content" {
-			p.FileManager = file.NewManager("/", 0)
+			p.FileManager = file.NewManager(p.query)
 		}
 	}
 }
