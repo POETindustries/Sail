@@ -1,6 +1,12 @@
 package file
 
-import "strings"
+import (
+	"net/url"
+	"sail/object"
+	"sail/object/cache"
+	"strconv"
+	"strings"
+)
 
 // Manager represents website's content as a collection
 // of browsable directories and files. Its purpose is the
@@ -13,10 +19,20 @@ type Manager struct {
 	wdID uint32
 }
 
-func NewManager(dir string, id uint32) *Manager {
-	fm := Manager{PWD: dir, wdID: id}
+func NewManager(query url.Values) (fm *Manager) {
+	id, err := strconv.ParseUint(query.Get("loc"), 10, 32)
+	if err != nil {
+		fm = &Manager{PWD: "/", wdID: 0}
+	} else {
+		uuid := "uuid/" + query.Get("loc")
+		pwd := cache.DB().ObjectURL(uuid)
+		if pwd == "" {
+			pwd = object.StaticAddr(uuid)
+		}
+		fm = &Manager{PWD: pwd, wdID: uint32(id)}
+	}
 	fm.populate()
-	return &fm
+	return fm
 }
 
 func (m *Manager) Icon(file *File) string {

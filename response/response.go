@@ -31,6 +31,7 @@ func New(wr http.ResponseWriter, req *http.Request) *Response {
 }
 
 func (r *Response) Serve() {
+	r.Presenter.SetQuery(r.request.URL.Query())
 	r.Presenter.SetURL(r.URL)
 	r.Presenter.SetMessage(r.Message)
 	m := r.Presenter.Compile()
