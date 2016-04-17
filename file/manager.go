@@ -43,11 +43,27 @@ func (m *Manager) populate() {
 	// get info from two sources:
 	// 1. every content entity that has f.wd as parent
 	// 2. inspect the actual os level file system
-	m.Files = fromStorageChildren(m.wdID)
-	for _, f := range m.Files {
+	m.populateWithContent()
+}
+
+func (m *Manager) populateWithContent() {
+	m.Files = fromStorageChildren(m.wdID, true)
+	first := 0
+	for i, f := range m.Files {
 		if f.hasChildren() {
-			f.mimeTypeMajor = Directory
-			f.mimeTypeMinor = Folder
+			if f.ID == m.wdID {
+				f.Name = "Index"
+				first = i
+			} else {
+				f.mimeTypeMajor = Directory
+				f.mimeTypeMinor = Folder
+			}
 		}
+	}
+	if first != 0 {
+		old := make([]*File, len(m.Files))
+		copy(old, m.Files)
+		old = append(old[:first], old[first+1:]...)
+		m.Files = append([]*File{m.Files[first]}, old...)
 	}
 }

@@ -8,12 +8,15 @@ import (
 	"sail/storage"
 )
 
-func fromStorageChildren(id uint32) []*File {
-	rows := storage.Get().In("sl_object").Attrs(schema.ObjectAttrs...).
+func fromStorageChildren(id uint32, includeCurrent bool) []*File {
+	query := storage.Get().In("sl_object").Attrs(schema.ObjectAttrs...).
 		Equals(schema.ObjectParent, id).And().
 		Equals(schema.ObjectTypeMajor, Text).And().
-		Equals(schema.ObjectTypeMinor, Html).
-		Order(schema.ObjectName).Asc().Exec()
+		Equals(schema.ObjectTypeMinor, Html)
+	if includeCurrent {
+		query.Or().Equals(schema.ObjectID, id)
+	}
+	rows := query.Order(schema.ObjectName).Asc().Exec()
 	return scanChildren(rows.(*sql.Rows))
 }
 
