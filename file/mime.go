@@ -2,15 +2,22 @@ package file
 
 const (
 	Directory = 0
-	TextHtml  = 1
-	TextPlain = 2
-	ImageJpeg = 3
-	ImagePng  = 4
+	Folder    = 0
 )
 
-var mime = [5]string{
-	"directory/folder",
-	"text/html",
-	"text/plain",
-	"image/jpeg",
-	"image/png"}
+const (
+	Text  = 1
+	Html  = 0
+	Plain = 1
+)
+
+const (
+	Image = 2
+	Jpeg  = 0
+	Png   = 1
+)
+
+var mime = [3][]string{
+	[]string{"directory/folder"},
+	[]string{"text/html", "text/plain"},
+	[]string{"image/jpeg", "image/png"}}
