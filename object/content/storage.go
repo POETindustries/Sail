@@ -9,12 +9,16 @@ import (
 )
 
 const queryMinByURL = `select * from ((select ` + schema.ObjectID + `,
-	` + schema.ObjectName + `,` + schema.ObjectURLCache + ` from sl_object
+	` + schema.ObjectName + `,` + schema.ObjectOwner + `,
+	` + schema.ObjectCreateDate + `,` + schema.ObjectEditDate + `,
+	` + schema.ObjectURLCache + ` from sl_object
 	where ` + schema.ObjectStatus + `=1 and ` + schema.ObjectURLCache + `=?)
 	natural join sl_content) natural join sl_meta;`
 
 const queryMinByID = `select * from ((select ` + schema.ObjectID + `,
-	` + schema.ObjectName + `,` + schema.ObjectURLCache + ` from sl_object
+	` + schema.ObjectName + `,` + schema.ObjectOwner + `,
+	` + schema.ObjectCreateDate + `,` + schema.ObjectEditDate + `,
+	` + schema.ObjectURLCache + ` from sl_object
 	where ` + schema.ObjectStatus + `=1 and ` + schema.ObjectID + `=?)
 	natural join sl_content) natural join sl_meta;`
 
@@ -46,8 +50,8 @@ func fromStorageFullByID(id uint32) []*Content {
 
 func scan(row *sql.Row) *Content {
 	c := New()
-	if err := row.Scan(&c.ID, &c.Title, &c.URL, &c.Content,
-		&c.Meta.ID, &c.TemplateID, &c.Meta.Title, &c.Meta.Keywords,
+	if err := row.Scan(&c.ID, &c.Title, &c.Owner, &c.CDate, &c.EDate, &c.URL,
+		&c.Content, &c.Meta.ID, &c.TemplateID, &c.Meta.Title, &c.Meta.Keywords,
 		&c.Meta.Description, &c.Meta.Language, &c.Meta.PageTopic,
 		&c.Meta.RevisitAfter, &c.Meta.Robots); err != nil {
 		errors.Log(err, conf.Instance().DevMode)
