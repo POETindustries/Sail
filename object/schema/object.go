@@ -40,6 +40,6 @@ const InitObject = `insert into sl_object (
 	` + ObjectURLCache + `
 	)
 	values
-	('Home','home',1,1,1, '/home'),
-	('About Sail','about',1,1,1, '/about'),
-	('Gopher','files/img/gopher.png',2,2,1, '/files/img/gopher.png');`
+	('Home','home',1,0,1, '/home'),
+	('About Sail','about',1,0,1, '/about'),
+	('Gopher','files/img/gopher.png',2,1,1, '/files/img/gopher.png');`
