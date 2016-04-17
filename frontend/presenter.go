@@ -7,6 +7,7 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/object"
+	"sail/object/cache"
 	"sail/object/content"
 	"sail/object/fallback"
 	tpl "sail/object/template"
@@ -156,6 +157,12 @@ func (p *Presenter) replaceInternalLinks(mk *[]byte) {
 		refs[string(r[2:len(r)-1])] = true
 	}
 	for k := range refs {
-		*mk = bytes.Replace(*mk, []byte(k), []byte(object.StaticAddr(k)), -1)
+		if a := cache.DB().ObjectURL(k); a != "" {
+			*mk = bytes.Replace(*mk, []byte(k), []byte(a), -1)
+		} else {
+			a = object.StaticAddr(k)
+			cache.DB().PushURL(k, a)
+			*mk = bytes.Replace(*mk, []byte(k), []byte(a), -1)
+		}
 	}
 }
