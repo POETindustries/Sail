@@ -1,8 +1,8 @@
 {{define "content"}}
-	<h1>Content</h1>
 	{{range .Files}}
-	<p>
-		<img src="theme/default-backend/icons/{{$.Icon .TypeCode}}.png" alt="Icon"/>
-		{{.Name}}, at {{.Address}}, is a {{.Type}} file, set {{.Status}}</p>
+	<div class="sail-backend-content-tile">
+		<img src="/theme/default-backend/icons/{{$.Icon .}}.png" alt="Icon"/>
+		<p class="desc">{{.Name}}</p>
+	</div>
 	{{end}}
 {{end}}
