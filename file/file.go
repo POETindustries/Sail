@@ -8,11 +8,18 @@ const (
 )
 
 type File struct {
+	ID      uint32
 	Name    string
 	Address string
 
-	mimeType uint16
-	status   int8
+	machineName   string
+	parent        uint32
+	owner         uint32
+	mimeTypeMajor uint16
+	mimeTypeMinor uint16
+	status        int8
+	cDate         string
+	eDate         string
 }
 
 func (f *File) Status() string {
@@ -24,24 +31,13 @@ func (f *File) Status() string {
 
 func (f *File) String() string {
 	return fmt.Sprintf("FILE %s: {Address: %s | Type: %s | Status: %s}",
-		f.Name, f.Address, mime[f.mimeType], f.Status())
+		f.Name, f.Address, mime[f.mimeTypeMajor][f.mimeTypeMinor], f.Status())
 }
 
 func (f *File) Type() string {
-	return mime[f.mimeType]
+	return mime[f.mimeTypeMajor][f.mimeTypeMinor]
 }
 
-func (f *File) TypeCode() uint16 {
-	return f.mimeType
-}
-
-func StaticAddr(uuid string) string {
-	if a := fromStorageGetAddr(uuid, true); a != "" {
-		return a
-	}
-	return uuid
-}
-
-func WebPages(dir string) []*File {
-	return fromStorageAsContent(dir)
+func (f *File) TypeCode() (uint16, uint16) {
+	return f.mimeTypeMajor, f.mimeTypeMinor
 }

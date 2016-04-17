@@ -87,7 +87,7 @@ func (p *Presenter) SetURL(url string) {
 	if p.url != url {
 		p.url = url
 		if p.url == "/office/content" {
-			p.FileManager = file.NewManager("/")
+			p.FileManager = file.NewManager("/", 0)
 		}
 	}
 }

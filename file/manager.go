@@ -12,22 +12,25 @@ import (
 type Manager struct {
 	PWD   string
 	Files []*File
+
+	wdID uint32
 }
 
-func NewManager(dir string) *Manager {
-	fm := Manager{PWD: dir}
+func NewManager(dir string, id uint32) *Manager {
+	fm := Manager{PWD: dir, wdID: id}
 	fm.populate()
 	fmt.Printf("%+v\n", fm.Files)
 	return &fm
 }
 
-func (f *Manager) Icon(mimeType uint16) string {
-	return strings.Split(mime[mimeType], "/")[1]
+func (m *Manager) Icon(file *File) string {
+	println(file.mimeTypeMajor, file.mimeTypeMinor)
+	return strings.Split(mime[file.mimeTypeMajor][file.mimeTypeMinor], "/")[1]
 }
 
-func (f *Manager) populate() {
+func (m *Manager) populate() {
 	// get info from two sources:
 	// 1. every content entity that has f.wd as parent
 	// 2. inspect the actual os level file system
-	f.Files = WebPages(f.PWD)
+	m.Files = fromStorageChildren(m.wdID)
 }
