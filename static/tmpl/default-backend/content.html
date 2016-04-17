@@ -1,8 +1,10 @@
 {{define "content"}}
 	{{range .Files}}
-	<div class="sail-backend-content-tile">
-		<img src="/theme/default-backend/icons/{{$.Icon .}}.png" alt="Icon"/>
-		<p class="desc">{{.Name}}</p>
+	<div class="sail-backend-content-tile">	
+		<a href="{{if .IsDir}}?loc={{.ID}}{{end}}">
+			<img src="/theme/default-backend/icons/{{$.Icon .}}.png" alt="Icon"/>
+			<span class="desc">{{.Name}}</span>
+		</a>
 	</div>
 	{{end}}
 {{end}}

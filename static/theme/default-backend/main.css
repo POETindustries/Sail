@@ -29,6 +29,11 @@
 	background-color: rgba(23, 147, 209, 0.9);
 }
 
+.sail-backend-content-tile a {
+	text-decoration: none;
+	color: black;
+}
+
 .sail-backend-content-tile img {
 	display: block;
 	margin: 0 auto;
@@ -38,6 +43,7 @@
 }
 
 .sail-backend-content-tile .desc {
+	display: block;
 	position: relative;
 	margin: 0;
 	padding: .5em;

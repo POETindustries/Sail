@@ -22,8 +22,8 @@ type File struct {
 	eDate         string
 }
 
-func (f *File) hasChildren() bool {
-	return fromStorageChildCount(f.ID) > 0
+func (f *File) IsDir() bool {
+	return f.mimeTypeMajor == Directory
 }
 
 func (f *File) Status() string {
@@ -44,4 +44,8 @@ func (f *File) Type() string {
 
 func (f *File) TypeCode() (uint16, uint16) {
 	return f.mimeTypeMajor, f.mimeTypeMinor
+}
+
+func (f *File) hasChildren() bool {
+	return fromStorageChildCount(f.ID) > 0
 }
