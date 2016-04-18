@@ -1,7 +1,10 @@
 package file
 
 import (
+	"io/ioutil"
 	"net/url"
+	"sail/conf"
+	"sail/errors"
 	"sail/object"
 	"sail/object/cache"
 	"strconv"
@@ -44,6 +47,7 @@ func (m *Manager) populate() {
 	// 1. every content entity that has f.wd as parent
 	// 2. inspect the actual os level file system
 	m.populateWithContent()
+	m.populateWithStaticFiles()
 }
 
 func (m *Manager) populateWithContent() {
@@ -66,4 +70,27 @@ func (m *Manager) populateWithContent() {
 		old = append(old[:first], old[first+1:]...)
 		m.Files = append([]*File{m.Files[first]}, old...)
 	}
+}
+
+func (m *Manager) populateWithStaticFiles() {
+	files, err := ioutil.ReadDir(conf.Instance().FileDir + m.PWD[1:])
+	if err != nil {
+		errors.Log(err, conf.Instance().DevMode)
+		return
+	}
+	var ds, fs []*File
+	for _, f := range files {
+		// TODO:	if f is directory, append to ds, else determine
+		// 			mime type and append to fs.
+		file := File{Name: f.Name(), Address: m.PWD + f.Name()}
+		if f.IsDir() {
+			ds = append(ds, &file)
+		} else {
+			file.mimeTypeMajor = Text
+			file.mimeTypeMinor = Html
+			fs = append(fs, &file)
+		}
+	}
+	m.Files = append(m.Files, ds...)
+	m.Files = append(m.Files, fs...)
 }
