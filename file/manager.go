@@ -1,10 +1,7 @@
 package file
 
 import (
-	"io/ioutil"
 	"net/url"
-	"sail/conf"
-	"sail/errors"
 	"sail/object"
 	"sail/object/cache"
 	"strconv"
@@ -43,54 +40,23 @@ func (m *Manager) Icon(file *File) string {
 }
 
 func (m *Manager) populate() {
-	// get info from two sources:
-	// 1. every content entity that has f.wd as parent
-	// 2. inspect the actual os level file system
-	m.populateWithContent()
-	m.populateWithStaticFiles()
-}
-
-func (m *Manager) populateWithContent() {
-	m.Files = fromStorageChildren(m.wdID, true)
-	first := 0
-	for i, f := range m.Files {
-		if f.hasChildren() {
+	files := fromStorageChildren(m.wdID, true)
+	var ds []*File
+	var fs []*File
+	for _, f := range files {
+		if f.IsDir() || f.hasChildren() {
 			if f.ID == m.wdID {
 				f.Name = "Index"
-				first = i
-			} else {
+				fs = append([]*File{f}, fs...)
+				continue
+			} else if !f.IsDir() {
 				f.mimeTypeMajor = Directory
 				f.mimeTypeMinor = Folder
 			}
-		}
-	}
-	if first != 0 {
-		old := make([]*File, len(m.Files))
-		copy(old, m.Files)
-		old = append(old[:first], old[first+1:]...)
-		m.Files = append([]*File{m.Files[first]}, old...)
-	}
-}
-
-func (m *Manager) populateWithStaticFiles() {
-	files, err := ioutil.ReadDir(conf.Instance().FileDir + m.PWD[1:])
-	if err != nil {
-		errors.Log(err, conf.Instance().DevMode)
-		return
-	}
-	var ds, fs []*File
-	for _, f := range files {
-		// TODO:	if f is directory, append to ds, else determine
-		// 			mime type and append to fs.
-		file := File{Name: f.Name(), Address: m.PWD + f.Name()}
-		if f.IsDir() {
-			ds = append(ds, &file)
+			ds = append(ds, f)
 		} else {
-			file.mimeTypeMajor = Text
-			file.mimeTypeMinor = Html
-			fs = append(fs, &file)
+			fs = append(fs, f)
 		}
 	}
-	m.Files = append(m.Files, ds...)
-	m.Files = append(m.Files, fs...)
+	m.Files = append(ds, fs...)
 }

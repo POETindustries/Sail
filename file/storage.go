@@ -10,11 +10,10 @@ import (
 
 func fromStorageChildren(id uint32, includeCurrent bool) []*File {
 	query := storage.Get().In("sl_object").Attrs(schema.ObjectAttrs...).
-		Equals(schema.ObjectParent, id).And().
-		Equals(schema.ObjectTypeMajor, Text).And().
-		Equals(schema.ObjectTypeMinor, Html)
+		Equals(schema.ObjectParent, id)
 	if includeCurrent {
-		query.Or().Equals(schema.ObjectID, id)
+		query.Or().Equals(schema.ObjectID, id).And().
+			NotEquals(schema.ObjectTypeMajor, Directory)
 	}
 	rows := query.Order(schema.ObjectName).Asc().Exec()
 	return scanChildren(rows.(*sql.Rows))
