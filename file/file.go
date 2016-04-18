@@ -33,6 +33,10 @@ func (f *File) Status() string {
 	return "public"
 }
 
+func (f *File) StatusCode() int8 {
+	return f.status
+}
+
 func (f *File) String() string {
 	return fmt.Sprintf("FILE %s: {Address: %s | Type: %s | Status: %s}",
 		f.Name, f.Address, mime[f.mimeTypeMajor][f.mimeTypeMinor], f.Status())
