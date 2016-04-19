@@ -19,6 +19,10 @@ type Manager struct {
 	wdID uint32
 }
 
+// NewManager returns a new Manager, pointing at the
+// directory determined by the given query. If the query
+// doesn't hold any information relating the file manager
+// can use, it points to the root directory.
 func NewManager(query url.Values) (fm *Manager) {
 	id, err := strconv.ParseUint(query.Get("loc"), 10, 32)
 	if err != nil {
@@ -35,10 +39,16 @@ func NewManager(query url.Values) (fm *Manager) {
 	return fm
 }
 
+// Icon returns the file's icon name. A template should
+// provide icons for at least the most common mime types,
+// specified by the mime type's minor descriptor, i.e.
+// 'html', 'plain', 'jpeg' etc.
 func (m *Manager) Icon(file *File) string {
 	return strings.Split(mime[file.mimeTypeMajor][file.mimeTypeMinor], "/")[1]
 }
 
+// populate fills the file manager's list of files in the
+// current directory with actual data.
 func (m *Manager) populate() {
 	files := fromStorageChildren(m.wdID, true)
 	var ds []*File
