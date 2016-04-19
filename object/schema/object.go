@@ -1,5 +1,7 @@
 package schema
 
+// ObjectID and the other Object[...] constants hold the
+// names of the attributes in the object table.
 const (
 	ObjectID          = "object_id"
 	ObjectName        = "object_name"
@@ -14,10 +16,15 @@ const (
 	ObjectURLCache    = "object_url_cache"
 )
 
+// ObjectAttrs is a convenience slice, holding all attribute
+// names for the object table. It is intended to be used in
+// database queries of the form 'select * from' where the
+// order of attributes matters.
 var ObjectAttrs = []string{ObjectID, ObjectName, ObjectMachineName,
 	ObjectParent, ObjectTypeMajor, ObjectTypeMinor, ObjectStatus, ObjectOwner,
 	ObjectCreateDate, ObjectEditDate, ObjectURLCache}
 
+// CreateObject holds the table creation statement.
 const CreateObject = `create table sl_object(
 	` + ObjectID + ` integer primary key not null,
 	` + ObjectName + ` text not null,
@@ -31,15 +38,20 @@ const CreateObject = `create table sl_object(
 	` + ObjectEditDate + ` text not null default '2015-09-19 10:34:12',
 	` + ObjectURLCache + ` text not null default '');`
 
+// InitObject executes first-time queries.
 const InitObject = `insert into sl_object (
+	` + ObjectID + `,
 	` + ObjectName + `,
 	` + ObjectMachineName + `,
+	` + ObjectParent + `,
 	` + ObjectTypeMajor + `,
 	` + ObjectTypeMinor + `,
 	` + ObjectStatus + `,
 	` + ObjectURLCache + `
 	)
 	values
-	('Home','home',1,0,1, '/home'),
-	('About Sail','about',1,0,1, '/about'),
-	('Gopher','files/img/gopher.png',2,1,1, '/files/img/gopher.png');`
+	(1,'Home','home',0,1,0,1,'/home'),
+	(2,'About Sail','about',0,1,0,1,'/about'),
+	(3,'Files','files',0,0,0,1,'/files/'),
+	(4,'Images','img',3,0,0,1,'/files/img/'),
+	(5,'Gopher','gopher.png',4,2,1,1,'/files/img/gopher.png');`

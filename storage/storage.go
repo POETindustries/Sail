@@ -5,7 +5,6 @@ import (
 	"os"
 	"sail/conf"
 	"sail/errors"
-	fileschema "sail/file/schema"
 	objectschema "sail/object/schema"
 	pageschema "sail/object/schema"
 	userschema "sail/user/schema"
@@ -24,8 +23,6 @@ var createInstructs = []string{
 	userschema.InitGroup,
 	userschema.CreateGroupMembers,
 	userschema.InitGroupMembers,
-	fileschema.CreateFile,
-	fileschema.InitFile,
 	pageschema.CreateWidget,
 	pageschema.InitWidget,
 	pageschema.CreateWidgetNav,

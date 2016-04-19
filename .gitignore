@@ -8,5 +8,4 @@
 /sail
 
 # non-core files & dirs
-/static/files
 *.test.*
