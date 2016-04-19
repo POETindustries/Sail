@@ -9,9 +9,13 @@
 
 /* content browser */
 .sail-backend-content-tile {
+	background: none;
+	border: none;
+	padding: 0;
 	display: inline-block;
 	position: relative;
 	vertical-align: top;
+	font-size: 1em;
 	width: 10em;
 	height: 6em;
 	margin: 1em 1em 4em;

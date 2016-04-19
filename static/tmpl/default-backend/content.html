@@ -1,10 +1,9 @@
 {{define "content"}}
 	{{range .Files}}
-	<div class="sail-backend-content-tile">
-		<a href="{{if .IsDir}}?loc={{.ID}}{{else}}?edit={{.ID}}{{end}}">
+	<button
+		type="button" class="sail-backend-content-tile" onclick="{{if .IsDir}}location.href='?loc={{.ID}}'{{else}}console.log({{.ID}},{{.TypeCodeMajor}}){{end}}">
 			<img src="/theme/default-backend/icons/{{$.Icon .}}.png" alt="Icon"/>
 			<span class="desc">{{.Name}}</span>
-		</a>
-	</div>
+	</button>
 	{{end}}
 {{end}}

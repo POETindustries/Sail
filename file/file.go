@@ -50,6 +50,14 @@ func (f *File) TypeCode() (uint16, uint16) {
 	return f.mimeTypeMajor, f.mimeTypeMinor
 }
 
+func (f *File) TypeCodeMajor() uint16 {
+	return f.mimeTypeMajor
+}
+
+func (f *File) TypeCodeMinor() uint16 {
+	return f.mimeTypeMinor
+}
+
 func (f *File) hasChildren() bool {
 	return fromStorageChildCount(f.ID) > 0
 }
