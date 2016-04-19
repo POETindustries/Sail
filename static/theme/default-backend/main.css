@@ -22,6 +22,11 @@
 	transition: .2s;
 }
 
+button::-moz-focus-inner {
+	padding: 0;
+	border: 0;
+}
+
 .sail-backend-content-tile:hover {
 	z-index: 50;
 	overflow: visible;
@@ -33,11 +38,6 @@
 	background-color: rgba(23, 147, 209, 0.9);
 }
 
-.sail-backend-content-tile a {
-	text-decoration: none;
-	color: black;
-}
-
 .sail-backend-content-tile img {
 	display: block;
 	margin: 0 auto;
@@ -47,6 +47,7 @@
 }
 
 .sail-backend-content-tile .desc {
+	color: black;
 	display: block;
 	position: relative;
 	margin: 0;
