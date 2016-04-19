@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sail/conf"
 	"sail/errors"
-	"sail/page/schema"
+	"sail/object/schema"
 	"sail/storage"
 )
 
@@ -30,10 +30,7 @@ func fetchData(widget *Widget) {
 }
 
 func fetchNavData(id uint32) *Nav {
-	stmt := "sl_widget_nav natural join (select %s,%s from sl_content)"
-	t := fmt.Sprintf(stmt, schema.ContentID, schema.ContentURL)
-	a := append(schema.NavAttrs, schema.ContentURL)
-	rows := storage.Get().In(t).Attrs(a...).
+	rows := storage.Get().In("sl_widget_nav").Attrs(schema.NavAttrs...).
 		Equals(schema.NavWidgetID, id).Exec()
 	return scanNav(rows.(*sql.Rows))
 }
@@ -58,7 +55,6 @@ func scanWidget(rows *sql.Rows) []*Widget {
 			errors.Log(err, conf.Instance().DevMode)
 			return nil
 		}
-		fmt.Printf("%+v\n", w)
 		ws = append(ws, w)
 	}
 	return ws
@@ -69,14 +65,13 @@ func scanNav(rows *sql.Rows) *Nav {
 	n := Nav{}
 	for rows.Next() {
 		e := NavEntry{}
-		if err := rows.Scan(&e.ID, &e.Name, &e.RefID, &e.Submenu, &e.Pos,
-			&e.RefURL); err != nil {
+		if err := rows.Scan(&e.ID, &e.Name, &e.RefID, &e.Submenu, &e.Pos); err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 			return nil
 		}
+		e.RefURL = fmt.Sprintf("uuid/%d", e.RefID)
 		n.Entries = append(n.Entries, &e)
 	}
-	fmt.Printf("%+v\n", n)
 	return &n
 }
 

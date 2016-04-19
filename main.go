@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sail/backend"
 	"sail/conf"
-	"sail/page/backend"
-	"sail/page/cache"
-	"sail/page/frontend"
+	"sail/frontend"
+	"sail/object/cache"
 	"sail/response"
 	"sail/storage"
 	"sail/user"
@@ -14,6 +14,9 @@ import (
 	"sail/user/session"
 	"time"
 )
+
+var avgSrvTime = 0
+var reqs = 0
 
 func main() {
 	config := conf.Instance()
@@ -42,7 +45,13 @@ func frontendHandler(wr http.ResponseWriter, req *http.Request) {
 	}
 
 	t2 := time.Now().Nanosecond()
-	fmt.Printf("Time to serve page: %d microseconds\n", (t2-t1)/1000)
+	t := (t2 - t1)
+	if t > 0 {
+		reqs++
+		avgSrvTime += t
+		fmt.Printf("%3d Time to serve page: %d microseconds. Average: %d\n",
+			reqs, t/1000, avgSrvTime/reqs/1000)
+	}
 }
 
 func backendHandler(wr http.ResponseWriter, req *http.Request) {

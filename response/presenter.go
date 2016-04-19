@@ -1,6 +1,9 @@
-package page
+package response
 
-import "bytes"
+import (
+	"bytes"
+	"net/url"
+)
 
 // Presenter initiates page creation and loading for handling requests
 // by users from the www. It also serves as the content provider for
@@ -12,6 +15,7 @@ import "bytes"
 // inside templates.
 type Presenter interface {
 	Compile() *bytes.Buffer
+	SetQuery(query url.Values)
 	Message() string
 	SetMessage(msg string)
 	URL() string

@@ -2,11 +2,13 @@ package backend
 
 import (
 	"bytes"
+	"net/url"
 	"sail/conf"
 	"sail/errors"
-	"sail/page/fallback"
-	"sail/page/template"
-	"sail/page/widget"
+	"sail/file"
+	"sail/object/fallback"
+	"sail/object/template"
+	"sail/object/widget"
 	"sail/user"
 	"sail/user/group"
 	"sail/user/rights"
@@ -22,11 +24,13 @@ import (
 // functions and fields of type bool are safe for use as conditions
 // inside templates.
 type Presenter struct {
-	Session *session.Session
-	User    *user.User
+	Session     *session.Session
+	User        *user.User
+	FileManager *file.Manager
 
-	msg string
-	url string
+	msg   string
+	url   string
+	query url.Values
 
 	template *template.Template
 	mainMenu *widget.Nav
@@ -71,6 +75,10 @@ func (p *Presenter) SetMessage(msg string) {
 	p.msg = msg
 }
 
+func (p *Presenter) SetQuery(query url.Values) {
+	p.query = query
+}
+
 // URL returns the url currently associated with the presenter.
 func (p *Presenter) URL() string {
 	if p.url == "/office/login" && p.Session != nil {
@@ -82,7 +90,12 @@ func (p *Presenter) URL() string {
 // SetURL should be used to change the presenter's internal
 // url after it has already been initialized.
 func (p *Presenter) SetURL(url string) {
-	p.url = url
+	if p.url != url {
+		p.url = url
+		if p.url == "/office/content" {
+			p.FileManager = file.NewManager(p.query)
+		}
+	}
 }
 
 // MainMenu returns available menu entry data, depending on

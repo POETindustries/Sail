@@ -54,7 +54,7 @@ func (q *Query) All() *Query {
 }
 
 func (q *Query) And() *Query {
-	if len(q.selection) > 1 {
+	if len(q.selection) > 0 {
 		q.selection = append(q.selection, and)
 	}
 	return q
@@ -101,8 +101,13 @@ func (q *Query) In(table string) *Query {
 	return q
 }
 
+func (q *Query) NotEquals(key string, val interface{}) *Query {
+	q.addSelection(key, val, "<>?")
+	return q
+}
+
 func (q *Query) Or() *Query {
-	if len(q.selection) > 1 {
+	if len(q.selection) > 0 {
 		q.selection = append(q.selection, or)
 	}
 	return q
@@ -190,7 +195,6 @@ func (q *Query) build() (query string) {
 	case modeDelete:
 		query = q.buildDelete()
 	}
-	println(q.String())
 	return
 }
 
@@ -221,7 +225,7 @@ func (q *Query) buildDelete() string {
 func (q *Query) buildGet() string {
 	var ord string
 	if q.order != "" && q.orderAttr != "" {
-		ord = "order by " + q.orderAttr + q.order
+		ord = "order by " + q.orderAttr + " collate nocase " + q.order
 	}
 	if len(q.selection) < 1 {
 		q.All()

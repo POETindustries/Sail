@@ -6,8 +6,8 @@ import (
 	"io"
 	"sail/conf"
 	"sail/errors"
-	"sail/page/fallback"
-	"sail/page/widget"
+	"sail/object/fallback"
+	"sail/object/widget"
 )
 
 // Template is the data structure that contains all data necessary

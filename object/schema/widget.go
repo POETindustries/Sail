@@ -35,7 +35,7 @@ const (
 	NavEntryID       = "entry_id"
 	NavWidgetID      = WidgetID
 	NavEntryName     = "entry_name"
-	NavEntryRefID    = ContentID
+	NavEntryRefID    = ObjectID
 	NavEntrySubmenu  = "submenu"
 	NavEntryPosition = "position"
 )

@@ -7,6 +7,57 @@
 	color: #494c50;
 }
 
+/* content browser */
+.sail-backend-content-tile {
+	background: none;
+	border: none;
+	padding: 0;
+	display: inline-block;
+	position: relative;
+	vertical-align: top;
+	font-size: 1em;
+	width: 10em;
+	height: 6em;
+	margin: 1em 1em 4em;
+	transition: .2s;
+}
+
+.sail-backend-content-tile:hover {
+	z-index: 50;
+	overflow: visible;
+	background-color: rgba(23, 147, 209, 0.9);
+}
+
+.sail-backend-content-tile:hover .desc {
+	white-space: normal;
+	background-color: rgba(23, 147, 209, 0.9);
+}
+
+.sail-backend-content-tile a {
+	text-decoration: none;
+	color: black;
+}
+
+.sail-backend-content-tile img {
+	display: block;
+	margin: 0 auto;
+	width: 6em;
+	height: 6em;
+	transition: .2s;
+}
+
+.sail-backend-content-tile .desc {
+	display: block;
+	position: relative;
+	margin: 0;
+	padding: .5em;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-align: center;
+	transition: .2s;
+}
+
 @media only screen and (min-width: 640px) {
 	#sail-backend-main {
 		margin: 4em 1em 1em 13em;

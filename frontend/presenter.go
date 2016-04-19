@@ -3,13 +3,16 @@ package frontend
 import (
 	"bytes"
 	"html/template"
+	"net/url"
+	"regexp"
 	"sail/conf"
 	"sail/errors"
-	"sail/page/content"
-	"sail/page/fallback"
-	tpl "sail/page/template"
-	"sail/page/widget"
-	"strings"
+	"sail/object"
+	"sail/object/cache"
+	"sail/object/content"
+	"sail/object/fallback"
+	tpl "sail/object/template"
+	"sail/object/widget"
 )
 
 // Presenter initiates page creation and loading for handling requests
@@ -41,7 +44,9 @@ func (p *Presenter) Compile() *bytes.Buffer {
 		errors.Log(err, conf.Instance().DevMode)
 		return bytes.NewBufferString(fallback.NOTFOUND404)
 	}
-	return &markup
+	b := markup.Bytes()
+	p.replaceInternalLinks(&b)
+	return bytes.NewBuffer(b)
 }
 
 func (p *Presenter) Message() string {
@@ -50,6 +55,10 @@ func (p *Presenter) Message() string {
 
 func (p *Presenter) SetMessage(msg string) {
 	p.msg = msg
+}
+
+func (p *Presenter) SetQuery(query url.Values) {
+	// TODO: implement query handling
 }
 
 func (p *Presenter) URL() string {
@@ -116,7 +125,7 @@ func (p *Presenter) Widget(name string) (w *widget.Widget) {
 	return
 }
 
-// Menu returns the menu identified by the name, if possible.
+// NavMenu returns the menu identified by the name, if possible.
 // It is guaranteed to return an object of the correct type; if the
 // desired object does not exist, an empty object is returned with
 // all necessary components minimally initialized.
@@ -128,7 +137,7 @@ func (p *Presenter) NavMenu(name string, isMain bool) *widget.Nav {
 	}
 	if isMain {
 		for _, e := range m.Entries {
-			e.Active = strings.HasPrefix(p.url, e.RefURL)
+			e.Active = (p.content.ID == e.RefID)
 		}
 	}
 	return m
@@ -144,4 +153,21 @@ func (p *Presenter) TextWidget(name string) template.HTML {
 		return template.HTML(t.Content)
 	}
 	return template.HTML("")
+}
+
+func (p *Presenter) replaceInternalLinks(mk *[]byte) {
+	r, _ := regexp.Compile("=\"uuid/[0-9]+\"")
+	refs := make(map[string]bool)
+	for _, r := range r.FindAll(*mk, -1) {
+		refs[string(r[2:len(r)-1])] = true
+	}
+	for k := range refs {
+		if a := cache.DB().ObjectURL(k); a != "" {
+			*mk = bytes.Replace(*mk, []byte(k), []byte(a), -1)
+		} else {
+			a = object.StaticAddr(k)
+			cache.DB().PushURL(k, a)
+			*mk = bytes.Replace(*mk, []byte(k), []byte(a), -1)
+		}
+	}
 }
