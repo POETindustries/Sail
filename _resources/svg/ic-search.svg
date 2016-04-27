@@ -15,7 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="ic-search.svg">
+   sodipodi:docname="ic-search.svg"
+   inkscape:export-filename="/home/dev/Code/go/src/sail/_resources/svg/ic-search.png"
+   inkscape:export-xdpi="30"
+   inkscape:export-ydpi="30">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -54,21 +57,22 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-860.36216)">
-    <circle
+    <ellipse
        style="fill:none;fill-opacity:1;stroke:#494c60;stroke-width:8;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4206"
-       cx="68"
-       cy="928.36218"
-       r="60" />
+       cx="76.575089"
+       cy="936.92279"
+       rx="40.575085"
+       ry="40.575081" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#494c60;stroke-width:11.99999905;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 110.45693,970.81917 73.30042,73.30033"
+       d="m 105.28664,965.63435 49.56951,49.56945"
        id="path4210"
        inkscape:connector-curvature="0" />
     <path
        inkscape:connector-curvature="0"
        id="path4212"
-       d="m 125.07107,985.43325 55.85787,55.85785"
+       d="m 115.16947,975.5171 37.77396,37.774"
        style="fill:none;fill-rule:evenodd;stroke:#494c60;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>

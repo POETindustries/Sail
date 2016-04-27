@@ -1,5 +1,32 @@
 {{define "users"}}
 <div id="sail-backend-main">
 	<h1>User &amp; Group Settings</h2>
+	<table id="sail-backend-users-table" class="sail-backend-user-mgmt-table">
+		<tr class="table-head">
+			<th class="cell-checkbox"><input type="checkbox"/></th>
+			<th>Username</th><th>Last Name</th><th>First Name</th>
+			<th>E-Mail</th><th>Phone</th>
+		</tr>
+		{{if eq 1 1}}
+		<tr class="even">
+			<td class="cell-checkbox"><input type="checkbox"/></td>
+			<td>{{"admin"}}</td><td>{{"Goodkat"}}</td><td>{{"Mister"}}</td>
+			<td>{{"mr@good.cat"}}</td><td>{{"002-555-4958488"}}</td>
+		</tr>
+		{{end}}
+	</table>
+	<table id="sail-backend-groups-table" class="sail-backend-user-mgmt-table">
+		<tr class="table-head">
+			<th class="cell-checkbox"><input type="checkbox"/></th>
+			<th>Name</th><th>Members</th><th>Permission Status</th>
+		</tr>
+		{{if eq 1 1}}
+		<tr class="even">
+			<td class="cell-checkbox"><input type="checkbox"/></td>
+			<td>{{"root"}}</td><td>{{"1"}}</td><td>{{"24%"}}</td>
+		</tr>
+		{{end}}
+	</table>
 </div>
+<script src="/js/default-backend/usermgr.js"></script>
 {{end}}

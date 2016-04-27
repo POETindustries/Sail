@@ -7,9 +7,10 @@
 	height: 4rem;
 	background-color: #b9bcc0;
 	color: #f8f8f8;
-	box-shadow: 0 0 2px #000000;
+	box-shadow: 0 0 4px #000000;
 }
 
+/* user management */
 #sail-backend-users-header {
 	padding-top: 0.5rem;
 }

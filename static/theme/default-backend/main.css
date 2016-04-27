@@ -2,6 +2,12 @@
 	margin: 5em 1em 1em;
 }
 
+@media only screen and (min-width: 640px) {
+	#sail-backend-main {
+		margin-left: 13em;
+	}
+}
+
 .sail-person-name {
 	font-weight: bold;
 	color: #494c50;
@@ -59,8 +65,35 @@ button::-moz-focus-inner {
 	transition: .2s;
 }
 
-@media only screen and (min-width: 640px) {
-	#sail-backend-main {
-		margin-left: 13em;
-	}
+/* user management */
+.sail-backend-user-mgmt-table {
+	width: 100%;
+	text-align: left;
+}
+
+.sail-backend-user-mgmt-table td,
+.sail-backend-user-mgmt-table th {
+	padding: 0.25em 0.5em;
+}
+
+.sail-backend-user-mgmt-table .cell-checkbox {
+	text-align: center;
+	width: 2em;
+}
+
+.sail-backend-user-mgmt-table .table-head {
+	background-color: #1793d1;
+	color: white;
+}
+
+.sail-backend-user-mgmt-table .even {
+	background-color: #d9dce0;
+}
+
+.sail-backend-user-mgmt-table .uneven {
+	background-color: #c9ccd0;
+}
+
+#sail-backend-groups-table {
+	display: none;
 }
