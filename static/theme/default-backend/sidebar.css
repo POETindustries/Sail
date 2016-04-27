@@ -6,7 +6,7 @@
 	height: 100vh;
 	padding-top: 4rem;
 	z-index: 20;
-	background: #c9ccd8;
+	background: #494c50;
 }
 
 /* main menu */
@@ -18,7 +18,7 @@
 	display: block;
 	text-decoration: none;
 	text-transform: uppercase;
-	color: #404040;
+	color: #d0d0d0;
 	padding: .5rem 1rem;
 }
 

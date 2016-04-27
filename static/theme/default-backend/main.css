@@ -1,5 +1,5 @@
 #sail-backend-main {
-	margin: 4em 1em 1em;
+	margin: 5em 1em 1em;
 }
 
 .sail-person-name {
@@ -61,6 +61,6 @@ button::-moz-focus-inner {
 
 @media only screen and (min-width: 640px) {
 	#sail-backend-main {
-		margin: 4em 1em 1em 13em;
+		margin-left: 13em;
 	}
 }

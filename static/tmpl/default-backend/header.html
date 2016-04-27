@@ -1,5 +1,27 @@
 {{define "header"}}
 <div id="sail-backend-header">
-    
+
+</div>
+{{end}}
+
+{{define "users-header"}}
+<div id="sail-backend-users-header">
+    <input id="user-group-toggle" type="checkbox"/>
+    <label for="user-group-toggle" id="user-group-toggle-label">
+        <img alt="Users" id="user-icon" src="/theme/default-backend/icons/ic-user.png"/>
+        <img alt="Groups" id="group-icon" src="/theme/default-backend/icons/ic-group.png"/>
+    </label>
+    <div id="user-actions">
+        <button type="button">
+            <img alt="New User" src="/theme/default-backend/icons/ic-user-add.png"/>
+        </button>
+    </div>
+    <div id="group-actions">
+        <button type="button">
+            <img alt="New Group" src="/theme/default-backend/icons/ic-group-add.png"/>
+        </button>
+    </div>
+    <div id="user-selection-actions"></div>
+    <div id="group-selection-actions"></div>
 </div>
 {{end}}

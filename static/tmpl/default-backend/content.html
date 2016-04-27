@@ -1,4 +1,5 @@
 {{define "content"}}
+<div id="sail-backend-main">
 	{{range .Files}}
 	<button
 		type="button" class="sail-backend-content-tile" onclick="{{if .IsDir}}location.href='?loc={{.ID}}'{{else}}console.log({{.ID}},{{.TypeCodeMajor}}){{end}}">
@@ -6,4 +7,5 @@
 			<span class="desc">{{.Name}}</span>
 	</button>
 	{{end}}
+</div>
 {{end}}
