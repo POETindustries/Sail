@@ -7,21 +7,34 @@
 {{define "users-header"}}
 <div id="sail-backend-users-header">
     <input id="user-group-toggle" type="checkbox"/>
-    <label for="user-group-toggle" id="user-group-toggle-label">
+    <label for="user-group-toggle" id="user-group-toggle-label" title="Toggle between users &amp; groups">
         <img alt="Users" id="user-icon" src="/theme/default-backend/icons/ic-user.png"/>
         <img alt="Groups" id="group-icon" src="/theme/default-backend/icons/ic-group.png"/>
-    </label>
-    <div id="user-actions">
-        <button type="button">
+    </label><div id="user-actions">
+        <button type="button" title="Create a new user">
             <img alt="New User" src="/theme/default-backend/icons/ic-user-add.png"/>
         </button>
-    </div>
-    <div id="group-actions">
-        <button type="button">
+    </div><div id="group-actions">
+        <button type="button" title="Create a new group">
             <img alt="New Group" src="/theme/default-backend/icons/ic-group-add.png"/>
         </button>
+    </div><div id="user-selection-actions">
+        <button type="button" title="Delete selected users">
+            <img alt="Delete User" src="/theme/default-backend/icons/ic-user-del.png"/>
+        </button>
+        <button type="button" title="Remove selected users from groups">
+            <img alt="Delete User from Group" src="/theme/default-backend/icons/ic-group-del-user.png"/>
+        </button>
+    </div><div id="group-selection-actions">
+        <button type="button" title="Delete selected groups">
+            <img alt="Delete Group" src="/theme/default-backend/icons/ic-group-del.png"/>
+        </button>
+        <button type="button" title="Add users to selected groups">
+            <img alt="Add User to Group" src="/theme/default-backend/icons/ic-group-add-user.png"/>
+        </button>
+        <button type="button" title="Remove users from selected groups">
+            <img alt="Delete User from Group" src="/theme/default-backend/icons/ic-group-del-user.png"/>
+        </button>
     </div>
-    <div id="user-selection-actions"></div>
-    <div id="group-selection-actions"></div>
 </div>
 {{end}}

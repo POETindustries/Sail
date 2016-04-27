@@ -7,6 +7,7 @@
 	height: 4rem;
 	background-color: #b9bcc0;
 	color: #f8f8f8;
+	box-shadow: 0 0 2px #000000;
 }
 
 #sail-backend-users-header {
@@ -20,13 +21,12 @@
 #sail-backend-users-header #group-selection-actions {
 	display: inline-block;
 	height: 3em;
-	padding: 0 0.5em;
 	border-right: 1px solid #696c80;
 }
 
-#sail-backend-users-header #user-selection-actions,
-#sail-backend-users-header #group-selection-actions {
-	border: none;
+#sail-backend-users-header #user-group-toggle-label {
+	padding: 0 1em;
+	margin-left: 1em;
 }
 
 #sail-backend-users-header img {
@@ -38,8 +38,13 @@
 	height: 100%;
 	background: none;
 	margin: 0;
-	padding: 0;
+	padding: 0 1em;
 	border: none;
+}
+
+#sail-backend-users-header #user-group-toggle-label:hover,
+#sail-backend-users-header button:hover {
+	background: #c9ccd0;
 }
 
 #sail-backend-users-header #user-group-toggle,
