@@ -20,7 +20,7 @@
         </button>
     </div>{{end}}<div id="user-selection-actions">
         {{if .CanDelete}}
-        <button type="button" title="Delete selected users">
+        <button type="button" title="Delete selected users" onclick="onDeleteUsers()">
             <img alt="Delete User" src="/theme/default-backend/icons/ic-user-del.png"/>
         </button>
         {{end}}
@@ -31,7 +31,7 @@
         {{end}}
     </div><div id="group-selection-actions">
         {{if .CanDelete}}
-        <button type="button" title="Delete selected groups">
+        <button type="button" title="Delete selected groups" onclick="onDeleteGroups()">
             <img alt="Delete Group" src="/theme/default-backend/icons/ic-group-del.png"/>
         </button>
         {{end}}

@@ -15,7 +15,7 @@
 		<tbody>
 		{{range $i, $u := .AllUsers}}
 		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
-			<td class="cell-checkbox"><input type="checkbox"/></td>
+			<td class="cell-checkbox"><input type="checkbox" value="{{$u.ID}}"/></td>
 			<td>{{$u.Name}}</td>
 			<td>{{$u.LastName}}</td>
 			<td>{{$u.FirstName}}</td>
@@ -37,7 +37,7 @@
 		<tbody>
 		{{range $i, $g := .AllGroups}}
 		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
-			<td class="cell-checkbox"><input type="checkbox"/></td>
+			<td class="cell-checkbox"><input type="checkbox" value="{{$g.ID}}"/></td>
 			<td>{{$g.Name}}</td>
 			<td>{{$g.MemberCount}}</td>
 			<td class="permission-progress">
