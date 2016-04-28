@@ -2,6 +2,7 @@
 <div id="sail-backend-main">
 	<h1>User &amp; Group Settings</h2>
 	<table id="sail-backend-users-table" class="sail-backend-user-mgmt-table">
+		<thead>
 		<tr class="table-head">
 			<th class="cell-checkbox"><input type="checkbox"/></th>
 			<th>Username</th>
@@ -10,6 +11,8 @@
 			<th>E-Mail</th>
 			<th>Phone</th>
 		</tr>
+		</thead>
+		<tbody>
 		{{range $i, $u := .AllUsers}}
 		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
 			<td class="cell-checkbox"><input type="checkbox"/></td>
@@ -20,14 +23,18 @@
 			<td>{{$u.Phone}}</td>
 		</tr>
 		{{end}}
+		</tbody>
 	</table>
 	<table id="sail-backend-groups-table" class="sail-backend-user-mgmt-table">
+		<thead>
 		<tr class="table-head">
 			<th class="cell-checkbox"><input type="checkbox"/></th>
 			<th>Name</th>
 			<th>Members</th>
 			<th>Permission Status</th>
 		</tr>
+		</thead>
+		<tbody>
 		{{range $i, $g := .AllGroups}}
 		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
 			<td class="cell-checkbox"><input type="checkbox"/></td>
@@ -40,6 +47,7 @@
 			</td>
 		</tr>
 		{{end}}
+		</tbody>
 	</table>
 </div>
 <script src="/js/default-backend/usermgr.js"></script>
