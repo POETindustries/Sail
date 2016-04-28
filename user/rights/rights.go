@@ -74,5 +74,5 @@ func Dom(path string) (d Domain, err error) {
 			}
 		}
 	}
-	return 0, errors.New("No domain found")
+	return DomainCount, errors.New("No domain found")
 }
