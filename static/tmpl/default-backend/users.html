@@ -10,14 +10,14 @@
 			<th>E-Mail</th>
 			<th>Phone</th>
 		</tr>
-		{{range .AllUsers}}
-		<tr class="even">
+		{{range $i, $u := .AllUsers}}
+		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
 			<td class="cell-checkbox"><input type="checkbox"/></td>
-			<td>{{.Name}}</td>
-			<td>{{.LastName}}</td>
-			<td>{{.FirstName}}</td>
-			<td>{{.Email}}</td>
-			<td>{{.Phone}}</td>
+			<td>{{$u.Name}}</td>
+			<td>{{$u.LastName}}</td>
+			<td>{{$u.FirstName}}</td>
+			<td>{{$u.Email}}</td>
+			<td>{{$u.Phone}}</td>
 		</tr>
 		{{end}}
 	</table>
@@ -28,14 +28,14 @@
 			<th>Members</th>
 			<th>Permission Status</th>
 		</tr>
-		{{range .AllGroups}}
-		<tr class="even">
+		{{range $i, $g := .AllGroups}}
+		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
 			<td class="cell-checkbox"><input type="checkbox"/></td>
-			<td>{{.Name}}</td>
-			<td>{{.MemberCount}}</td>
+			<td>{{$g.Name}}</td>
+			<td>{{$g.MemberCount}}</td>
 			<td class="permission-progress">
-				<span style="min-width:{{.PermissionStatus}}%;">
-					{{.PermissionStatus}} %
+				<span style="min-width:{{$g.PermissionStatus}}%;">
+					{{$g.PermissionStatus}} %
 				</span>
 			</td>
 		</tr>
