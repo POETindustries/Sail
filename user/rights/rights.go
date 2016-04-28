@@ -14,9 +14,10 @@ const (
 const DomainCount = 4
 
 const (
-	Create Mode = 0x01
-	Update Mode = 0x02
-	Delete Mode = 0x04
+	Read   Mode = 0x01
+	Create Mode = 0x02
+	Update Mode = 0x04
+	Delete Mode = 0x08
 )
 
 var paths = [][]string{
