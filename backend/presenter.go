@@ -27,6 +27,7 @@ type Presenter struct {
 	Session     *session.Session
 	User        *user.User
 	FileManager *file.Manager
+	UserManager *group.Manager
 
 	msg   string
 	url   string
@@ -75,6 +76,9 @@ func (p *Presenter) SetMessage(msg string) {
 	p.msg = msg
 }
 
+// SetQuery passes a given URL GET query to the presenter.
+// Based on the parameters, it can decide whether to show
+// some elements or hide others.
 func (p *Presenter) SetQuery(query url.Values) {
 	p.query = query
 }
@@ -94,6 +98,8 @@ func (p *Presenter) SetURL(url string) {
 		p.url = url
 		if p.url == "/office/content" {
 			p.FileManager = file.NewManager(p.query)
+		} else if p.url == "/office/users" {
+			p.UserManager = group.NewManager()
 		}
 	}
 }
