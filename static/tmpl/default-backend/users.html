@@ -33,7 +33,11 @@
 			<td class="cell-checkbox"><input type="checkbox"/></td>
 			<td>{{.Name}}</td>
 			<td>{{.MemberCount}}</td>
-			<td>{{.PermissionStatus}} %</td>
+			<td class="permission-progress">
+				<span style="min-width:{{.PermissionStatus}}%;">
+					{{.PermissionStatus}} %
+				</span>
+			</td>
 		</tr>
 		{{end}}
 	</table>
