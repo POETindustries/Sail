@@ -4,26 +4,36 @@
 	<table id="sail-backend-users-table" class="sail-backend-user-mgmt-table">
 		<tr class="table-head">
 			<th class="cell-checkbox"><input type="checkbox"/></th>
-			<th>Username</th><th>Last Name</th><th>First Name</th>
-			<th>E-Mail</th><th>Phone</th>
+			<th>Username</th>
+			<th>Last Name</th>
+			<th>First Name</th>
+			<th>E-Mail</th>
+			<th>Phone</th>
 		</tr>
-		{{if eq 1 1}}
+		{{range .AllUsers}}
 		<tr class="even">
 			<td class="cell-checkbox"><input type="checkbox"/></td>
-			<td>{{"admin"}}</td><td>{{"Goodkat"}}</td><td>{{"Mister"}}</td>
-			<td>{{"mr@good.cat"}}</td><td>{{"002-555-4958488"}}</td>
+			<td>{{.Name}}</td>
+			<td>{{.LastName}}</td>
+			<td>{{.FirstName}}</td>
+			<td>{{.Email}}</td>
+			<td>{{.Phone}}</td>
 		</tr>
 		{{end}}
 	</table>
 	<table id="sail-backend-groups-table" class="sail-backend-user-mgmt-table">
 		<tr class="table-head">
 			<th class="cell-checkbox"><input type="checkbox"/></th>
-			<th>Name</th><th>Members</th><th>Permission Status</th>
+			<th>Name</th>
+			<th>Members</th>
+			<th>Permission Status</th>
 		</tr>
-		{{if eq 1 1}}
+		{{range .AllGroups}}
 		<tr class="even">
 			<td class="cell-checkbox"><input type="checkbox"/></td>
-			<td>{{"root"}}</td><td>{{"1"}}</td><td>{{"24%"}}</td>
+			<td>{{.Name}}</td>
+			<td>{{.MemberCount}}</td>
+			<td>{{.PermissionStatus}} %</td>
 		</tr>
 		{{end}}
 	</table>

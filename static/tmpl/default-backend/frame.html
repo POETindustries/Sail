@@ -20,7 +20,7 @@
 		{{template "content" .FileManager}}
 	{{else if eq .URL "/office/users"}}
 		{{template "users-header" .}}
-		{{template "users" .}}
+		{{template "users" .UserManager}}
 	{{else if eq .URL "/office/config"}}
 		{{template "header" .}}
 		{{template "config" .}}
