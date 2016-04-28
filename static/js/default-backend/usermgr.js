@@ -14,8 +14,8 @@
 			userTable.style.display = "table";
 		}
 	};
-	initSelectAll(userTable)
-	initSelectAll(groupTable)
+	initSelectAll(userTable);
+	initSelectAll(groupTable);
 })();
 
 /*
@@ -35,5 +35,5 @@ function initSelectAll(table) {
  * hides all table entries that do not match the keyword.
  */
 function filter(keyword) {
-	console.log(keyword)
+	console.log(keyword);
 }
