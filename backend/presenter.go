@@ -51,6 +51,22 @@ func New(s *session.Session, u *user.User) *Presenter {
 	return p
 }
 
+func (p *Presenter) CanCreate() bool {
+	return p.checkPrivilege(rights.Create)
+}
+
+func (p *Presenter) CanDelete() bool {
+	return p.checkPrivilege(rights.Delete)
+}
+
+func (p *Presenter) CanRead() bool {
+	return p.checkPrivilege(rights.Read)
+}
+
+func (p *Presenter) CanUpdate() bool {
+	return p.checkPrivilege(rights.Update)
+}
+
 // Compile creates html markup from the prsenter's template
 // and the data stored in the presenter at the time of
 // compilation. The resulting markup is ready to be sent
@@ -133,4 +149,23 @@ func (p *Presenter) buildNav(uid uint32) *widget.Nav {
 			ID: 5, Name: "Maintenance", RefURL: "/office/maintenance"})
 	}
 	return &nav
+}
+
+func (p *Presenter) checkPrivilege(mode rights.Mode) bool {
+	d, err := rights.Dom(p.url)
+	if err != nil {
+		return false
+	}
+	switch mode {
+	case rights.Read:
+		return group.All().Permission(p.User.ID, d).R()
+	case rights.Create:
+		return group.All().Permission(p.User.ID, d).C()
+	case rights.Update:
+		return group.All().Permission(p.User.ID, d).U()
+	case rights.Delete:
+		return group.All().Permission(p.User.ID, d).D()
+	default:
+		return false
+	}
 }
