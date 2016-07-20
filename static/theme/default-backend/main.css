@@ -98,11 +98,11 @@ button::-moz-focus-inner {
 	color: white;
 }
 
-.sail-backend-user-mgmt-table .even {
+.sail-backend-user-mgmt-table tbody tr:nth-child(odd) {
 	background-color: #d9dce0;
 }
 
-.sail-backend-user-mgmt-table .uneven {
+.sail-backend-user-mgmt-table tbody tr:nth-child(even) {
 	background-color: #c9ccd0;
 }
 

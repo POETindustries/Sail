@@ -13,14 +13,14 @@
 		</tr>
 		</thead>
 		<tbody>
-		{{range $i, $u := .AllUsers}}
-		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
-			<td class="cell-checkbox"><input type="checkbox" value="{{$u.ID}}"/></td>
-			<td>{{$u.Name}}</td>
-			<td>{{$u.LastName}}</td>
-			<td>{{$u.FirstName}}</td>
-			<td>{{$u.Email}}</td>
-			<td>{{$u.Phone}}</td>
+		{{range .AllUsers}}
+		<tr>
+			<td class="cell-checkbox"><input type="checkbox" value="{{.ID}}"/></td>
+			<td>{{.Name}}</td>
+			<td>{{.LastName}}</td>
+			<td>{{.FirstName}}</td>
+			<td>{{.Email}}</td>
+			<td>{{.Phone}}</td>
 		</tr>
 		{{end}}
 		</tbody>
@@ -35,14 +35,14 @@
 		</tr>
 		</thead>
 		<tbody>
-		{{range $i, $g := .AllGroups}}
-		<tr class="{{if even $i}}even{{else}}uneven{{end}}">
-			<td class="cell-checkbox"><input type="checkbox" value="{{$g.ID}}"/></td>
-			<td>{{$g.Name}}</td>
-			<td>{{$g.MemberCount}}</td>
+		{{range .AllGroups}}
+		<tr>
+			<td class="cell-checkbox"><input type="checkbox" value="{{.ID}}"/></td>
+			<td>{{.Name}}</td>
+			<td>{{.MemberCount}}</td>
 			<td class="permission-progress">
-				<span style="min-width:{{$g.PermissionStatus}}%;">
-					{{$g.PermissionStatus}} %
+				<span style="min-width:{{.PermissionStatus}}%;">
+					{{.PermissionStatus}} %
 				</span>
 			</td>
 		</tr>
