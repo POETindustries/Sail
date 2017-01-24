@@ -1,16 +1,25 @@
 package session
 
-import "time"
+import (
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"time"
+)
 
 // Database manages an internal list of active sessions.
 type Database struct {
 	sessions map[string]*Session
+	seeds    []byte
+	quota    int
 }
 
 var instance *Database
 
 func new() *Database {
-	return &Database{sessions: make(map[string]*Session)}
+	db := &Database{sessions: make(map[string]*Session)}
+	db.reseed()
+	return db
 }
 
 // DB returns a pointer to the session database singleton.
@@ -69,6 +78,16 @@ func (db *Database) Remove(id string) {
 	delete(db.sessions, id)
 }
 
+// Seed returns the next available seed for use in creating session ids.
+func (db *Database) Seed() (b []byte) {
+	if len(db.seeds) < 5 && !db.reseed() {
+		return // TODO fill b with random data from a secondary source?
+	}
+	b = db.seeds[:4]
+	DB().seeds = DB().seeds[5:]
+	return b
+}
+
 // Start resets a session's timer to the current time.
 func (db *Database) Start(id string) {
 	if s := db.sessions[id]; s != nil {
@@ -83,4 +102,37 @@ func (db *Database) User(id string) (u string) {
 		u = s.User
 	}
 	return
+}
+
+func (db *Database) reseed() bool {
+	db.checkSeedQuota()
+	if db.quota < 10000 { // are there enough bytes left to download another chunk?
+		return false
+	}
+	resp, err := http.Get("https://www.random.org/strings/?num=4&len=4&digits=on&upperalpha=on&loweralpha=on&format=plain") // TODO num needs to be higher in production, maybe make this editable through config file?
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.Status != "200 OK" {
+		return false
+	}
+	db.seeds, _ = ioutil.ReadAll(resp.Body)
+	return true
+}
+
+func (db *Database) checkSeedQuota() bool {
+	resp, err := http.Get("https://www.random.org/quota/?format=plain")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.Status != "200 OK" {
+		return false
+	}
+	body, _ := ioutil.ReadAll(resp.Body)
+	if db.quota, err = strconv.Atoi(string(body[:len(body)-1])); err != nil {
+		db.quota = 0
+	}
+	return true
 }

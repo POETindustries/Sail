@@ -58,7 +58,7 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 	t1 := time.Now().Nanosecond()
 
 	if storage.DB().Ping() == nil {
-		cookie, _ := req.Cookie("session")
+		cookie, _ := req.Cookie("id")
 		if cookie != nil && session.DB().Has(cookie.Value) {
 			s := session.DB().Get(cookie.Value)
 			u := user.ByName(s.User)
@@ -86,7 +86,7 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 	if usr, ok := user.Verify(u, p); ok {
 		sess := session.New(req, req.PostFormValue("user"))
 		session.DB().Add(sess)
-		c := http.Cookie{Name: "session", Value: sess.ID}
+		c := http.Cookie{Name: "id", Value: sess.ID}
 		http.SetCookie(wr, &c)
 		if b := group.NewBouncer(req); !b.Pass(usr.ID) {
 			b.Sanitize("/office/")
