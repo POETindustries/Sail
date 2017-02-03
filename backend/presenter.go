@@ -9,10 +9,10 @@ import (
 	"sail/object/fallback"
 	"sail/object/template"
 	"sail/object/widget"
+	"sail/session"
 	"sail/user"
 	"sail/user/group"
 	"sail/user/rights"
-	"sail/user/session"
 )
 
 // Presenter initiates page creation and loading for handling requests

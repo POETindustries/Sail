@@ -3,9 +3,9 @@ package group
 import (
 	"net/http"
 	"net/url"
+	"sail/session"
 	"sail/user"
 	"sail/user/rights"
-	"sail/user/session"
 )
 
 // Bouncer enforces access to resources and actions. It checks if
