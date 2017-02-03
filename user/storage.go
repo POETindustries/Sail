@@ -8,6 +8,21 @@ import (
 	"sail/user/schema"
 )
 
+func singleFromStorage(u *User) bool {
+	query := storage.Get().In("sl_user").Attrs(schema.UserAttrs...)
+	rows := query.Equals(schema.UserName, u.name).Exec()
+	r := rows.(*sql.Rows)
+	defer r.Close()
+	for r.Next() {
+		if err := r.Scan(&u.id, &u.name, &u.pass, &u.FirstName, &u.LastName,
+			&u.Email, &u.Phone, &u.CDate, &u.ExpDate); err != nil {
+			errors.Log(err, conf.Instance().DevMode)
+			return false
+		}
+	}
+	return true
+}
+
 func fromStorageByName(names ...string) []*User {
 	query := storage.Get().In("sl_user").Attrs(schema.UserAttrs...)
 	if len(names) == 1 {
@@ -24,7 +39,7 @@ func scanUser(rows *sql.Rows) []*User {
 	var us []*User
 	for rows.Next() {
 		u := User{}
-		if err := rows.Scan(&u.ID, &u.Name, &u.pass, &u.FirstName, &u.LastName,
+		if err := rows.Scan(&u.id, &u.name, &u.pass, &u.FirstName, &u.LastName,
 			&u.Email, &u.Phone, &u.CDate, &u.ExpDate); err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 			return nil

@@ -43,10 +43,10 @@ func New(s *session.Session, u *user.User) *Presenter {
 	p := &Presenter{Session: s, User: u, template: template.New()}
 	p.template.Name = "default-backend"
 	if u != nil {
-		p.mainMenu = p.buildNav(p.User.ID)
+		p.mainMenu = p.buildNav(p.User.ID())
 	} else if s != nil {
-		p.User = user.ByName(p.Session.User)
-		p.mainMenu = p.buildNav(p.User.ID)
+		p.User = user.LoadNew(p.Session.User)
+		p.mainMenu = p.buildNav(p.User.ID())
 	}
 	return p
 }
@@ -158,13 +158,13 @@ func (p *Presenter) checkPrivilege(mode rights.Mode) bool {
 	}
 	switch mode {
 	case rights.Read:
-		return group.All().Permission(p.User.ID, d).R()
+		return group.All().Permission(p.User.ID(), d).R()
 	case rights.Create:
-		return group.All().Permission(p.User.ID, d).C()
+		return group.All().Permission(p.User.ID(), d).C()
 	case rights.Update:
-		return group.All().Permission(p.User.ID, d).U()
+		return group.All().Permission(p.User.ID(), d).U()
 	case rights.Delete:
-		return group.All().Permission(p.User.ID, d).D()
+		return group.All().Permission(p.User.ID(), d).D()
 	default:
 		return false
 	}

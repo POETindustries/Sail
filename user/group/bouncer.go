@@ -48,11 +48,7 @@ func (b *Bouncer) PassByCookie(c *http.Cookie) bool {
 // by the session has the right to access the path and execute the
 // actions specified in the Bouncer's request object.
 func (b *Bouncer) PassBySession(s *session.Session) bool {
-	u := user.ByName(s.User)
-	if u == nil {
-		return false
-	}
-	return b.Pass(u.ID)
+	return b.Pass(user.LoadNew(s.User).ID())
 }
 
 // Sanitize cleans the Bouncer's request object of unwanted and

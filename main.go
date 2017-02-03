@@ -61,8 +61,8 @@ func backendHandler(wr http.ResponseWriter, req *http.Request) {
 		cookie, _ := req.Cookie("id")
 		if cookie != nil && session.DB().Has(cookie.Value) {
 			s := session.DB().Get(cookie.Value)
-			u := user.ByName(s.User)
-			if b := group.NewBouncer(req); !b.Pass(u.ID) {
+			u := user.LoadNew(s.User)
+			if b := group.NewBouncer(req); !b.Pass(u.ID()) {
 				b.Sanitize("/office/")
 			}
 			r := response.New(wr, req)
@@ -83,16 +83,16 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 	u := req.PostFormValue("user")
 	p := req.PostFormValue("pass")
 	r := response.New(wr, req)
-	if usr, ok := user.Verify(u, p); ok {
+	if usr, ok := session.Verify(user.New(u), p); ok {
 		sess := session.New(req, req.PostFormValue("user"))
 		session.DB().Add(sess)
 		c := http.Cookie{Name: "id", Value: sess.ID}
 		http.SetCookie(wr, &c)
-		if b := group.NewBouncer(req); !b.Pass(usr.ID) {
+		if b := group.NewBouncer(req); !b.Pass(usr.ID()) {
 			b.Sanitize("/office/")
 		}
 		r.URL = req.URL.Path
-		r.Presenter = backend.New(sess, usr)
+		r.Presenter = backend.New(sess, usr.(*user.User))
 		sess.Start()
 	} else {
 		if u != "" || p != "" {
