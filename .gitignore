@@ -8,5 +8,5 @@
 /sail
 
 # non-core files & dirs
-/static/files
 *.test.*
+_resources/svg/*.png

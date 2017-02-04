@@ -4,20 +4,20 @@ import (
 	"database/sql"
 	"sail/conf"
 	"sail/errors"
-	"sail/storage"
+	"sail/store"
 	"sail/user/rights"
 	"sail/user/schema"
 )
 
 func fromStorageByID(id ...uint32) []*Group {
-	query := storage.Get().In("sl_group").Attrs(schema.GroupAttrs...)
+	query := store.Get().In("sl_group").Attrs(schema.GroupAttrs...)
 	if len(id) == 1 {
 		query.Equals(schema.GroupID, id[0])
 	} else if len(id) > 1 {
 		// query.EqualsMany(schema.GroupID, id)
 	}
-	rows := query.Exec()
-	gs := scanGroup(rows.(*sql.Rows))
+	rows, _ := query.Exec()
+	gs := scanGroup(rows)
 	for _, g := range gs {
 		g.users = fetchMembers(g.ID)
 	}
@@ -25,8 +25,8 @@ func fromStorageByID(id ...uint32) []*Group {
 }
 
 func fetchMembers(id uint32) map[uint32]bool {
-	rows := storage.Get().In("sl_group_members").Attrs(schema.UserID).
-		Equals(schema.GroupID, id).Exec().(*sql.Rows)
+	rows, _ := store.Get().In("sl_group_members").Attrs(schema.UserID).
+		Equals(schema.GroupID, id).Exec()
 	return scanMembers(rows)
 }
 
@@ -36,7 +36,8 @@ func scanGroup(rows *sql.Rows) []*Group {
 	for rows.Next() {
 		g := New()
 		if err := rows.Scan(&g.ID, &g.Name, &g.perm[rights.Maintenance],
-			&g.perm[rights.Users]); err != nil {
+			&g.perm[rights.Users], &g.perm[rights.Content],
+			&g.perm[rights.Config]); err != nil {
 			errors.Log(err, conf.Instance().DevMode)
 		}
 		gs = append(gs, g)

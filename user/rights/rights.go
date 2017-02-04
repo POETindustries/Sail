@@ -6,20 +6,25 @@ type Domain uint16
 type Mode uint8
 
 const (
-	Users       Domain = 0x0000
-	Maintenance Domain = 0x0001
+	Content     Domain = 0
+	Users       Domain = 1
+	Config      Domain = 2
+	Maintenance Domain = 3
 )
-const DomainCount = 2
+const DomainCount = 4
 
 const (
-	Create Mode = 0x01
-	Update Mode = 0x02
-	Delete Mode = 0x04
+	Read   Mode = 0x01
+	Create Mode = 0x02
+	Update Mode = 0x04
+	Delete Mode = 0x08
 )
 
 var paths = [][]string{
+	[]string{"/office/content"},
 	[]string{"/office/users"},
-	[]string{"/office/settings"}}
+	[]string{"/office/config"},
+	[]string{"/office/maintenance"}}
 
 // Permission is a lightweight datastructure for passing
 // rights information around between packages.
@@ -69,5 +74,5 @@ func Dom(path string) (d Domain, err error) {
 			}
 		}
 	}
-	return 0, errors.New("No domain found")
+	return DomainCount, errors.New("No domain found")
 }

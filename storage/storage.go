@@ -5,7 +5,8 @@ import (
 	"os"
 	"sail/conf"
 	"sail/errors"
-	pageschema "sail/page/schema"
+	objectschema "sail/object/schema"
+	pageschema "sail/object/schema"
 	userschema "sail/user/schema"
 
 	// sqlite database driver
@@ -34,7 +35,9 @@ var createInstructs = []string{
 	pageschema.CreateMeta,
 	pageschema.InitMeta,
 	pageschema.CreateContent,
-	pageschema.InitContent}
+	pageschema.InitContent,
+	objectschema.CreateObject,
+	objectschema.InitObject}
 
 // DB returns a pointer to the database handle singleton.
 func DB() *sql.DB {
@@ -42,15 +45,6 @@ func DB() *sql.DB {
 		panic("storage: Database init failed")
 	}
 	return db
-}
-
-func dbInit() bool {
-	loc := conf.Instance().Cwd + "db/"
-	if _, err := os.Stat(loc); err != nil {
-		os.MkdirAll(loc, 0700)
-	}
-	db, _ = sql.Open("sqlite3", loc+"sail.db")
-	return db.Ping() == nil
 }
 
 // ExecCreateInstructs takes care of first-time setup of the datastore.
@@ -63,4 +57,13 @@ func ExecCreateInstructs() (err error) {
 		}
 	}
 	return
+}
+
+func dbInit() bool {
+	loc := conf.Instance().Cwd + "db/"
+	if _, err := os.Stat(loc); err != nil {
+		os.MkdirAll(loc, 0700)
+	}
+	db, _ = sql.Open("sqlite3", loc+"sail.db")
+	return db.Ping() == nil
 }

@@ -20,7 +20,7 @@ type Config struct {
 	Cwd       string
 	StaticDir string
 	TmplDir   string
-	ImgDir    string
+	FileDir   string
 	JsDir     string
 	ThemeDir  string
 
@@ -42,7 +42,7 @@ func new() *Config {
 		Cwd:       cwd + "/",
 		StaticDir: cwd + "/static/",
 		TmplDir:   cwd + "/static/tmpl/",
-		ImgDir:    cwd + "/static/img/",
+		FileDir:   cwd + "/static/files/",
 		JsDir:     cwd + "/static/js/",
 		ThemeDir:  cwd + "/static/theme/"}
 

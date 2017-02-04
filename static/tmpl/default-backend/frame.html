@@ -11,14 +11,30 @@
 </head>
 
 <body>
-	{{if eq .URL "/office/login"}}
+{{if eq .URL "/office/login"}}
 	{{template "login" .}}
-	{{else}}
-	{{template "header" .}}
+{{else}}
 	{{template "sidebar" .}}
-	{{template "main" .}}
+	{{if eq .URL "/office/content"}}
+		{{template "header" .}}
+		{{template "content" .FileManager}}
+	{{else if eq .URL "/office/users"}}
+		{{template "users-header" .}}
+		{{template "users" .UserManager}}
+	{{else if eq .URL "/office/config"}}
+		{{template "header" .}}
+		{{template "config" .}}
+	{{else if eq .URL "/office/maintenance"}}
+		{{template "header" .}}
+		{{template "maintenance" .}}
+	{{else}}
+		{{template "header" .}}
+		{{template "home" .}}
 	{{end}}
-	{{if .Message}}<div id="sail-message">{{.Message}}</div>{{end}}
+{{end}}
+{{if .Message}}
+	<div id="sail-message">{{.Message}}</div>
+{{end}}
 </body>
 
 </html>

@@ -1,4 +1,5 @@
 {{define "home"}}
+<div id="sail-backend-main">
 <p>Hello <span class="sail-person-name">{{.User.FirstName}} {{.User.LastName}}.</span>
 You are currently logged in as <span class="sail-person-name">{{.User.Name}}.</span></p>
 <table>
@@ -6,6 +7,7 @@ You are currently logged in as <span class="sail-person-name">{{.User.Name}}.</s
 	<tr><td>Account active since:</td><td>{{.User.CDate}}</td></tr>
 	<tr><td>Session ID:</td><td>{{.Session.ID}}</td></tr>
 	<tr><td>Preferred language:</td><td>{{.Session.Lang}}</td></tr>
-	<tr><td>Last activity:</td><td>{{.Session.Time}}</td></tr>	
+	<tr><td>Last activity:</td><td>{{.Session.Time}}</td></tr>
 </table>
+</div>
 {{end}}

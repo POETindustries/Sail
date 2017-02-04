@@ -10,12 +10,12 @@
     text-overflow: ellipsis;
     text-transform: uppercase;
     text-decoration: none;
-    color: #f0f0f0;
+    color: #191c20;
     transition: 0.2s;
 }
 
 .main_menu_item:hover {
-    color: #191c20;
+    color: #f0f0f0;
 }
 
 #menu_button {
@@ -27,7 +27,7 @@
 }
 
 #main_menu .active {
-    color: #191c20;
+    color: #f0f0f0;
 }
 
 /*******************************************************************************
@@ -102,13 +102,13 @@
     }
 
     .main_menu_item {
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid #191c20;
         padding: 1em 1.2em 0;
         display: table-cell;
         text-align: center;
     }
 
     #main_menu .active {
-        border-bottom: 1px solid #191c20;
+        border-bottom: 1px solid #f0f0f0;
     }
 }

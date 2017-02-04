@@ -38,7 +38,7 @@ func (c *Cache) Mode(uid uint32, dom rights.Domain) (m rights.Mode) {
 	for _, g := range c.groups {
 		if _, ok := g.users[uid]; ok {
 			m = m | g.Mode(dom)
-			if m == 7 {
+			if m == 15 {
 				break
 			}
 		}

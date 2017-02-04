@@ -1,0 +1,111 @@
+#sail-backend-main {
+	margin: 5em 1em 1em;
+}
+
+@media only screen and (min-width: 640px) {
+	#sail-backend-main {
+		margin-left: 13em;
+	}
+}
+
+.sail-person-name {
+	font-weight: bold;
+	color: #494c50;
+}
+
+/* content browser */
+.sail-backend-content-tile {
+	background: none;
+	border: none;
+	padding: 0;
+	display: inline-block;
+	position: relative;
+	vertical-align: top;
+	font-size: 1em;
+	width: 10em;
+	height: 6em;
+	margin: 1em 1em 4em;
+	transition: .2s;
+}
+
+button::-moz-focus-inner {
+	padding: 0;
+	border: 0;
+}
+
+.sail-backend-content-tile:hover {
+	z-index: 50;
+	overflow: visible;
+	background-color: rgba(23, 147, 209, 0.9);
+}
+
+.sail-backend-content-tile:hover .desc {
+	white-space: normal;
+	background-color: rgba(23, 147, 209, 0.9);
+}
+
+.sail-backend-content-tile img {
+	display: block;
+	margin: 0 auto;
+	width: 6em;
+	height: 6em;
+	transition: .2s;
+}
+
+.sail-backend-content-tile .desc {
+	color: black;
+	display: block;
+	position: relative;
+	margin: 0;
+	padding: .5em;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-align: center;
+	transition: .2s;
+}
+
+/* user management */
+.sail-backend-user-mgmt-table {
+	width: 100%;
+	text-align: left;
+}
+
+.sail-backend-user-mgmt-table td,
+.sail-backend-user-mgmt-table th {
+	padding: 0.25em 0.5em;
+}
+
+.sail-backend-user-mgmt-table .permission-progress {
+	padding: 0;
+}
+
+.sail-backend-user-mgmt-table .permission-progress span {
+	display: inline-block;
+	background-color: #07c163;
+	padding: 0.25em 0.5em;
+	color: white;
+	font-weight: bold;
+}
+
+.sail-backend-user-mgmt-table .cell-checkbox {
+	text-align: center;
+	width: 2em;
+}
+
+.sail-backend-user-mgmt-table .table-head {
+	background-color: #1793d1;
+	color: white;
+}
+
+.sail-backend-user-mgmt-table tbody tr:nth-child(odd) {
+	background-color: #d9dce0;
+}
+
+.sail-backend-user-mgmt-table tbody tr:nth-child(even) {
+	background-color: #c9ccd0;
+}
+
+#sail-backend-groups-table {
+	display: none;
+}
