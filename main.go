@@ -86,6 +86,7 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 	if usr, ok := session.Verify(user.New(u), p); ok {
 		sess := session.New(req, req.PostFormValue("user"))
 		session.DB().Add(sess)
+		session.Users().Add(usr)
 		c := http.Cookie{Name: "id", Value: sess.ID}
 		http.SetCookie(wr, &c)
 		if b := group.NewBouncer(req); !b.Pass(usr.ID()) {

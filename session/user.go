@@ -24,18 +24,16 @@ type UserDB struct {
 	ids   map[uint32]User
 }
 
-var userDBInstance *UserDB
-
-func newUserDB() *UserDB {
-	return &UserDB{names: map[string]User{}, ids: map[uint32]User{}}
-}
+var userdb *UserDB
 
 // Users returns a pointer to the system-wide user database.
 func Users() *UserDB {
-	if userDBInstance == nil {
-		userDBInstance = newUserDB()
+	if userdb == nil {
+		userdb = &UserDB{
+			names: map[string]User{},
+			ids:   map[uint32]User{}}
 	}
-	return userDBInstance
+	return userdb
 }
 
 // Add inserts a user into the database. Previous user objects
@@ -74,6 +72,15 @@ func (db *UserDB) ByName(name string) User {
 // id given. returns nil if none was found.
 func (db *UserDB) ByID(id uint32) User {
 	return db.ids[id]
+}
+
+// All returns all users the system knows about.
+func (db *UserDB) All() []User {
+	var us []User
+	for _, v := range db.ids {
+		us = append(us, v)
+	}
+	return us
 }
 
 // Remove deletes the user from the database.

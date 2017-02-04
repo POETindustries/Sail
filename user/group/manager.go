@@ -8,13 +8,19 @@ type Manager struct {
 }
 
 func NewManager() *Manager {
-	return &Manager{}
+	return &Manager{userMgr: session.Users()}
 }
 
 func (m *Manager) LoadUsers() {
 	if m.userMgr == nil {
 		m.userMgr = session.Users()
 	}
+}
+
+func (m *Manager) AllUsers() []session.User {
+	// TODO 2017-02-03: returns only currently active
+	// users, should fetch from persistent storage.
+	return m.userMgr.All()
 }
 
 func (m *Manager) AllGroups() []*Group {
