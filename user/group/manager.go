@@ -1,9 +1,9 @@
 package group
 
-import "sail/user"
+import "sail/session"
 
 type Manager struct {
-	userMgr *user.Manager
+	userMgr *session.UserDB
 	groups  []*Group
 }
 
@@ -13,16 +13,8 @@ func NewManager() *Manager {
 
 func (m *Manager) LoadUsers() {
 	if m.userMgr == nil {
-		m.userMgr = user.NewManager()
+		m.userMgr = session.Users()
 	}
-	m.userMgr.All()
-}
-
-func (m *Manager) AllUsers() []*user.User {
-	if m.userMgr == nil {
-		m.LoadUsers()
-	}
-	return m.userMgr.All()
 }
 
 func (m *Manager) AllGroups() []*Group {
