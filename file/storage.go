@@ -5,23 +5,23 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/object/schema"
-	"sail/storage"
+	"sail/store"
 )
 
 func fromStorageChildren(id uint32, includeCurrent bool) []*File {
-	query := storage.Get().In("sl_object").Attrs(schema.ObjectAttrs...).
+	query := store.Get().In("sl_object").Attrs(schema.ObjectAttrs...).
 		Equals(schema.ObjectParent, id)
 	if includeCurrent {
 		query.Or().Equals(schema.ObjectID, id).And().
 			NotEquals(schema.ObjectTypeMajor, Directory)
 	}
-	rows := query.Order(schema.ObjectName).Asc().Exec()
-	return scanChildren(rows.(*sql.Rows))
+	rows, _ := query.Order(schema.ObjectName).Asc().Exec()
+	return scanChildren(rows)
 }
 
 func fromStorageChildCount(id uint32) (count uint32) {
-	rows := storage.Get().In("sl_object").Attrs("count("+schema.ObjectParent+")").
-		Equals(schema.ObjectParent, id).Exec().(*sql.Rows)
+	rows, _ := store.Get().In("sl_object").Attrs("count("+schema.ObjectParent+")").
+		Equals(schema.ObjectParent, id).Exec()
 	defer rows.Close()
 	rows.Next()
 	rows.Scan(&count)

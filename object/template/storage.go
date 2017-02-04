@@ -5,23 +5,23 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/object/schema"
-	"sail/storage"
+	"sail/store"
 )
 
 func fromStorageByID(ids ...uint32) []*Template {
-	query := storage.Get().In("sl_template").Attrs(schema.TemplateAttrs...)
+	query := store.Get().In("sl_template").Attrs(schema.TemplateAttrs...)
 	if len(ids) == 1 {
 		query.Equals(schema.TemplateID, ids[0])
 	} else if len(ids) > 1 {
 		// query.EqualsMany(schema.TemplateID, ids)
 	}
-	rows := query.Exec()
-	ts := scanTemplate(rows.(*sql.Rows))
+	rows, _ := query.Exec()
+	ts := scanTemplate(rows)
 	for _, t := range ts {
-		rows = storage.Get().In("sl_template_widgets").
+		rows, _ = store.Get().In("sl_template_widgets").
 			Equals(schema.TemplateID, t.ID).
 			Attrs(schema.TemplateWidgetID).Exec()
-		t.WidgetIDs = scanWidgetID(rows.(*sql.Rows))
+		t.WidgetIDs = scanWidgetID(rows)
 	}
 	return ts
 }

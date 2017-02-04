@@ -6,18 +6,18 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/object/schema"
-	"sail/storage"
+	"sail/store"
 )
 
 func fromStorageByID(ids ...uint32) []*Widget {
-	query := storage.Get().In("sl_widget").Attrs(schema.WidgetAttrs...)
+	query := store.Get().In("sl_widget").Attrs(schema.WidgetAttrs...)
 	if len(ids) == 1 {
 		query.Equals(schema.WidgetID, ids[0])
 	} else if len(ids) > 1 {
 		// query.EqualsMany(schema.WidgetID, ids)
 	}
-	rows := query.Exec()
-	return scanWidget(rows.(*sql.Rows))
+	rows, _ := query.Exec()
+	return scanWidget(rows)
 }
 
 func fetchData(widget *Widget) {
@@ -30,14 +30,14 @@ func fetchData(widget *Widget) {
 }
 
 func fetchNavData(id uint32) *Nav {
-	rows := storage.Get().In("sl_widget_nav").Attrs(schema.NavAttrs...).
+	rows, _ := store.Get().In("sl_widget_nav").Attrs(schema.NavAttrs...).
 		Equals(schema.NavWidgetID, id).Exec()
-	return scanNav(rows.(*sql.Rows))
+	return scanNav(rows)
 }
 
 func fetchTextData(id uint32) *Text {
-	rows := storage.Get().In("sl_widget_text").Equals(schema.TextID, id).Exec()
-	ts := scanText(rows.(*sql.Rows))
+	rows, _ := store.Get().In("sl_widget_text").Equals(schema.TextID, id).Exec()
+	ts := scanText(rows)
 	if len(ts) < 1 {
 		// could return &Text{}, but nil is consistent with other
 		// funcs. It needs to be seen whether this is a good idea.

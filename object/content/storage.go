@@ -6,6 +6,7 @@ import (
 	"sail/errors"
 	"sail/object/schema"
 	"sail/storage"
+	"sail/store"
 )
 
 const queryMinByURL = `select * from ((select ` + schema.ObjectID + `,
@@ -37,15 +38,15 @@ func fromStorageFullByURL(url string) []*Content {
 	a := append(schema.ObjectAttrs, schema.ContentContent, schema.ContentMetaID,
 		schema.ContentTemplateID)
 	a = append(a, schema.MetaAttrs...)
-	rows := storage.Get().In(t).Attrs(a...).Equals(schema.ObjectURLCache, url).Exec()
-	return scanFull(rows.(*sql.Rows))
+	rows, _ := store.Get().In(t).Attrs(a...).Equals(schema.ObjectURLCache, url).Exec()
+	return scanFull(rows)
 }
 
 func fromStorageFullByID(id uint32) []*Content {
 	t := "(sl_object natural join sl_content) natural join sl_meta"
 	a := append(schema.ContentAttrs, schema.MetaAttrs...)
-	rows := storage.Get().In(t).Attrs(a...).Equals(schema.ContentID, id).Exec()
-	return scanFull(rows.(*sql.Rows))
+	rows, _ := store.Get().In(t).Attrs(a...).Equals(schema.ContentID, id).Exec()
+	return scanFull(rows)
 }
 
 func scan(row *sql.Row) *Content {

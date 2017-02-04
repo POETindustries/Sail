@@ -1,9 +1,11 @@
-package storage
+package store
 
 import (
+	"database/sql"
 	"fmt"
 	"sail/conf"
 	"sail/errors"
+	"sail/storage"
 	"strings"
 )
 
@@ -21,6 +23,13 @@ const (
 	modeDelete = 0x008
 )
 
+// Query acts as middle man between persistent storage and
+// business logic. All requests to persistent storage should
+// happen through query objects.
+//
+// TODO 2017-02-03: Add additional fields for return values
+// in order to eliminate returning an interface at the end
+// of Exec().
 type Query struct {
 	mode          uint8
 	table         string
@@ -32,27 +41,42 @@ type Query struct {
 	orderAttr     string
 }
 
+// Add sets the query's operation mode to insertion, signaling
+// that the data being sent is to be inserted as a new dataset.
 func Add() *Query {
 	return &Query{mode: modeAdd}
 }
 
+// Delete sets the query's operation mode to deletion. The
+// dataset is to be deleted from permanent storage.
 func Delete() *Query {
 	return &Query{mode: modeDelete}
 }
 
+// Get indicates that data is to be retrieved from storage,
+// not changing any values.
 func Get() *Query {
 	return &Query{mode: modeGet}
 }
 
+// Update sends data to update datasets that are expected to
+// already exist in the database.
 func Update() *Query {
 	return &Query{mode: modeUpdate}
 }
 
+// All indicates that all datasets from a given table should
+// be targeted. Ignored by operation mode Add().
+// 		Danger Zone: This is potentially harmful, especially
+//		in combination with Delete(). Use of All() should always
+//		go with extra attention.
 func (q *Query) All() *Query {
 	q.selection = append(q.selection, "1=1")
 	return q
 }
 
+// And adds an additional condition to the query's selection.
+// Its position in the instruction chain is meaningful.
 func (q *Query) And() *Query {
 	if len(q.selection) > 0 {
 		q.selection = append(q.selection, and)
@@ -60,52 +84,75 @@ func (q *Query) And() *Query {
 	return q
 }
 
+// Asc instructs query to order the results in ascending order,
+// i.e. from lowest to highest.
 func (q *Query) Asc() *Query {
 	q.order = asc
 	return q
 }
 
+// Attrs is used to set which attributes, or columns, to use
+// when executing the query. Their usage depends on the query's
+// operation mode. Get() retrieves the attributes, while all
+// other modes ignore them completely.
 func (q *Query) Attrs(attrs ...string) *Query {
-	q.attrs = attrs
+	if q.mode == modeGet {
+		q.attrs = attrs
+	}
 	return q
 }
 
+// Desc instructs query to order the results in descending
+// order, i.e. from highest to lowest.
 func (q *Query) Desc() *Query {
 	q.order = desc
 	return q
 }
 
+// Equals passes the key-value pair relevant for matching the
+// datasets to the query. It instructs to work only on those
+// datasets where the value of attribute 'key' matches the
+// value passed with 'val'.
 func (q *Query) Equals(key string, val interface{}) *Query {
 	q.addSelection(key, val, "=?")
 	return q
 }
 
-func (q *Query) Exec() (res interface{}) {
+// Exec executes the query, making the actual request to the
+// database. It should be the last operation that query does
+// before retrieving the results.
+func (q *Query) Exec() (rows *sql.Rows, ok bool) {
 	var err error
 	switch q.mode {
-	case modeGet:
-		res, err = DB().Query(q.build(), q.selectionVals...) // res = sql.Rows
-	case modeAdd, modeUpdate, modeDelete:
+	case modeGet, modeDelete:
+		rows, err = storage.DB().Query(q.build(), q.selectionVals...)
+	case modeAdd, modeUpdate:
 		vals := append(q.attrVals, q.selectionVals...)
-		_, err = DB().Exec(q.build(), vals...)
-		res = (err == nil) // res = bool
+		_, err = storage.DB().Exec(q.build(), vals...)
 	}
-	if err != nil {
+	ok = (err == nil)
+	if !ok {
 		errors.Log(err, conf.Instance().DevMode)
 	}
 	return
 }
 
+// In is used to pass the table that query should be prepared for.
 func (q *Query) In(table string) *Query {
 	q.table = table
 	return q
 }
 
+// NotEquals acts as opposite of Equals(). It passes the key-value
+// pair relevant for matching the datasets to the query and
+// instructs to work only on those datasets where the value of
+// attribute 'key' does not match the value passed with 'val'.
 func (q *Query) NotEquals(key string, val interface{}) *Query {
 	q.addSelection(key, val, "<>?")
 	return q
 }
 
+// Or adds another condition to the query.
 func (q *Query) Or() *Query {
 	if len(q.selection) > 0 {
 		q.selection = append(q.selection, or)
@@ -113,64 +160,34 @@ func (q *Query) Or() *Query {
 	return q
 }
 
+// Order is used to define the attribute that should be the
+// one that determines sort order. Only relevant when used
+// with Asc() or Desc().
 func (q *Query) Order(attr string) *Query {
 	q.orderAttr = attr
 	return q
 }
 
+// String implements the Printable interface and prints a
+// human-readable representation of the query if it would
+// be executed in the state it is at the current time.
 func (q *Query) String() string {
-	switch q.mode {
-	case modeGet:
-		a := strings.Join(q.attrs, ", ")
-		s := strings.Join(q.selection, " ")
-		o := ""
-		if q.order != "" && q.orderAttr != "" {
-			o = "order by " + q.orderAttr + q.order
-		}
-		for i := 0; strings.Contains(s, "?"); i++ {
-			s = strings.Replace(s, "?", fmt.Sprintf("%v", q.selectionVals[i]), 1)
-		}
-		return fmt.Sprintf("select %s from %s where %s %s",
-			a, q.table, s, o)
-	case modeAdd:
-		a := strings.Join(q.attrs, ", ")
-		v := ""
-		for _, i := range q.attrVals {
-			v += fmt.Sprintf("%v, ", i)
-		}
-		return fmt.Sprintf("insert into %s (%s) values (%s)",
-			q.table, a, v[:len(v)-2])
-	case modeUpdate:
-		a := strings.Join(q.attrs, ", ")
-		s := strings.Join(q.selection, ", ")
-		for i := 0; strings.Contains(a, "?"); i++ {
-			a = strings.Replace(a, "?", fmt.Sprintf("%v", q.attrVals[i]), 1)
-		}
-		for i := 0; strings.Contains(s, "?"); i++ {
-			s = strings.Replace(s, "?", fmt.Sprintf("%v", q.selectionVals[i]), 1)
-		}
-		return fmt.Sprintf("update %s set %s where %s", q.table, a, s)
-	case modeDelete:
-		s := ""
-		if len(q.selection) > 0 {
-			s = "where " + strings.Join(q.selection, " ")
-		}
-		for i := 0; strings.Contains(s, "?"); i++ {
-			s = strings.Replace(s, "?", fmt.Sprintf("%v", q.selectionVals[i]), 1)
-		}
-		return fmt.Sprintf("delete from %s %s", q.table, s)
-	default:
-		return ""
-	}
+	copy := *q
+	return copy.build()
 }
 
+// Values is used to pass the 'payload' to the query. It takes
+// a set of key-value pairs that are handled based on the
+// operation mode. When updating or inserting a dataset, vals
+// contain the new values to write. Get() and Delete() ignore
+// these completely.
 func (q *Query) Values(vals map[string]interface{}) *Query {
 	if q.mode == modeUpdate {
 		for k, v := range vals {
 			q.attrs = append(q.attrs, k+"=?")
 			q.attrVals = append(q.attrVals, v)
 		}
-	} else {
+	} else if q.mode == modeAdd {
 		for k, v := range vals {
 			q.attrs = append(q.attrs, k)
 			q.attrVals = append(q.attrVals, v)
@@ -185,6 +202,9 @@ func (q *Query) addSelection(key string, val interface{}, op string) {
 }
 
 func (q *Query) build() (query string) {
+	if q.table == "" {
+		return
+	}
 	switch q.mode {
 	case modeGet:
 		query = q.buildGet()
@@ -212,11 +232,7 @@ func (q *Query) buildAdd() string {
 
 func (q *Query) buildDelete() string {
 	if len(q.selection) < 1 {
-		// what happens when there is no selection attribute?
-		// For now, we make sure that nothing gets deleted. This
-		// might change in the future, allowing users to delete
-		// all accounts at once.
-		q.selection = append(q.selection, "1=0")
+		return ""
 	}
 	sel := strings.Join(q.selection, " ")
 	return fmt.Sprintf("delete from %s where %s", q.table, sel)
@@ -230,12 +246,18 @@ func (q *Query) buildGet() string {
 	if len(q.selection) < 1 {
 		q.All()
 	}
+	if len(q.attrs) < 1 {
+		q.attrs = append(q.attrs, "*")
+	}
 	pro := strings.Join(q.attrs, ",")
 	sel := strings.Join(q.selection, " ")
 	return fmt.Sprintf("select %s from %s where %s %s", pro, q.table, sel, ord)
 }
 
 func (q *Query) buildUpdate() string {
+	if len(q.attrs) < 1 || len(q.selection) < 1 {
+		return ""
+	}
 	attrs := strings.Join(q.attrs, ",")
 	sel := strings.Join(q.selection, " ")
 	return fmt.Sprintf("update %s set %s where %s", q.table, attrs, sel)
