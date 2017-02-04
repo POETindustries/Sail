@@ -9,3 +9,4 @@
 
 # non-core files & dirs
 *.test.*
+_resources/svg/*.png

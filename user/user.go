@@ -1,15 +1,11 @@
 package user
 
-import (
-	"fmt"
-
-	"golang.org/x/crypto/bcrypt"
-)
+import "errors"
 
 // User represents a Person registered within the system.
 type User struct {
-	ID        uint32
-	Name      string
+	id        uint32
+	name      string
 	pass      string
 	FirstName string
 	LastName  string
@@ -21,40 +17,33 @@ type User struct {
 }
 
 // New returns a fresh, minimally initialized User object.
-func New() *User {
-	return &User{}
+func New(name string) *User {
+	return &User{name: name}
 }
 
-// ByName returns a User object from the persistent storage,
-// identified by its unique user name.
-func ByName(name string) *User {
-	us := fromStorageByName(name)
-	if len(us) < 1 {
-		return nil
+func LoadNew(name string) *User {
+	u := New(name)
+	if u.Load() {
+		return u
 	}
-	return us[0]
+	return New(name)
 }
 
-// Verify returns a User and a boolean value indicating whether user
-// and password match entries in the user database. If so, the User
-// return value is safe for use.
-//
-// Since there has to be a database request anyway, the resulting
-// User object is returned in order to give the opportunity to use it
-// right away instead of fetching anew a few lines later.
-func Verify(user, pass string) (u *User, ok bool) {
-	if user != "" && pass != "" {
-		if u = ByName(user); u != nil {
-			err := bcrypt.CompareHashAndPassword([]byte(u.pass), []byte(pass))
-			ok = (err == nil)
-		}
-	}
-	return
+func (u *User) ID() uint32 {
+	return u.id
 }
 
-func encrypt(s string) string {
-	if k, err := bcrypt.GenerateFromPassword([]byte(s), 12); err == nil {
-		return fmt.Sprintf("%s\n", k)
+func (u *User) Name() string {
+	return u.name
+}
+
+func (u *User) Load() bool {
+	return singleFromStorage(u)
+}
+
+func (u *User) Hash() (string, error) {
+	if u.pass == "" {
+		return "", errors.New("No hash found")
 	}
-	return ""
+	return u.pass, nil
 }

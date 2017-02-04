@@ -1,11 +1,11 @@
 package object
 
 import (
-	"database/sql"
 	"sail/conf"
 	"sail/errors"
 	"sail/object/schema"
 	"sail/storage"
+	"sail/store"
 	"strings"
 )
 
@@ -30,8 +30,8 @@ as (
 select ` + schema.ObjectMachineName + `,` + schema.ObjectStatus + ` from parent_of;`
 
 func fromStorageStaticAddr(id uint32, public bool) (addr string) {
-	rows := storage.Get().In("sl_object").Attrs(schema.ObjectURLCache).
-		Equals(schema.ObjectID, id).Exec().(*sql.Rows)
+	rows, _ := store.Get().In("sl_object").Attrs(schema.ObjectURLCache).
+		Equals(schema.ObjectID, id).Exec()
 	defer rows.Close()
 	rows.Next()
 	if err := rows.Scan(&addr); err != nil {
@@ -56,8 +56,8 @@ func fromStorageBuildStaticAddr(id uint32, public bool) (addr string) {
 }
 
 func fromStorageID(url string, public bool) (id uint32) {
-	rows := storage.Get().In("sl_object").Attrs(schema.ObjectID).
-		Equals(schema.ObjectURLCache, url).Exec().(*sql.Rows)
+	rows, _ := store.Get().In("sl_object").Attrs(schema.ObjectID).
+		Equals(schema.ObjectURLCache, url).Exec()
 	defer rows.Close()
 	rows.Next()
 	if err := rows.Scan(&id); err != nil {
@@ -68,8 +68,8 @@ func fromStorageID(url string, public bool) (id uint32) {
 
 func fromStorageBuildID(url string, public bool) uint32 {
 	locs := strings.Split(url, "/")
-	rows := storage.Get().In("sl_object").Attrs(schema.ObjectID, schema.ObjectStatus).
-		Equals(schema.ObjectMachineName, locs[len(locs)-1]).Exec().(*sql.Rows)
+	rows, _ := store.Get().In("sl_object").Attrs(schema.ObjectID, schema.ObjectStatus).
+		Equals(schema.ObjectMachineName, locs[len(locs)-1]).Exec()
 	var ids []uint32
 	for rows.Next() {
 		var id uint32

@@ -26,11 +26,13 @@ const CreateUser = `create table if not exists sl_user(
     ` + UserCDate + ` text not null default '2015-09-19 10:34:12',
     ` + UserExpDate + ` text not null default '2020-09-19 10:34:12');`
 
+// InitUser inserts a default user with admin rights. Password is 'toor'.
+// Obviously not suitable for production environments.
 const InitUser = `insert into sl_user
         values(
         1,
         'admin',
-		'$2a$08$g312eq5uYaPXoixBVkOI4OC2Su1sgS2GOhOuNPJqMBrn1j/99vKe2',
+		'$2a$12$gZaLvx7eUgn7DA0XDwKgOe//FvyXO7RynueOeXOnQrCkmwr/Y0rRS',
         'Mister',
         'Goodkat',
         'admin@sail.example.com',

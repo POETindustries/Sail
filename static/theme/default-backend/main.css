@@ -1,5 +1,11 @@
 #sail-backend-main {
-	margin: 4em 1em 1em;
+	margin: 5em 1em 1em;
+}
+
+@media only screen and (min-width: 640px) {
+	#sail-backend-main {
+		margin-left: 13em;
+	}
 }
 
 .sail-person-name {
@@ -59,8 +65,47 @@ button::-moz-focus-inner {
 	transition: .2s;
 }
 
-@media only screen and (min-width: 640px) {
-	#sail-backend-main {
-		margin: 4em 1em 1em 13em;
-	}
+/* user management */
+.sail-backend-user-mgmt-table {
+	width: 100%;
+	text-align: left;
+}
+
+.sail-backend-user-mgmt-table td,
+.sail-backend-user-mgmt-table th {
+	padding: 0.25em 0.5em;
+}
+
+.sail-backend-user-mgmt-table .permission-progress {
+	padding: 0;
+}
+
+.sail-backend-user-mgmt-table .permission-progress span {
+	display: inline-block;
+	background-color: #07c163;
+	padding: 0.25em 0.5em;
+	color: white;
+	font-weight: bold;
+}
+
+.sail-backend-user-mgmt-table .cell-checkbox {
+	text-align: center;
+	width: 2em;
+}
+
+.sail-backend-user-mgmt-table .table-head {
+	background-color: #1793d1;
+	color: white;
+}
+
+.sail-backend-user-mgmt-table tbody tr:nth-child(odd) {
+	background-color: #d9dce0;
+}
+
+.sail-backend-user-mgmt-table tbody tr:nth-child(even) {
+	background-color: #c9ccd0;
+}
+
+#sail-backend-groups-table {
+	display: none;
 }

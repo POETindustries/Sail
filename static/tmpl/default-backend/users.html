@@ -1,3 +1,54 @@
 {{define "users"}}
+<div id="sail-backend-main">
 	<h1>User &amp; Group Settings</h2>
+	<table id="sail-backend-users-table" class="sail-backend-user-mgmt-table">
+		<thead>
+		<tr class="table-head">
+			<th class="cell-checkbox"><input type="checkbox"/></th>
+			<th>Username</th>
+			<th>Last Name</th>
+			<th>First Name</th>
+			<th>E-Mail</th>
+			<th>Phone</th>
+		</tr>
+		</thead>
+		<tbody>
+		{{range .AllUsers}}
+		<tr>
+			<td class="cell-checkbox"><input type="checkbox" value="{{.ID}}"/></td>
+			<td>{{.Name}}</td>
+			<td>{{.LastName}}</td>
+			<td>{{.FirstName}}</td>
+			<td>{{.Email}}</td>
+			<td>{{.Phone}}</td>
+		</tr>
+		{{end}}
+		</tbody>
+	</table>
+	<table id="sail-backend-groups-table" class="sail-backend-user-mgmt-table">
+		<thead>
+		<tr class="table-head">
+			<th class="cell-checkbox"><input type="checkbox"/></th>
+			<th>Group Name</th>
+			<th>Members</th>
+			<th>Permission Status</th>
+		</tr>
+		</thead>
+		<tbody>
+		{{range .AllGroups}}
+		<tr>
+			<td class="cell-checkbox"><input type="checkbox" value="{{.ID}}"/></td>
+			<td>{{.Name}}</td>
+			<td>{{.MemberCount}}</td>
+			<td class="permission-progress">
+				<span style="min-width:{{.PermissionStatus}}%;">
+					{{.PermissionStatus}} %
+				</span>
+			</td>
+		</tr>
+		{{end}}
+		</tbody>
+	</table>
+</div>
+<script src="/js/default-backend/usermgr.js"></script>
 {{end}}
