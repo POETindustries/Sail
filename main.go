@@ -9,7 +9,7 @@ import (
 	"sail/object/cache"
 	"sail/response"
 	"sail/session"
-	"sail/storage"
+	"sail/store"
 	"sail/user"
 	"sail/user/group"
 	"time"
@@ -20,8 +20,8 @@ var reqs = 0
 
 func main() {
 	config := conf.Instance()
-	if storage.DB() != nil {
-		storage.ExecCreateInstructs()
+	if store.DB() != nil {
+		//storage.ExecCreateInstructs()
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
 		http.Handle("/favicon.ico", http.FileServer(http.Dir(config.StaticDir)))
@@ -37,7 +37,7 @@ func frontendHandler(wr http.ResponseWriter, req *http.Request) {
 
 	if markup := cache.DB().Markup(req.URL.Path); markup != nil {
 		wr.Write(markup)
-	} else if storage.DB().Ping() == nil {
+	} else if store.DB().Ping() == nil {
 		r := response.New(wr, req)
 		r.Presenter = frontend.New(r.Content(), r.Template())
 		r.URL = r.Content().URL
@@ -57,7 +57,7 @@ func frontendHandler(wr http.ResponseWriter, req *http.Request) {
 func backendHandler(wr http.ResponseWriter, req *http.Request) {
 	t1 := time.Now().Nanosecond()
 
-	if storage.DB().Ping() == nil {
+	if store.DB().Ping() == nil {
 		cookie, _ := req.Cookie("id")
 		if cookie != nil && session.DB().Has(cookie.Value) {
 			s := session.DB().Get(cookie.Value)

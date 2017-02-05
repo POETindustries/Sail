@@ -8,14 +8,20 @@ import (
 	"sail/errors"
 )
 
-const dbUser = "sl_user"
-const dbPass = "sl_pass"
-const dbName = "sl_main"
-const dbHost = "localhost"
+const (
+	dbDriver = "sqlite3"
+	dbUser   = "sl_user"
+	dbPass   = "sl_pass"
+	dbName   = "sl_main"
+	dbHost   = "localhost"
 
-const devMode = true
-const firstRun = false
+	devMode  = true
+	firstRun = false
+)
 
+// Config holds the application's basic configuration. It
+// is read from a config file that server administrators have
+// access to.
 type Config struct {
 	Cwd       string
 	StaticDir string
@@ -24,10 +30,11 @@ type Config struct {
 	JsDir     string
 	ThemeDir  string
 
-	DBUser string `json:"db_user"`
-	DBPass string `json:"db_password"`
-	DBHost string `json:"db_host"`
-	DBName string `json:"db_name"`
+	DBDriver string `json:"db_driver"`
+	DBUser   string `json:"db_user"`
+	DBPass   string `json:"db_password"`
+	DBHost   string `json:"db_host"`
+	DBName   string `json:"db_name"`
 
 	DevMode  bool `json:"dev_mode"`
 	FirstRun bool `json:"first_run"`
@@ -37,7 +44,6 @@ var instance *Config
 
 func new() *Config {
 	cwd, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
 	instance = &Config{
 		Cwd:       cwd + "/",
 		StaticDir: cwd + "/static/",
@@ -48,7 +54,7 @@ func new() *Config {
 
 	if err := instance.load("config.json"); err != nil {
 		errors.Log(err, true)
-
+		instance.DBDriver = dbDriver
 		instance.DBUser = dbUser
 		instance.DBPass = dbPass
 		instance.DBHost = dbHost
@@ -56,24 +62,16 @@ func new() *Config {
 		instance.DevMode = devMode
 		instance.FirstRun = firstRun
 	}
-
 	return instance
 }
 
+// Instance provides access to the application-wide config
+// singleton.
 func Instance() *Config {
 	if instance == nil {
 		new()
 	}
 	return instance
-}
-
-func (c *Config) DBCredString() string {
-	return "postgres://" +
-		c.DBUser + ":" +
-		c.DBPass + "@" +
-		c.DBHost + "/" +
-		c.DBName + "?" +
-		"sslmode=disable"
 }
 
 func (c *Config) load(file string) error {

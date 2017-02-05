@@ -4,7 +4,6 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/object/schema"
-	"sail/storage"
 	"sail/store"
 	"strings"
 )
@@ -41,7 +40,7 @@ func fromStorageStaticAddr(id uint32, public bool) (addr string) {
 }
 
 func fromStorageBuildStaticAddr(id uint32, public bool) (addr string) {
-	if rows, err := storage.DB().Query(queryStaticAddr, id); err == nil {
+	if rows, err := store.DB().Query(queryStaticAddr, id); err == nil {
 		defer rows.Close()
 		var p int8
 		for rows.Next() {

@@ -1,4 +1,5 @@
 {
+"db_driver"		: "sqlite3",
 "db_user"       : "sl_user",
 "db_password"   : "sl_pass",
 "db_name"       : "sl_main",

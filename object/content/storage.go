@@ -5,7 +5,6 @@ import (
 	"sail/conf"
 	"sail/errors"
 	"sail/object/schema"
-	"sail/storage"
 	"sail/store"
 )
 
@@ -24,12 +23,12 @@ const queryMinByID = `select * from ((select ` + schema.ObjectID + `,
 	natural join sl_content) natural join sl_meta;`
 
 func fromStorageMinByURL(url string) *Content {
-	row := storage.DB().QueryRow(queryMinByURL, url)
+	row := store.DB().QueryRow(queryMinByURL, url)
 	return scan(row)
 }
 
 func fromStorageMinByID(id uint32) *Content {
-	row := storage.DB().QueryRow(queryMinByID, id)
+	row := store.DB().QueryRow(queryMinByID, id)
 	return scan(row)
 }
 
