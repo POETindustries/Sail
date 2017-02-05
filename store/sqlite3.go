@@ -23,6 +23,11 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	return sql.Open("sqlite3", loc+"sail.db")
 }
 
-func (s *sqlite3) Param() string { return "?" }
+func (s *sqlite3) Param() string {
+	return "?"
+}
 
-func (s *sqlite3) credentials() string { return "" }
+func (s *sqlite3) credentials() string {
+	// sqlite does not implement access credentials
+	return ""
+}

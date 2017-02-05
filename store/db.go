@@ -61,6 +61,7 @@ func (d *Database) init() bool {
 	case "sqlite3":
 		d.driver = &sqlite3{}
 	case "mysql":
+		d.driver = &mysql{}
 	case "postgres":
 		d.driver = &postgres{}
 	default:
