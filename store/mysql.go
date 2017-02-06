@@ -3,6 +3,9 @@ package store
 import (
 	"database/sql"
 	"sail/conf"
+
+	// mysql database driver
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type mysql struct{}
