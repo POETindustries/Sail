@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	and  = " and "
-	or   = " or "
-	asc  = " asc "
-	desc = " desc "
+	and  = "and"
+	or   = "or"
+	asc  = "asc"
+	desc = "desc"
 )
 
 const (
