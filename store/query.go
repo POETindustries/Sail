@@ -26,7 +26,6 @@ const (
 // business logic. All requests to persistent storage should
 // happen through query objects.
 type Query struct {
-	mode          uint8
 	table         string
 	attrs         []string
 	attrVals      []interface{}
@@ -40,6 +39,7 @@ type Query struct {
 	// changed by other goroutine running parallel
 	// to this one.
 	driver Driver
+	mode   uint8
 }
 
 // Add sets the query's operation mode to insertion, signaling
@@ -173,8 +173,18 @@ func (q *Query) Order(attr string) *Query {
 // human-readable representation of the query if it would
 // be executed in the state it is at the current time.
 func (q *Query) String() string {
-	copy := *q
-	return fmt.Sprintf("%s|%v\n", copy.build(), append(q.attrVals, q.selectionVals...))
+	copy := Query{
+		mode:      q.mode,
+		table:     q.table,
+		order:     q.order,
+		orderAttr: q.orderAttr,
+		driver:    q.driver.Copy()}
+	copy.attrs = append(copy.attrs, q.attrs...)
+	copy.attrVals = append(copy.attrVals, q.attrVals...)
+	copy.selection = append(copy.selection, q.selection...)
+	copy.selectionVals = append(copy.selectionVals, q.selectionVals...)
+	vals := append(copy.attrVals, copy.selectionVals...)
+	return fmt.Sprintf("%s|%v\n", copy.build(), vals)
 }
 
 // Values is used to pass the 'payload' to the query. It takes
