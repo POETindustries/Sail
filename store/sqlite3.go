@@ -27,6 +27,10 @@ func (s *sqlite3) Param() string {
 	return "?"
 }
 
+func (s *sqlite3) PrepareData(query *Query) []interface{} {
+	return append(query.attrVals, query.selectionVals...)
+}
+
 func (s *sqlite3) credentials() string {
 	// sqlite does not implement access credentials
 	return ""

@@ -10,6 +10,7 @@ type Driver interface {
 	Copy() Driver
 	Init() (*sql.DB, error)
 	Param() string
+	PrepareData(query *Query) []interface{}
 	credentials() string
 }
 

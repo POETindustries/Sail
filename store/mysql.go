@@ -22,6 +22,10 @@ func (m *mysql) Param() string {
 	return "?"
 }
 
+func (m *mysql) PrepareData(query *Query) []interface{} {
+	return append(query.attrVals, query.selectionVals...)
+}
+
 func (m *mysql) credentials() string {
 	return conf.Instance().DBUser + ":" +
 		conf.Instance().DBPass + "@tcp(" +

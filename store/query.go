@@ -128,7 +128,7 @@ func (q *Query) Exec() (rows *sql.Rows, ok bool) {
 	case modeGet, modeDelete:
 		rows, err = DB().Query(q.build(), q.selectionVals...)
 	case modeAdd, modeUpdate:
-		vals := append(q.attrVals, q.selectionVals...)
+		vals := q.driver.PrepareData(q)
 		_, err = DB().Exec(q.build(), vals...)
 	}
 	ok = (err == nil)
@@ -183,7 +183,7 @@ func (q *Query) String() string {
 	copy.attrVals = append(copy.attrVals, q.attrVals...)
 	copy.selection = append(copy.selection, q.selection...)
 	copy.selectionVals = append(copy.selectionVals, q.selectionVals...)
-	vals := append(copy.attrVals, copy.selectionVals...)
+	vals := copy.driver.PrepareData(&copy)
 	return fmt.Sprintf("%s|%v\n", copy.build(), vals)
 }
 

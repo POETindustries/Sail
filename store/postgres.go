@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"sail/conf"
 	"strconv"
+	"strings"
 
 	// postgres database driver
 	_ "github.com/lib/pq"
@@ -24,6 +25,15 @@ func (p *postgres) Init() (*sql.DB, error) {
 func (p *postgres) Param() string {
 	p.count++
 	return "$" + strconv.Itoa(p.count)
+}
+
+func (p *postgres) PrepareData(query *Query) []interface{} {
+	for _, v := range query.attrs {
+		if strings.Contains(v, "$1") {
+			return append(query.attrVals, query.selectionVals...)
+		}
+	}
+	return append(query.selectionVals, query.attrVals...)
 }
 
 func (p *postgres) credentials() string {
