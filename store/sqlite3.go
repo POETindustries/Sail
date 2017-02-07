@@ -20,7 +20,7 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	if _, err := os.Stat(loc); err != nil {
 		os.MkdirAll(loc, 0700)
 	}
-	return sql.Open("sqlite3", loc+conf.Instance().DBName+".db")
+	return sql.Open("sqlite3", loc+s.credentials())
 }
 
 func (s *sqlite3) Data(query *Query) []interface{} {
@@ -28,6 +28,5 @@ func (s *sqlite3) Data(query *Query) []interface{} {
 }
 
 func (s *sqlite3) credentials() string {
-	// sqlite does not implement access credentials
-	return ""
+	return conf.Instance().DBName + ".db"
 }
