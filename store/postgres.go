@@ -22,18 +22,20 @@ func (p *postgres) Init() (*sql.DB, error) {
 	return sql.Open("postgres", p.credentials())
 }
 
-func (p *postgres) Param() string {
-	p.count++
-	return "$" + strconv.Itoa(p.count)
-}
-
-func (p *postgres) PrepareData(query *Query) []interface{} {
-	for _, v := range query.attrs {
-		if strings.Contains(v, "$1") {
-			return append(query.attrVals, query.selectionVals...)
+func (p *postgres) Data(query *Query) []interface{} {
+	for i, a := range query.attrs {
+		if strings.HasSuffix(a, "?") {
+			p.count++
+			query.attrs[i] = strings.Replace(a, "?", "$"+strconv.Itoa(p.count), 1)
 		}
 	}
-	return append(query.selectionVals, query.attrVals...)
+	for i, s := range query.selection {
+		if strings.HasSuffix(s, "?") {
+			p.count++
+			query.selection[i] = strings.Replace(s, "?", "$"+strconv.Itoa(p.count), 1)
+		}
+	}
+	return append(query.attrVals, query.selectionVals...)
 }
 
 func (p *postgres) credentials() string {

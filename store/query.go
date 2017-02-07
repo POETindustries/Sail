@@ -115,7 +115,7 @@ func (q *Query) Desc() *Query {
 // datasets where the value of attribute 'key' matches the
 // value passed with 'val'.
 func (q *Query) Equals(key string, val interface{}) *Query {
-	q.addSelection(key, val, "="+q.driver.Param())
+	q.addSelection(key, val, "=?")
 	return q
 }
 
@@ -124,12 +124,12 @@ func (q *Query) Equals(key string, val interface{}) *Query {
 // before retrieving the results.
 func (q *Query) Exec() (rows *sql.Rows, ok bool) {
 	var err error
+	data := q.driver.Data(q)
 	switch q.mode {
 	case modeGet, modeDelete:
-		rows, err = DB().Query(q.build(), q.selectionVals...)
+		rows, err = DB().Query(q.build(), data...)
 	case modeAdd, modeUpdate:
-		vals := q.driver.PrepareData(q)
-		_, err = DB().Exec(q.build(), vals...)
+		_, err = DB().Exec(q.build(), data...)
 	}
 	ok = (err == nil)
 	if !ok {
@@ -149,7 +149,7 @@ func (q *Query) In(table string) *Query {
 // instructs to work only on those datasets where the value of
 // attribute 'key' does not match the value passed with 'val'.
 func (q *Query) NotEquals(key string, val interface{}) *Query {
-	q.addSelection(key, val, "<>"+q.driver.Param())
+	q.addSelection(key, val, "<>?")
 	return q
 }
 
@@ -183,7 +183,7 @@ func (q *Query) String() string {
 	copy.attrVals = append(copy.attrVals, q.attrVals...)
 	copy.selection = append(copy.selection, q.selection...)
 	copy.selectionVals = append(copy.selectionVals, q.selectionVals...)
-	vals := copy.driver.PrepareData(&copy)
+	vals := copy.driver.Data(&copy)
 	return fmt.Sprintf("%s|%v\n", copy.build(), vals)
 }
 
@@ -195,13 +195,14 @@ func (q *Query) String() string {
 func (q *Query) Values(vals map[string]interface{}) *Query {
 	if q.mode == modeUpdate {
 		for k, v := range vals {
-			q.attrs = append(q.attrs, k+"="+q.driver.Param())
+			q.attrs = append(q.attrs, k+"=?")
 			q.attrVals = append(q.attrVals, v)
 		}
 	} else if q.mode == modeAdd {
 		for k, v := range vals {
 			q.attrs = append(q.attrs, k)
 			q.attrVals = append(q.attrVals, v)
+			q.selection = append(q.selection, "?")
 		}
 	}
 	return q
@@ -233,12 +234,8 @@ func (q *Query) buildAdd() string {
 	if len(q.attrs) < 1 || len(q.attrs) != len(q.attrVals) {
 		return ""
 	}
-	vs := make([]string, len(q.attrs))
-	for i := 0; i < len(vs); i++ {
-		vs[i] = q.driver.Param()
-	}
 	return fmt.Sprintf("insert into %s (%s) values (%s)",
-		q.table, strings.Join(q.attrs, ","), strings.Join(vs, ","))
+		q.table, strings.Join(q.attrs, ","), strings.Join(q.selection, ","))
 }
 
 func (q *Query) buildDelete() string {

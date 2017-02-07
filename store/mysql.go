@@ -18,11 +18,7 @@ func (m *mysql) Init() (*sql.DB, error) {
 	return sql.Open("mysql", m.credentials())
 }
 
-func (m *mysql) Param() string {
-	return "?"
-}
-
-func (m *mysql) PrepareData(query *Query) []interface{} {
+func (m *mysql) Data(query *Query) []interface{} {
 	return append(query.attrVals, query.selectionVals...)
 }
 

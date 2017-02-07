@@ -23,11 +23,7 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	return sql.Open("sqlite3", loc+"sail.db")
 }
 
-func (s *sqlite3) Param() string {
-	return "?"
-}
-
-func (s *sqlite3) PrepareData(query *Query) []interface{} {
+func (s *sqlite3) Data(query *Query) []interface{} {
 	return append(query.attrVals, query.selectionVals...)
 }
 

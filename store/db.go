@@ -9,8 +9,7 @@ import (
 type Driver interface {
 	Copy() Driver
 	Init() (*sql.DB, error)
-	Param() string
-	PrepareData(query *Query) []interface{}
+	Data(query *Query) []interface{}
 	credentials() string
 }
 
