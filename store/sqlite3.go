@@ -20,7 +20,7 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	if _, err := os.Stat(loc); err != nil {
 		os.MkdirAll(loc, 0700)
 	}
-	return sql.Open("sqlite3", loc+"sail.db")
+	return sql.Open("sqlite3", loc+conf.Instance().DBName+".db")
 }
 
 func (s *sqlite3) Data(query *Query) []interface{} {
