@@ -18,10 +18,6 @@ func (p *postgres) Copy() Driver {
 	return &postgres{}
 }
 
-func (p *postgres) Init() (*sql.DB, error) {
-	return sql.Open("postgres", p.credentials())
-}
-
 func (p *postgres) Data(query *Query) []interface{} {
 	for i, a := range query.attrs {
 		if strings.HasSuffix(a, "?") {
@@ -36,6 +32,14 @@ func (p *postgres) Data(query *Query) []interface{} {
 		}
 	}
 	return append(query.attrVals, query.selectionVals...)
+}
+
+func (p *postgres) Init() (*sql.DB, error) {
+	return sql.Open("postgres", p.credentials())
+}
+
+func (p *postgres) Setup(data SetupData) {
+
 }
 
 func (p *postgres) credentials() string {

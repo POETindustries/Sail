@@ -14,12 +14,16 @@ func (m *mysql) Copy() Driver {
 	return &mysql{}
 }
 
+func (m *mysql) Data(query *Query) []interface{} {
+	return append(query.attrVals, query.selectionVals...)
+}
+
 func (m *mysql) Init() (*sql.DB, error) {
 	return sql.Open("mysql", m.credentials())
 }
 
-func (m *mysql) Data(query *Query) []interface{} {
-	return append(query.attrVals, query.selectionVals...)
+func (m *mysql) Setup(data SetupData) {
+
 }
 
 func (m *mysql) credentials() string {

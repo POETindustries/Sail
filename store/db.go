@@ -10,7 +10,16 @@ type Driver interface {
 	Copy() Driver
 	Init() (*sql.DB, error)
 	Data(query *Query) []interface{}
+	Setup(data SetupData)
 	credentials() string
+}
+
+// SetupData provides a way to send all necessary data to
+// the Database's Setup function.
+type SetupData struct {
+	Data     map[string]interface{}
+	Primary  string
+	Relation string
 }
 
 // Database gives access to the database implementation
@@ -51,6 +60,14 @@ func (d *Database) Query(query string, args ...interface{}) (*sql.Rows, error) {
 // QueryRow wraps the function of the same name from sql.DB.
 func (d *Database) QueryRow(query string, args ...interface{}) *sql.Row {
 	return d.db.QueryRow(query, args...)
+}
+
+// Setup uses the data passed to build creation queries that
+// fit the underlying SQL dialect. Packages using the store
+// package can provide data to be stored without having to
+// know about storage internals.
+func (d *Database) Setup(data SetupData) {
+	d.driver.Setup(data)
 }
 
 // init sets up proper initialization of the database backend.
