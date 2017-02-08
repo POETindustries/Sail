@@ -2,11 +2,23 @@ package conf
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sail/errors"
 )
+
+const skeleton = `{
+"db_driver"     : "%s",
+"db_user"       : "%s",
+"db_password"   : "%s",
+"db_name"       : "%s",
+"db_host"       : "%s",
+
+"dev_mode"      : %t,
+"first_run"     : %t
+}`
 
 const (
 	dbDriver = "sqlite3"
@@ -23,12 +35,12 @@ const (
 // is read from a config file that server administrators have
 // access to.
 type Config struct {
-	Cwd       string
-	StaticDir string
-	TmplDir   string
-	FileDir   string
-	JsDir     string
-	ThemeDir  string
+	Cwd       string `json:"-"`
+	StaticDir string `json:"-"`
+	TmplDir   string `json:"-"`
+	FileDir   string `json:"-"`
+	JsDir     string `json:"-"`
+	ThemeDir  string `json:"-"`
 
 	DBDriver string `json:"db_driver"`
 	DBUser   string `json:"db_user"`
@@ -82,6 +94,16 @@ func (c *Config) load(file string) error {
 	if err = json.Unmarshal(in, c); err != nil {
 		return err
 	}
-
 	return nil
+}
+
+// Save writes the current state of the Config object to the
+// config file.
+func (c *Config) Save() {
+	f := fmt.Sprintf(skeleton, c.DBDriver, c.DBUser, c.DBPass, c.DBName,
+		c.DBHost, c.DevMode, c.FirstRun)
+	err := ioutil.WriteFile(c.Cwd+"config.json", []byte(f), 0640) //maybe do 0600 for hardened security?
+	if err != nil {
+		errors.Log(err, c.DevMode)
+	}
 }
