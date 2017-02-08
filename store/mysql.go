@@ -22,7 +22,7 @@ func (m *mysql) Init() (*sql.DB, error) {
 	return sql.Open("mysql", m.credentials())
 }
 
-func (m *mysql) Setup(data SetupData) {
+func (m *mysql) Setup(data *SetupData) {
 
 }
 

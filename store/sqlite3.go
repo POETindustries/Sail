@@ -31,7 +31,7 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	return sql.Open("sqlite3", loc+s.credentials())
 }
 
-func (s *sqlite3) Setup(data SetupData) {
+func (s *sqlite3) Setup(data *SetupData) {
 	var schema, datatype, arg string
 	for attr, val := range data.Data {
 		if s.asText(val, &datatype) || s.asBlob(val, &datatype) {

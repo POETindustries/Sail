@@ -10,7 +10,7 @@ type Driver interface {
 	Copy() Driver
 	Init() (*sql.DB, error)
 	Data(query *Query) []interface{}
-	Setup(data SetupData)
+	Setup(data *SetupData)
 	credentials() string
 }
 
@@ -66,7 +66,7 @@ func (d *Database) QueryRow(query string, args ...interface{}) *sql.Row {
 // fit the underlying SQL dialect. Packages using the store
 // package can provide data to be stored without having to
 // know about storage internals.
-func (d *Database) Setup(data SetupData) {
+func (d *Database) Setup(data *SetupData) {
 	d.driver.Setup(data)
 }
 

@@ -38,7 +38,7 @@ func (p *postgres) Init() (*sql.DB, error) {
 	return sql.Open("postgres", p.credentials())
 }
 
-func (p *postgres) Setup(data SetupData) {
+func (p *postgres) Setup(data *SetupData) {
 
 }
 
