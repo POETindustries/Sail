@@ -22,18 +22,18 @@ func TestQuery(t *testing.T) {
 }
 
 func TestQueryAdd(t *testing.T) {
-	Add().In("sl_test").Exec()
+	Add().In("test").Exec()
 }
 
 func TestQueryGet(t *testing.T) {
-	Get().In("sl_test").Exec()
-	Get().In("sl_test").All().Exec()
+	Get().In("test").Exec()
+	Get().In("test").All().Exec()
 }
 
 func TestQueryUpdate(t *testing.T) {
-	Update().In("sl_test").Exec()
+	Update().In("test").Exec()
 }
 
 func TestQueryDelete(t *testing.T) {
-	Delete().In("sl_test").Exec()
+	Delete().In("test").Exec()
 }

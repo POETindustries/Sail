@@ -5,21 +5,31 @@ import (
 	"sail/conf"
 )
 
+type Datasize int16
+
+const (
+	All   Datasize = 0
+	Small Datasize = 32
+	Mid   Datasize = 8192
+	Large Datasize = 16384
+)
+
 // Driver provides unified access to the actual sql drivers.
 type Driver interface {
 	Copy() Driver
 	Init() (*sql.DB, error)
 	Data(query *Query) []interface{}
-	Setup(data *SetupData)
+	Setup(table string, data []*SetupData)
 	credentials() string
 }
 
 // SetupData provides a way to send all necessary data to
 // the Database's Setup function.
 type SetupData struct {
-	Data     map[string]interface{}
-	Primary  string
-	Relation string
+	Name      string
+	Value     interface{}
+	Size      Datasize
+	IsPrimary bool
 }
 
 // Database gives access to the database implementation
@@ -66,8 +76,8 @@ func (d *Database) QueryRow(query string, args ...interface{}) *sql.Row {
 // fit the underlying SQL dialect. Packages using the store
 // package can provide data to be stored without having to
 // know about storage internals.
-func (d *Database) Setup(data *SetupData) {
-	d.driver.Setup(data)
+func (d *Database) Setup(table string, data []*SetupData) {
+	d.driver.Setup(table, data)
 }
 
 // init sets up proper initialization of the database backend.

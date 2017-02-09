@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"reflect"
 	"sail/conf"
 	"sail/errors"
 	"time"
@@ -31,71 +30,38 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	return sql.Open("sqlite3", loc+s.credentials())
 }
 
-func (s *sqlite3) Setup(data *SetupData) {
-	var schema, datatype, arg string
-	for attr, val := range data.Data {
-		if s.asText(val, &datatype) || s.asBlob(val, &datatype) {
-			arg = "'%s'"
-		} else if s.asInt(val, &datatype) {
-			arg = "%d"
-			if reflect.TypeOf(val).Kind() == reflect.Bool {
-				val = s.btoi(val.(bool))
+func (s *sqlite3) Setup(table string, data []*SetupData) {
+	var stmt string
+	for _, d := range data {
+		switch d.Value.(type) {
+		case int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64:
+			if d.IsPrimary {
+				stmt += fmt.Sprintf("%s integer primary key,", d.Name)
+			} else {
+				stmt += fmt.Sprintf("%s integer not null default %d,", d.Name, d.Value)
 			}
-		} else if s.asReal(val, &datatype) {
-			arg = "%f"
-		} else {
+		case float32, float64:
+			stmt += fmt.Sprintf("%s real not null default %f,", d.Name, d.Value)
+		case bool:
+			stmt += fmt.Sprintf("%s integer not null default %d,", d.Name, s.btoi(d.Value.(bool)))
+		case string:
+			stmt += fmt.Sprintf("%s text not null default '%s',", d.Name, d.Value)
+		case []byte:
+			stmt += fmt.Sprintf("%s blob not null default '%s',", d.Name, d.Value)
+		case time.Time:
+			stmt += fmt.Sprintf("%s integer not null default %d,", d.Name, d.Value.(time.Time).Unix())
+		default:
 			return // TODO 2017-02-08: log unrecognized type error
 		}
-		if attr == data.Primary {
-			schema += fmt.Sprintf("%s %s primary key not null,", attr, datatype)
-		} else {
-			schema += fmt.Sprintf("%s %s not null default "+arg+",", attr, datatype, val)
-		}
 	}
-	query := fmt.Sprintf("create table if not exists %s(%s)", data.Relation, schema[:len(schema)-1])
-	if _, err := DB().Exec(query); err != nil {
+	q := fmt.Sprintf("create table if not exists %s(%s)", table, stmt[:len(stmt)-1])
+	if _, err := DB().Exec(q); err != nil {
 		errors.Log(err, conf.Instance().DevMode)
 	}
 }
 
 func (s *sqlite3) credentials() string {
 	return conf.Instance().DBName + ".db"
-}
-
-func (s *sqlite3) asText(v interface{}, res *string) bool {
-	switch v.(type) {
-	case string, time.Time:
-		*res = "text"
-		return true
-	}
-	return false
-}
-
-func (s *sqlite3) asInt(v interface{}, res *string) bool {
-	switch v.(type) {
-	case int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64, bool:
-		*res = "integer"
-		return true
-	}
-	return false
-}
-
-func (s *sqlite3) asReal(v interface{}, res *string) bool {
-	switch v.(type) {
-	case float32, float64:
-		*res = "real"
-		return true
-	}
-	return false
-}
-
-func (s *sqlite3) asBlob(v interface{}, res *string) bool {
-	switch v.(type) {
-	case []byte:
-		*res = "blob"
-		return true
-	}
-	return false
 }
 
 func (s *sqlite3) btoi(b bool) int {
