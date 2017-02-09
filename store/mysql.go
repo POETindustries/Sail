@@ -118,8 +118,6 @@ func (m *mysql) asText(v interface{}, size Datasize, outType *string) bool {
 		} else {
 			*outType = "varchar(" + strconv.Itoa(int(size)) + ")"
 		}
-	case []string:
-		*outType = "enum"
 	case []byte:
 		*outType = "longblob"
 	default:

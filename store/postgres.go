@@ -2,9 +2,12 @@ package store
 
 import (
 	"database/sql"
+	"fmt"
 	"sail/conf"
+	"sail/errors"
 	"strconv"
 	"strings"
+	"time"
 
 	// postgres database driver
 	_ "github.com/lib/pq"
@@ -39,7 +42,30 @@ func (p *postgres) Init() (*sql.DB, error) {
 }
 
 func (p *postgres) Setup(table string, data []*SetupData) {
-
+	var datatype, stmt string
+	for _, d := range data {
+		if p.asInt(d.Value, &datatype) {
+			if d.IsPrimary {
+				stmt += fmt.Sprintf("%s bigserial,", d.Name)
+			} else {
+				stmt += fmt.Sprintf("%s %s not null default %d,", d.Name, datatype, d.Value)
+			}
+		} else if p.asReal(d.Value, &datatype) {
+			stmt += fmt.Sprintf("%s %s not null default %f,", d.Name, datatype, d.Value)
+		} else if p.asText(d.Value, d.Size, &datatype) {
+			stmt += fmt.Sprintf("%s %s not null default '%s',", d.Name, datatype, d.Value)
+		} else if p.asBool(d.Value, &datatype) {
+			stmt += fmt.Sprintf("%s %s not null default %t,", d.Name, datatype, d.Value)
+		} else if p.asTime(d.Value, &datatype) {
+			stmt += fmt.Sprintf("%s %s not null default %d,", d.Name, datatype, d.Value.(time.Time).Unix())
+		} else {
+			return // TODO 2017-02-09: log unrecognized type error
+		}
+	}
+	q := fmt.Sprintf("create table if not exists %s(%s)", table, stmt[:len(stmt)-1])
+	if _, err := DB().Exec(q); err != nil {
+		errors.Log(err, conf.Instance().DevMode)
+	}
 }
 
 func (p *postgres) credentials() string {
@@ -49,4 +75,64 @@ func (p *postgres) credentials() string {
 		conf.Instance().DBHost + "/" +
 		conf.Instance().DBName + "?" +
 		"sslmode=disable"
+}
+
+func (p *postgres) asInt(v interface{}, outType *string) bool {
+	switch v.(type) {
+	case int8, uint8, int16:
+		*outType = "smallint"
+	case int32, uint16, int:
+		*outType = "integer"
+	case int64, uint32, uint:
+		*outType = "bigint"
+	default:
+		return false
+	}
+	return true
+}
+
+func (p *postgres) asReal(v interface{}, outType *string) bool {
+	switch v.(type) {
+	case float32:
+		*outType = "real"
+	case float64:
+		*outType = "double precision"
+	default:
+		return false
+	}
+	return true
+}
+
+func (p *postgres) asBool(v interface{}, outType *string) bool {
+	switch v.(type) {
+	case bool:
+		*outType = "boolean"
+		return true
+	}
+	return false
+}
+
+func (p *postgres) asText(v interface{}, size Datasize, outType *string) bool {
+	switch v.(type) {
+	case string:
+		if size == All {
+			*outType = "text"
+		} else {
+			*outType = "varchar(" + strconv.Itoa(int(size)) + ")"
+		}
+	case []byte:
+		*outType = "bytea"
+	default:
+		return false
+	}
+	return true
+}
+
+func (p *postgres) asTime(v interface{}, outType *string) bool {
+	switch v.(type) {
+	case time.Time:
+		*outType = "bigint"
+		return true
+	}
+	return false
 }
