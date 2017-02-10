@@ -45,7 +45,7 @@ var instance *Database
 func DB() *Database {
 	if instance == nil {
 		instance = &Database{}
-		if !instance.init() {
+		if instance.init() != nil {
 			panic("Database initialization failed!")
 		}
 	}
@@ -83,7 +83,7 @@ func (d *Database) Setup(table string, data []*SetupData) {
 // init sets up proper initialization of the database backend.
 // Failure indicates a serious problem and should prevent the
 // app from continuing.
-func (d *Database) init() bool {
+func (d *Database) init() error {
 	switch conf.Instance().DBDriver {
 	case "sqlite3":
 		d.driver = &sqlite3{}
@@ -92,11 +92,12 @@ func (d *Database) init() bool {
 	case "postgres":
 		d.driver = &postgres{}
 	default:
-		return false
+		return ErrNoDriver{conf.Instance().DBDriver}
 	}
-	if db, err := d.driver.Init(); err == nil {
-		d.db = db
-		return (d.db.Ping() == nil)
+	db, err := d.driver.Init()
+	if err != nil {
+		return err
 	}
-	return false
+	d.db = db
+	return d.db.Ping()
 }
