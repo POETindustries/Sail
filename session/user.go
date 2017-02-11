@@ -10,9 +10,12 @@ import (
 // to satisfy in order to work with Sail's session framework.
 type User interface {
 	ID() uint32
+	Hash() (string, error)
 	Name() string
 	Load() bool
-	Hash() (string, error)
+	Save() bool
+	SaveHash(hash string) bool
+	Store() error
 }
 
 // UserDB is a simple in-memory database of all users that are
@@ -108,24 +111,18 @@ func (db *UserDB) RemoveID(id uint32) {
 	}
 }
 
-// Verify returns a User and a boolean value indicating whether user
-// and password match entries in the user database. If so, the User
-// return value is safe for use.
-//
-// Since there has to be a database request anyway, the resulting
-// User object is returned in order to give the opportunity to use it
-// right away instead of fetching anew a few lines later.
-func Verify(u User, pass string) (User, bool) {
-	if pass == "" || !u.Load() {
-		return nil, false
+// Verify returns a boolean value indicating whether user
+// and password match entries in the user database.
+func Verify(u User, pass string) bool {
+	if pass == "" || u.Name() == "" {
+		return false
 	}
-	fmt.Printf("%+v\n", u)
 	if hash, err := u.Hash(); err == nil {
 		if bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass)) == nil {
-			return u, true
+			return true
 		}
 	}
-	return nil, false
+	return false
 }
 
 // Encrypt generates a cryptographically secure hash from the

@@ -133,9 +133,9 @@ func (db *Database) Start(id string) {
 
 // User returns the user name associated with the session specified
 // by the given id.
-func (db *Database) User(id string) (u string) {
+func (db *Database) User(id string) (username string) {
 	if s := db.sessions[id]; s != nil {
-		u = s.User
+		username = s.User
 	}
 	return
 }
