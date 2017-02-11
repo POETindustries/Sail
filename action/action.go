@@ -1,6 +1,7 @@
 package action
 
 const (
-	Login  = "login"
-	Cancel = "cancel"
+	Register = "register"
+	Login    = "login"
+	Cancel   = "cancel"
 )
