@@ -115,19 +115,19 @@ func testQueryAdd(t *testing.T) {
 		"test_name":     12,
 		"test_birthday": "hello"}
 
-	if _, ok := Add().In("test").Values(valsGood).Exec(); !ok {
+	if _, err := Add().In("test").Values(valsGood).Exec(); err != nil {
 		t.Errorf("%s: error in Add with data: %+v", conf.Instance().DBDriver, valsGood)
 	}
-	if _, ok := Add().In("test").Values(valsBad).Exec(); ok {
+	if _, err := Add().In("test").Values(valsBad).Exec(); err == nil {
 		t.Errorf("%s: no error happened, but should have: %+v", conf.Instance().DBDriver, valsBad)
 	}
 }
 
 func testQueryGet(t *testing.T) {
-	if r, ok := Get().In("test").All().Exec(); ok {
+	if r, err := Get().In("test").All().Exec(); err == nil {
 		getHelper(r, t)
 	}
-	if r, ok := Get().In("test").Equals("test_name", "Voldemort").Exec(); ok {
+	if r, err := Get().In("test").Equals("test_name", "Voldemort").Exec(); err == nil {
 		getHelper(r, t)
 	}
 }
