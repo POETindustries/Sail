@@ -21,7 +21,7 @@ var reqs = 0
 func main() {
 	config := conf.Instance()
 	if store.DB() != nil {
-		//storage.ExecCreateInstructs()
+		setup()
 		http.HandleFunc("/", frontendHandler)
 		http.HandleFunc("/office/", backendHandler)
 		http.Handle("/favicon.ico", http.FileServer(http.Dir(config.StaticDir)))
@@ -83,7 +83,8 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 	u := req.PostFormValue("user")
 	p := req.PostFormValue("pass")
 	r := response.New(wr, req)
-	if usr, ok := session.Verify(user.New(u), p); ok {
+	usr := user.New(u)
+	if session.Verify(user.New(u), p) {
 		sess := session.New(req, req.PostFormValue("user"))
 		session.DB().Add(sess)
 		session.Users().Add(usr)
@@ -93,7 +94,7 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 			b.Sanitize("/office/")
 		}
 		r.URL = req.URL.Path
-		r.Presenter = backend.New(sess, usr.(*user.User))
+		r.Presenter = backend.New(sess, usr)
 		sess.Start()
 	} else {
 		if u != "" || p != "" {
@@ -103,4 +104,14 @@ func loginHandler(wr http.ResponseWriter, req *http.Request) {
 		r.Presenter = backend.New(nil, nil)
 	}
 	r.Serve()
+}
+
+func setup() {
+	if !conf.Instance().FirstRun {
+		return
+	}
+	store.DB().Setup(user.SetupData())
+	conf.Instance().FirstRun = false
+	conf.Instance().Save()
+
 }

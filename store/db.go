@@ -29,8 +29,8 @@ type Driver interface {
 type SetupData struct {
 	Name      string
 	Value     interface{}
-	Size      Datasize
 	IsPrimary bool
+	Size      Datasize
 }
 
 // Database gives access to the database implementation
