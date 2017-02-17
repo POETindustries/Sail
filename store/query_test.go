@@ -71,7 +71,7 @@ func TestQuery(t *testing.T) {
 	pic, _ := hex.DecodeString(iconData)
 	testdata.avatar = pic
 
-	for _, d := range []string{"sqlite3", "mysql", "postgres"} {
+	for _, d := range []string{"sqlite3" /*, "mysql", "postgres"*/} {
 		conf.Instance().DBDriver = d
 		if err := DB().init(); err != nil {
 			t.Errorf("%s init failed: %s", d, err.Error())
