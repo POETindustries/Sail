@@ -21,6 +21,7 @@ func New(name string) *User {
 	return &User{name: name}
 }
 
+// TODO 2017-02-08: rename to LoadOrNew
 func LoadNew(name string) *User {
 	u := New(name)
 	if u.Load() {
@@ -46,4 +47,16 @@ func (u *User) Hash() (string, error) {
 		return "", errors.New("No hash found")
 	}
 	return u.pass, nil
+}
+
+func (u *User) Save() bool {
+	return false
+}
+
+func (u *User) SaveHash(hash string) bool {
+	return false
+}
+
+func (u *User) Store() error {
+	return nil
 }

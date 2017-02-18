@@ -3,8 +3,6 @@ package store
 import (
 	"database/sql"
 	"fmt"
-	"sail/conf"
-	"sail/errors"
 	"strings"
 )
 
@@ -122,18 +120,13 @@ func (q *Query) Equals(key string, val interface{}) *Query {
 // Exec executes the query, making the actual request to the
 // database. It should be the last operation that query does
 // before retrieving the results.
-func (q *Query) Exec() (rows *sql.Rows, ok bool) {
-	var err error
+func (q *Query) Exec() (rows *sql.Rows, err error) {
 	data := q.driver.Data(q)
 	switch q.mode {
 	case modeGet, modeDelete:
 		rows, err = DB().Query(q.build(), data...)
 	case modeAdd, modeUpdate:
 		_, err = DB().Exec(q.build(), data...)
-	}
-	ok = (err == nil)
-	if !ok {
-		errors.Log(err, conf.Instance().DevMode)
 	}
 	return
 }
