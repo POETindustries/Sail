@@ -20,6 +20,7 @@ type Driver interface {
 	Copy() Driver
 	Init() (*sql.DB, error)
 	Data(query *Query) []interface{}
+	Prepare(query string) string
 	Setup(table string, data []*SetupData)
 	credentials() string
 }
@@ -56,7 +57,7 @@ func DB() *Database {
 
 // Exec wraps the function of the same name from sql.DB.
 func (d *Database) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return d.db.Exec(query, args...)
+	return d.db.Exec(d.driver.Prepare(query), args...)
 }
 
 // Ping wraps the function of the same name from sql.DB.
@@ -66,12 +67,12 @@ func (d *Database) Ping() error {
 
 // Query wraps the function of the same name from sql.DB.
 func (d *Database) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	return d.db.Query(query, args...)
+	return d.db.Query(d.driver.Prepare(query), args...)
 }
 
 // QueryRow wraps the function of the same name from sql.DB.
 func (d *Database) QueryRow(query string, args ...interface{}) *sql.Row {
-	return d.db.QueryRow(query, args...)
+	return d.db.QueryRow(d.driver.Prepare(query), args...)
 }
 
 // Setup uses the data passed to build creation queries that

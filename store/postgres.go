@@ -41,6 +41,15 @@ func (p *postgres) Init() (*sql.DB, error) {
 	return sql.Open("postgres", p.credentials())
 }
 
+func (p *postgres) Prepare(query string) string {
+	p.count = 0
+	for strings.Contains(query, "?") {
+		p.count++
+		query = strings.Replace(query, "?", "$"+strconv.Itoa(p.count), 1)
+	}
+	return query
+}
+
 func (p *postgres) Setup(table string, data []*SetupData) {
 	var datatype, stmt string
 	for _, d := range data {

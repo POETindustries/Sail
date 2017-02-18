@@ -30,6 +30,10 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	return sql.Open("sqlite3", loc+s.credentials())
 }
 
+func (s *sqlite3) Prepare(query string) string {
+	return query
+}
+
 func (s *sqlite3) Setup(table string, data []*SetupData) {
 	var stmt string
 	for _, d := range data {

@@ -26,6 +26,10 @@ func (m *mysql) Init() (*sql.DB, error) {
 	return sql.Open("mysql", m.credentials())
 }
 
+func (m *mysql) Prepare(query string) string {
+	return query
+}
+
 func (m *mysql) Setup(table string, data []*SetupData) {
 	var datatype, stmt string
 	for _, d := range data {
