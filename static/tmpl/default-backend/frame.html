@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Sail | Office</title>
+	<meta charset="utf-8">
+	<meta name="title" content="Sail Office">
+	<meta name="robots" content="nofollow, noindex">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/theme/default-backend/style.css"/>
+</head>
+
+<body>
+{{if eq .URL "/office/login"}}
+	{{template "login" .}}
+{{else}}
+	{{template "sidebar" .}}
+	{{if eq .URL "/office/content"}}
+		{{template "header" .}}
+		{{template "content" .FileManager}}
+	{{else if eq .URL "/office/users"}}
+		{{template "users-header" .}}
+		{{template "users" .UserManager}}
+	{{else if eq .URL "/office/config"}}
+		{{template "header" .}}
+		{{template "config" .}}
+	{{else if eq .URL "/office/maintenance"}}
+		{{template "header" .}}
+		{{template "maintenance" .}}
+	{{else}}
+		{{template "header" .}}
+		{{template "home" .}}
+	{{end}}
+{{end}}
+{{if .Message}}
+	<div id="sail-message">{{.Message}}</div>
+{{end}}
+</body>
+
+</html>

@@ -1,45 +1,117 @@
 package main
 
 import (
-	"bytes"
-	"io"
+	"fmt"
 	"net/http"
+	"sail/backend"
 	"sail/conf"
-	"sail/dbase"
-	"sail/page"
+	"sail/frontend"
+	"sail/object/cache"
+	"sail/response"
+	"sail/session"
+	"sail/store"
+	"sail/user"
+	"sail/user/group"
+	"time"
 )
 
-// FrontendHandler handles all requests that are coming from site visitors.
-// It parses the request url and calls the functions necessary for generating
-// a valid page that is send to the client.
-func frontendHandler(writer http.ResponseWriter, req *http.Request) {
-	var p *page.Page
-	var b bytes.Buffer
-
-	if db := dbase.Open("sl_main"); db == nil {
-		p = page.Load404()
-	} else {
-		p = page.Builder("home", db)
-	}
-	if err := p.Frame.Execute(&b, p); err != nil {
-		println(err.Error())
-		io.WriteString(writer, page.NOTFOUND404)
-	} else {
-		b.WriteTo(writer)
-	}
-}
-
-// BackendHandler handles connections to the administrative interface.
-func backendHandler(writer http.ResponseWriter, req *http.Request) {
-	// TODO check for session cookie, show login page if not present
-}
+var avgSrvTime = 0
+var reqs = 0
 
 func main() {
-	conf.InitConf()
-	http.HandleFunc("/", frontendHandler)
-	http.Handle("/img/", http.FileServer(http.Dir(conf.CWD)))
-	http.Handle("/js/", http.FileServer(http.Dir(conf.CWD)))
-	http.Handle("/theme/", http.FileServer(http.Dir(conf.CWD)))
-	http.HandleFunc("/office/", backendHandler)
-	http.ListenAndServe(":8080", nil)
+	config := conf.Instance()
+	if store.DB() != nil {
+		setup()
+		http.HandleFunc("/", frontendHandler)
+		http.HandleFunc("/office/", backendHandler)
+		http.Handle("/favicon.ico", http.FileServer(http.Dir(config.StaticDir)))
+		http.Handle("/files/", http.FileServer(http.Dir(config.StaticDir)))
+		http.Handle("/js/", http.FileServer(http.Dir(config.StaticDir)))
+		http.Handle("/theme/", http.FileServer(http.Dir(config.StaticDir)))
+		http.ListenAndServe(":8080", nil)
+	}
+}
+
+func frontendHandler(wr http.ResponseWriter, req *http.Request) {
+	t1 := time.Now().Nanosecond()
+
+	if markup := cache.DB().Markup(req.URL.Path); markup != nil {
+		wr.Write(markup)
+	} else if store.DB().Ping() == nil {
+		r := response.New(wr, req)
+		r.Presenter = frontend.New(r.Content(), r.Template())
+		r.URL = r.Content().URL
+		r.Serve()
+	}
+
+	t2 := time.Now().Nanosecond()
+	t := (t2 - t1)
+	if t > 0 {
+		reqs++
+		avgSrvTime += t
+		fmt.Printf("%3d Time to serve page: %d microseconds. Average: %d\n",
+			reqs, t/1000, avgSrvTime/reqs/1000)
+	}
+}
+
+func backendHandler(wr http.ResponseWriter, req *http.Request) {
+	t1 := time.Now().Nanosecond()
+
+	if store.DB().Ping() == nil {
+		cookie, _ := req.Cookie("id")
+		if cookie != nil && session.DB().Has(cookie.Value) {
+			s := session.DB().Get(cookie.Value)
+			u := user.LoadNew(s.User)
+			if b := group.NewBouncer(req); !b.Pass(u.ID()) {
+				b.Sanitize("/office/")
+			}
+			r := response.New(wr, req)
+			r.FallbackURL = "/office/"
+			r.Presenter = backend.New(s, u)
+			s.Start()
+			r.Serve()
+		} else {
+			loginHandler(wr, req)
+		}
+	}
+
+	t2 := time.Now().Nanosecond()
+	fmt.Printf("Time to serve page: %d microseconds\n", (t2-t1)/1000)
+}
+
+func loginHandler(wr http.ResponseWriter, req *http.Request) {
+	u := req.PostFormValue("user")
+	p := req.PostFormValue("pass")
+	r := response.New(wr, req)
+	usr := user.New(u)
+	if session.Verify(user.New(u), p) {
+		sess := session.New(req, req.PostFormValue("user"))
+		session.DB().Add(sess)
+		session.Users().Add(usr)
+		c := http.Cookie{Name: "id", Value: sess.ID}
+		http.SetCookie(wr, &c)
+		if b := group.NewBouncer(req); !b.Pass(usr.ID()) {
+			b.Sanitize("/office/")
+		}
+		r.URL = req.URL.Path
+		r.Presenter = backend.New(sess, usr)
+		sess.Start()
+	} else {
+		if u != "" || p != "" {
+			r.Message = "Wrong login credentials!"
+		}
+		r.URL = "/office/login"
+		r.Presenter = backend.New(nil, nil)
+	}
+	r.Serve()
+}
+
+func setup() {
+	if !conf.Instance().FirstRun {
+		return
+	}
+	store.DB().Setup(user.SetupData())
+	conf.Instance().FirstRun = false
+	conf.Instance().Save()
+
 }

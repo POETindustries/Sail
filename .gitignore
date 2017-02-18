@@ -1,2 +1,12 @@
+# metadata & temporary files
 /.project
 *.swp
+.directory
+
+# generated files & dirs
+/db
+/sail
+
+# non-core files & dirs
+*.test.*
+_resources/svg/*.png
