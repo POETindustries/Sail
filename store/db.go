@@ -33,9 +33,9 @@ type Datasize int16
 
 const (
 	All   Datasize = 0
-	Small Datasize = 32
-	Mid   Datasize = 8192
-	Large Datasize = 16384
+	Small Datasize = 64
+	Mid   Datasize = 256
+	Large Datasize = 4096
 )
 
 // Driver provides unified access to the actual sql drivers.
