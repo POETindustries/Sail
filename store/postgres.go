@@ -95,6 +95,7 @@ func (p *postgres) Setup(table string, data []*SetupData) {
 		}
 	}
 	q := fmt.Sprintf("create table if not exists %s(%s)", table, stmt[:len(stmt)-1])
+	log.DB(q, log.LvlDbg)
 	if _, err := DB().Exec(q); err != nil {
 		log.DB(err, log.LvlErr)
 	}
