@@ -26,7 +26,7 @@ package store
 import (
 	"database/sql"
 	"sail/conf"
-	"sail/errors"
+	"sail/log"
 )
 
 type Datasize int16
@@ -71,7 +71,7 @@ func DB() *Database {
 	if instance == nil {
 		instance = &Database{}
 		if err := instance.init(); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlErr)
 			panic("Database initialization failed!")
 		}
 	}

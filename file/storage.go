@@ -2,8 +2,7 @@ package file
 
 import (
 	"database/sql"
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/object/schema"
 	"sail/store"
 )
@@ -36,7 +35,7 @@ func scanChildren(rows *sql.Rows) []*File {
 		if err := rows.Scan(&f.ID, &f.Name, &f.machineName, &f.parent,
 			&f.mimeTypeMajor, &f.mimeTypeMinor, &f.status, &f.owner,
 			&f.cDate, &f.eDate, &f.Address); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		fs = append(fs, &f)

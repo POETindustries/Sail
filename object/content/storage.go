@@ -2,8 +2,7 @@ package content
 
 import (
 	"database/sql"
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/object/schema"
 	"sail/store"
 )
@@ -54,7 +53,7 @@ func scan(row *sql.Row) *Content {
 		&c.Content, &c.Meta.ID, &c.TemplateID, &c.Meta.Title, &c.Meta.Keywords,
 		&c.Meta.Description, &c.Meta.Language, &c.Meta.PageTopic,
 		&c.Meta.RevisitAfter, &c.Meta.Robots); err != nil {
-		errors.Log(err, conf.Instance().DevMode)
+		log.DB(err, log.LvlWarn)
 		return nil
 	}
 	return c
@@ -71,7 +70,7 @@ func scanFull(rows *sql.Rows) []*Content {
 			&c.Meta.ID, &c.TemplateID, &c.Meta.Title, &c.Meta.Keywords,
 			&c.Meta.Description, &c.Meta.Language, &c.Meta.PageTopic,
 			&c.Meta.RevisitAfter, &c.Meta.Robots); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		cs = append(cs, c)

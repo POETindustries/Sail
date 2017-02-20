@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"io"
 	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/object/fallback"
 	"sail/object/widget"
 )
@@ -73,7 +73,7 @@ func (t *Template) Parse() {
 		dir := conf.Instance().TmplDir + t.Name
 		tpl, err := template.New("").Funcs(funcMap).ParseGlob(dir + "/*.html")
 		if err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.Srv(err, log.LvlErr)
 			tpl, _ = template.New("frame").Parse(fallback.NOTFOUND404)
 		}
 		t.template = tpl

@@ -3,9 +3,8 @@ package backend
 import (
 	"bytes"
 	"net/url"
-	"sail/conf"
-	"sail/errors"
 	"sail/file"
+	"sail/log"
 	"sail/object/fallback"
 	"sail/object/template"
 	"sail/object/widget"
@@ -74,7 +73,7 @@ func (p *Presenter) CanUpdate() bool {
 func (p *Presenter) Compile() *bytes.Buffer {
 	var markup bytes.Buffer
 	if err := p.template.Execute(&markup, p); err != nil {
-		errors.Log(err, conf.Instance().DevMode)
+		log.Srv(err, log.LvlErr)
 		return bytes.NewBufferString(fallback.NOTFOUND404)
 	}
 	return &markup

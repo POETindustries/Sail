@@ -27,7 +27,7 @@ import (
 	"database/sql"
 	"fmt"
 	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"strconv"
 	"time"
 
@@ -80,7 +80,7 @@ func (m *mysql) Setup(table string, data []*SetupData) {
 	}
 	q := fmt.Sprintf("create table if not exists %s(%s)", table, stmt[:len(stmt)-1])
 	if _, err := DB().Exec(q); err != nil {
-		errors.Log(err, conf.Instance().DevMode)
+		log.DB(err, log.LvlErr)
 	}
 }
 

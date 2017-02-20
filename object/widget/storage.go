@@ -3,8 +3,7 @@ package widget
 import (
 	"database/sql"
 	"fmt"
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/object/schema"
 	"sail/store"
 )
@@ -52,7 +51,7 @@ func scanWidget(rows *sql.Rows) []*Widget {
 	for rows.Next() {
 		w := New()
 		if err := rows.Scan(&w.ID, &w.Name, &w.RefName, &w.Type); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		ws = append(ws, w)
@@ -66,7 +65,7 @@ func scanNav(rows *sql.Rows) *Nav {
 	for rows.Next() {
 		e := NavEntry{}
 		if err := rows.Scan(&e.ID, &e.Name, &e.RefID, &e.Submenu, &e.Pos); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		e.RefURL = fmt.Sprintf("uuid/%d", e.RefID)
@@ -81,7 +80,7 @@ func scanText(rows *sql.Rows) []*Text {
 	for rows.Next() {
 		t := Text{}
 		if err := rows.Scan(&t.Content); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		ts = append(ts, &t)

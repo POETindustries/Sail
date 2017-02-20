@@ -5,8 +5,7 @@ import (
 	"html/template"
 	"net/url"
 	"regexp"
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/object"
 	"sail/object/cache"
 	"sail/object/content"
@@ -41,7 +40,7 @@ func New(cnt *content.Content, tmpl *tpl.Template) *Presenter {
 func (p *Presenter) Compile() *bytes.Buffer {
 	var markup bytes.Buffer
 	if err := p.template.Execute(&markup, p); err != nil {
-		errors.Log(err, conf.Instance().DevMode)
+		log.Srv(err, log.LvlErr)
 		return bytes.NewBufferString(fallback.NOTFOUND404)
 	}
 	b := markup.Bytes()

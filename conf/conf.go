@@ -29,7 +29,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sail/errors"
+	"sail/log"
 )
 
 const skeleton = `{
@@ -88,7 +88,7 @@ func new() *Config {
 		ThemeDir:  cwd + "/static/theme/"}
 
 	if err := instance.load("config.json"); err != nil {
-		errors.Log(err, true)
+		log.Srv(err, log.LvlWarn)
 		instance.DBDriver = dbDriver
 		instance.DBUser = dbUser
 		instance.DBPass = dbPass
@@ -127,6 +127,6 @@ func (c *Config) Save() {
 		c.DBHost, c.DevMode, c.FirstRun)
 	err := ioutil.WriteFile(c.Cwd+"config.json", []byte(f), 0640) //maybe do 0600 for hardened security?
 	if err != nil {
-		errors.Log(err, c.DevMode)
+		log.Srv(err, log.LvlWarn)
 	}
 }

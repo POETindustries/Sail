@@ -2,8 +2,7 @@ package user
 
 import (
 	"database/sql"
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/store"
 	"time"
 )
@@ -45,7 +44,7 @@ func singleFromStorage(u *User) bool {
 	for r.Next() {
 		if err := r.Scan(&u.id, &u.name, &u.pass, &u.FirstName, &u.LastName,
 			&u.Email, &u.Phone, &u.CDate, &u.ExpDate); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return false
 		}
 	}
@@ -70,7 +69,7 @@ func scanUser(rows *sql.Rows) []*User {
 		u := User{}
 		if err := rows.Scan(&u.id, &u.name, &u.pass, &u.FirstName, &u.LastName,
 			&u.Email, &u.Phone, &u.CDate, &u.ExpDate); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		us = append(us, &u)

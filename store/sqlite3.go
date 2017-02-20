@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"os"
 	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"time"
 
 	// sqlite database driver
@@ -83,7 +83,7 @@ func (s *sqlite3) Setup(table string, data []*SetupData) {
 	}
 	q := fmt.Sprintf("create table if not exists %s(%s)", table, stmt[:len(stmt)-1])
 	if _, err := DB().Exec(q); err != nil {
-		errors.Log(err, conf.Instance().DevMode)
+		log.DB(err, log.LvlErr)
 	}
 }
 

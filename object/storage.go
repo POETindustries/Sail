@@ -1,8 +1,7 @@
 package object
 
 import (
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/object/schema"
 	"sail/store"
 	"strings"
@@ -74,7 +73,7 @@ func fromStorageBuildID(url string, public bool) uint32 {
 		var id uint32
 		var p int8
 		if err := rows.Scan(&id, &p); err != nil || (public && p != 1) {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			continue
 		}
 		ids = append(ids, id)

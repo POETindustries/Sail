@@ -2,8 +2,7 @@ package group
 
 import (
 	"database/sql"
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/store"
 	"sail/user/rights"
 	"sail/user/schema"
@@ -38,7 +37,7 @@ func scanGroup(rows *sql.Rows) []*Group {
 		if err := rows.Scan(&g.ID, &g.Name, &g.perm[rights.Maintenance],
 			&g.perm[rights.Users], &g.perm[rights.Content],
 			&g.perm[rights.Config]); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 		}
 		gs = append(gs, g)
 	}
@@ -51,7 +50,7 @@ func scanMembers(rows *sql.Rows) map[uint32]bool {
 	for rows.Next() {
 		var id uint32
 		if err := rows.Scan(&id); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 		}
 		ms[id] = true
 	}

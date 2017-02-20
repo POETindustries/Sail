@@ -2,8 +2,7 @@ package template
 
 import (
 	"database/sql"
-	"sail/conf"
-	"sail/errors"
+	"sail/log"
 	"sail/object/schema"
 	"sail/store"
 )
@@ -32,7 +31,7 @@ func scanTemplate(rows *sql.Rows) []*Template {
 	for rows.Next() {
 		t := New()
 		if err := rows.Scan(&t.ID, &t.Name); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		ts = append(ts, t)
@@ -46,7 +45,7 @@ func scanWidgetID(rows *sql.Rows) []uint32 {
 	for rows.Next() {
 		var w uint32
 		if err := rows.Scan(&w); err != nil {
-			errors.Log(err, conf.Instance().DevMode)
+			log.DB(err, log.LvlWarn)
 			return nil
 		}
 		ws = append(ws, w)
