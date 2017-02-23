@@ -31,6 +31,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -79,13 +80,14 @@ type Database struct {
 }
 
 var db *Database
+var sessionInit sync.Once
 
 // DB returns a pointer to the session database singleton.
 func DB() *Database {
-	if db == nil {
+	sessionInit.Do(func() {
 		db = &Database{sessions: make(map[string]*Session)}
 		db.reseed()
-	}
+	})
 	return db
 }
 

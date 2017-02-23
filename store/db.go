@@ -27,6 +27,7 @@ import (
 	"database/sql"
 	"sail/conf"
 	"sail/log"
+	"sync"
 )
 
 type Datasize int16
@@ -65,16 +66,17 @@ type Database struct {
 }
 
 var instance *Database
+var initializer sync.Once
 
 // DB provides access to the Database singleton.
 func DB() *Database {
-	if instance == nil {
+	initializer.Do(func() {
 		instance = &Database{}
 		if err := instance.init(); err != nil {
 			log.DB(err, log.LvlErr)
 			panic("Database initialization failed!")
 		}
-	}
+	})
 	return instance
 }
 

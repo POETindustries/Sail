@@ -25,6 +25,7 @@ package session
 
 import (
 	"fmt"
+	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -51,14 +52,15 @@ type UserDB struct {
 }
 
 var userdb *UserDB
+var userdbInit sync.Once
 
 // Users returns a pointer to the system-wide user database.
 func Users() *UserDB {
-	if userdb == nil {
+	userdbInit.Do(func() {
 		userdb = &UserDB{
 			names: map[string]User{},
 			ids:   map[uint32]User{}}
-	}
+	})
 	return userdb
 }
 
