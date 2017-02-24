@@ -60,7 +60,11 @@ func (p *postgres) Data(query *Query) []interface{} {
 }
 
 func (p *postgres) Init() (*sql.DB, error) {
-	return sql.Open("postgres", p.credentials())
+	db, err := sql.Open("postgres", p.credentials())
+	if err == nil {
+		db.SetMaxOpenConns(16)
+	}
+	return db, err
 }
 
 func (p *postgres) Prepare(query string) string {
