@@ -47,6 +47,7 @@ type User interface {
 // queries to persistent storage. Operations on this object
 // do not change persistent user data.
 type UserDB struct {
+	sync.RWMutex
 	names map[string]User
 	ids   map[uint32]User
 }
@@ -67,18 +68,28 @@ func Users() *UserDB {
 // Add inserts a user into the database. Previous user objects
 // with the same name or id are overwritten.
 func (db *UserDB) Add(u User) {
+	db.Lock()
 	db.names[u.Name()] = u
 	db.ids[u.ID()] = u
+	db.Unlock()
 }
 
 // Has checks if a user is already in the database.
 func (db *UserDB) Has(u User) bool {
-	return db.HasID(u.ID()) || db.HasName(u.Name())
+	db.RLock()
+	defer db.RUnlock()
+	return db.hasID(u.ID()) || db.hasName(u.Name())
 }
 
 // HasName checks if a user with the given name exists in the
 // database.
 func (db *UserDB) HasName(name string) bool {
+	db.RLock()
+	defer db.RUnlock()
+	return db.hasName(name)
+}
+
+func (db *UserDB) hasName(name string) bool {
 	_, ok := db.names[name]
 	return ok
 }
@@ -86,6 +97,12 @@ func (db *UserDB) HasName(name string) bool {
 // HasID checks if a user with the given id exists in the
 // database.
 func (db *UserDB) HasID(id uint32) bool {
+	db.RLock()
+	defer db.RUnlock()
+	return db.hasID(id)
+}
+
+func (db *UserDB) hasID(id uint32) bool {
 	_, ok := db.ids[id]
 	return ok
 }
@@ -93,34 +110,48 @@ func (db *UserDB) HasID(id uint32) bool {
 // ByName fetches a user from the database that matches the
 // username given. returns nil if none was found.
 func (db *UserDB) ByName(name string) User {
+	db.RLock()
+	defer db.RUnlock()
 	return db.names[name]
 }
 
 // ByID fetches a user from the database that matches the
 // id given. returns nil if none was found.
 func (db *UserDB) ByID(id uint32) User {
+	db.RLock()
+	defer db.RUnlock()
 	return db.ids[id]
 }
 
 // All returns all users the system knows about.
 func (db *UserDB) All() []User {
 	var us []User
+	db.RLock()
 	for _, v := range db.ids {
 		us = append(us, v)
 	}
+	db.RUnlock()
 	return us
 }
 
 // Remove deletes the user from the database.
 func (db *UserDB) Remove(u User) {
+	db.Lock()
 	db.RemoveID(u.ID())
+	db.Unlock()
 }
 
 // RemoveName deletes the user that matches the given name
 // from the database.
 func (db *UserDB) RemoveName(name string) {
-	if db.HasName(name) {
-		id := db.ByName(name).ID()
+	db.Lock()
+	db.removeName(name)
+	db.Unlock()
+}
+
+func (db *UserDB) removeName(name string) {
+	if db.hasName(name) {
+		id := db.names[name].ID()
 		delete(db.names, name)
 		delete(db.ids, id)
 	}
@@ -129,8 +160,14 @@ func (db *UserDB) RemoveName(name string) {
 // RemoveID deletes the user that matches the given id from
 // the database.
 func (db *UserDB) RemoveID(id uint32) {
-	if db.HasID(id) {
-		name := db.ByID(id).Name()
+	db.Lock()
+	db.removeID(id)
+	db.Unlock()
+}
+
+func (db *UserDB) removeID(id uint32) {
+	if db.hasID(id) {
+		name := db.ids[id].Name()
 		delete(db.names, name)
 		delete(db.ids, id)
 	}
