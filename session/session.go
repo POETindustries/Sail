@@ -89,17 +89,11 @@ func (db *Database) Clean() {
 	db.Lock()
 	for _, s := range db.sessions {
 		if time.Since(s.Time).Hours() > 6 {
+			Users().RemoveName(s.User)
 			delete(db.sessions, s.ID)
 		}
 	}
 	db.Unlock()
-}
-
-// Get returns the session specified by the given id.
-func (db *Database) Get(id string) *Session {
-	db.RLock()
-	defer db.RUnlock()
-	return db.sessions[id]
 }
 
 // Has returns true if the session specified by the given id exists
@@ -135,6 +129,7 @@ func (db *Database) New(req *http.Request, user string) string {
 // Remove removes the session with the given id from the session pool.
 func (db *Database) Remove(id string) {
 	db.Lock()
+	Users().RemoveName(db.sessions[id].User)
 	delete(db.sessions, id)
 	db.Unlock()
 }
