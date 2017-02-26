@@ -30,6 +30,7 @@ import (
 	"os"
 	"path/filepath"
 	"sail/log"
+	"sync"
 )
 
 const skeleton = `{
@@ -76,10 +77,11 @@ type Config struct {
 }
 
 var instance *Config
+var initializer sync.Once
 
 func new() *Config {
 	cwd, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	instance = &Config{
+	c := &Config{
 		Cwd:       cwd + "/",
 		StaticDir: cwd + "/static/",
 		TmplDir:   cwd + "/static/tmpl/",
@@ -87,25 +89,25 @@ func new() *Config {
 		JsDir:     cwd + "/static/js/",
 		ThemeDir:  cwd + "/static/theme/"}
 
-	if err := instance.load("config.json"); err != nil {
+	if err := c.load("config.json"); err != nil {
 		log.Srv(err, log.LvlWarn)
-		instance.DBDriver = dbDriver
-		instance.DBUser = dbUser
-		instance.DBPass = dbPass
-		instance.DBHost = dbHost
-		instance.DBName = dbName
-		instance.DevMode = devMode
-		instance.FirstRun = firstRun
+		c.DBDriver = dbDriver
+		c.DBUser = dbUser
+		c.DBPass = dbPass
+		c.DBHost = dbHost
+		c.DBName = dbName
+		c.DevMode = devMode
+		c.FirstRun = firstRun
 	}
-	return instance
+	return c
 }
 
 // Instance provides access to the application-wide config
 // singleton.
 func Instance() *Config {
-	if instance == nil {
-		new()
-	}
+	initializer.Do(func() {
+		instance = new()
+	})
 	return instance
 }
 

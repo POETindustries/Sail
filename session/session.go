@@ -31,6 +31,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -49,7 +50,6 @@ type Session struct {
 func New(req *http.Request, user string) (s *Session) {
 	s = &Session{User: user}
 	s.setLang(req.Header.Get("Accept-Language"))
-	s.genID()
 	return s
 }
 
@@ -62,105 +62,116 @@ func (s *Session) setLang(lang string) {
 	s.Lang = strings.Split(lang, ",")[0]
 }
 
-func (s *Session) genID() {
-	b := make([]byte, 8)
-	if _, err := rand.Read(b); err != nil {
-		panic(err.Error())
-	}
-	b = append(b, DB().Seed()...)
-	s.ID = fmt.Sprintf("%x", sha1.Sum(b))
-}
-
 // Database manages an internal list of active sessions.
 type Database struct {
+	sync.RWMutex
 	sessions map[string]*Session
 	seeds    []byte
 	quota    int
 }
 
 var db *Database
+var sessionInit sync.Once
 
 // DB returns a pointer to the session database singleton.
 func DB() *Database {
-	if db == nil {
+	sessionInit.Do(func() {
 		db = &Database{sessions: make(map[string]*Session)}
 		db.reseed()
-	}
+	})
 	return db
-}
-
-// Add adds a new session to the session pool.
-func (db *Database) Add(session *Session) {
-	db.sessions[session.ID] = session
 }
 
 // Clean removes all expired sessions.
 func (db *Database) Clean() {
 	// TODO: expiration time is hardcoded to 6 hours.
 	// This needs to be a config setting in the future.
+	db.Lock()
 	for _, s := range db.sessions {
 		if time.Since(s.Time).Hours() > 6 {
-			db.Remove(s.ID)
+			Users().RemoveName(s.User)
+			delete(db.sessions, s.ID)
 		}
 	}
-}
-
-// Get returns the session specified by the given id.
-func (db *Database) Get(id string) *Session {
-	return db.sessions[id]
+	db.Unlock()
 }
 
 // Has returns true if the session specified by the given id exists
 // in the database of active sessions.
 func (db *Database) Has(id string) bool {
+	db.RLock()
+	defer db.RUnlock()
 	return db.sessions[id] != nil
-}
-
-// ID ...is here for whatever reason.
-func (db *Database) ID(id string) (i string) {
-	if s := db.sessions[id]; s != nil {
-		i = s.ID
-	}
-	return
 }
 
 // Lang returns the session's language.
 func (db *Database) Lang(id string) (l string) {
+	db.RLock()
 	if s := db.sessions[id]; s != nil {
 		l = s.Lang
 	}
+	db.RUnlock()
 	return
+}
+
+// New creates a new session, stores it in the database and
+// returns the unique session id.
+func (db *Database) New(req *http.Request, user string) string {
+	s := New(req, user)
+	s.Start()
+	db.Lock()
+	defer db.Unlock()
+	s.ID = db.nextID()
+	db.sessions[s.ID] = s
+	return s.ID
 }
 
 // Remove removes the session with the given id from the session pool.
 func (db *Database) Remove(id string) {
+	db.Lock()
+	// TODO 2017-02-26: Danger Zone: Remove can deadlock
+	// if the user database is locked at this time and
+	// wants to act on the session database, which will
+	// be locked by Remove. This is never the case in
+	// the current implementation and it should never be.
+	// The user database has no business being on
+	// session database's lawn. Still, something worth
+	// looking out for. The same applies to Clean().
+	Users().RemoveName(db.sessions[id].User)
 	delete(db.sessions, id)
-}
-
-// Seed returns the next available seed for use in creating session ids.
-func (db *Database) Seed() (b []byte) {
-	if len(db.seeds) < 5 && !db.reseed() {
-		return // TODO fill b with random data from a secondary source?
-	}
-	b = db.seeds[:4]
-	DB().seeds = DB().seeds[5:]
-	return b
+	db.Unlock()
 }
 
 // Start resets a session's timer to the current time.
 func (db *Database) Start(id string) {
+	db.Lock()
 	if s := db.sessions[id]; s != nil {
 		s.Start()
 	}
+	db.Unlock()
 }
 
 // User returns the user name associated with the session specified
 // by the given id.
 func (db *Database) User(id string) (username string) {
+	db.RLock()
 	if s := db.sessions[id]; s != nil {
 		username = s.User
 	}
+	db.RUnlock()
 	return
+}
+
+func (db *Database) nextID() string {
+	b := make([]byte, 8)
+	if _, err := rand.Read(b); err != nil {
+		panic(err.Error())
+	}
+	if len(db.seeds) > 5 || db.reseed() {
+		b = append(b, db.seeds[:4]...)
+		db.seeds = db.seeds[5:]
+	}
+	return fmt.Sprintf("%x", sha1.Sum(b))
 }
 
 func (db *Database) reseed() bool {

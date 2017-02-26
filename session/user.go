@@ -25,6 +25,7 @@ package session
 
 import (
 	"fmt"
+	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -32,6 +33,7 @@ import (
 // User describes the base interface that concrete structs need
 // to satisfy in order to work with Sail's session framework.
 type User interface {
+	Copy() User
 	ID() uint32
 	Hash() (string, error)
 	Name() string
@@ -45,38 +47,65 @@ type User interface {
 // currently active. It helps to improve performance and reduce
 // queries to persistent storage. Operations on this object
 // do not change persistent user data.
+//
+// Concurrency Safety
+//
+// UserDB itself is safe for concurrent use from multiple
+// goroutines. In order to preserve safety, when methods return
+// an object directly from the database, they actually return
+// a copy of the object. This is enforced by interface User's
+// Copy() method.
+//
+// Writes to objects retrieved this way do therefore not
+// propagate to the objects inside the database. If such an
+// object is mutated, the related object in the database has
+// to be overwritten with the newly changed one.
 type UserDB struct {
+	sync.RWMutex
 	names map[string]User
 	ids   map[uint32]User
 }
 
 var userdb *UserDB
+var userdbInit sync.Once
 
 // Users returns a pointer to the system-wide user database.
 func Users() *UserDB {
-	if userdb == nil {
+	userdbInit.Do(func() {
 		userdb = &UserDB{
 			names: map[string]User{},
 			ids:   map[uint32]User{}}
-	}
+	})
 	return userdb
 }
 
 // Add inserts a user into the database. Previous user objects
-// with the same name or id are overwritten.
+// with the same name or id are overwritten. Add is suitable
+// for updating an entry in the database.
 func (db *UserDB) Add(u User) {
-	db.names[u.Name()] = u
-	db.ids[u.ID()] = u
+	new := u.Copy()
+	db.Lock()
+	db.names[u.Name()] = new
+	db.ids[u.ID()] = new
+	db.Unlock()
 }
 
 // Has checks if a user is already in the database.
 func (db *UserDB) Has(u User) bool {
-	return db.HasID(u.ID()) || db.HasName(u.Name())
+	db.RLock()
+	defer db.RUnlock()
+	return db.hasID(u.ID()) || db.hasName(u.Name())
 }
 
 // HasName checks if a user with the given name exists in the
 // database.
 func (db *UserDB) HasName(name string) bool {
+	db.RLock()
+	defer db.RUnlock()
+	return db.hasName(name)
+}
+
+func (db *UserDB) hasName(name string) bool {
 	_, ok := db.names[name]
 	return ok
 }
@@ -84,6 +113,12 @@ func (db *UserDB) HasName(name string) bool {
 // HasID checks if a user with the given id exists in the
 // database.
 func (db *UserDB) HasID(id uint32) bool {
+	db.RLock()
+	defer db.RUnlock()
+	return db.hasID(id)
+}
+
+func (db *UserDB) hasID(id uint32) bool {
 	_, ok := db.ids[id]
 	return ok
 }
@@ -91,34 +126,56 @@ func (db *UserDB) HasID(id uint32) bool {
 // ByName fetches a user from the database that matches the
 // username given. returns nil if none was found.
 func (db *UserDB) ByName(name string) User {
-	return db.names[name]
+	db.RLock()
+	defer db.RUnlock()
+	if u := db.names[name]; u != nil {
+		return u.Copy()
+	}
+	return nil
 }
 
 // ByID fetches a user from the database that matches the
 // id given. returns nil if none was found.
 func (db *UserDB) ByID(id uint32) User {
-	return db.ids[id]
+	db.RLock()
+	defer db.RUnlock()
+	if u := db.ids[id]; u != nil {
+		return u.Copy()
+	}
+	return nil
 }
 
 // All returns all users the system knows about.
+//
+// Deprecated: All is deprecated.
 func (db *UserDB) All() []User {
 	var us []User
+	db.RLock()
 	for _, v := range db.ids {
 		us = append(us, v)
 	}
+	db.RUnlock()
 	return us
 }
 
 // Remove deletes the user from the database.
 func (db *UserDB) Remove(u User) {
+	db.Lock()
 	db.RemoveID(u.ID())
+	db.Unlock()
 }
 
 // RemoveName deletes the user that matches the given name
 // from the database.
 func (db *UserDB) RemoveName(name string) {
-	if db.HasName(name) {
-		id := db.ByName(name).ID()
+	db.Lock()
+	db.removeName(name)
+	db.Unlock()
+}
+
+func (db *UserDB) removeName(name string) {
+	if db.hasName(name) {
+		id := db.names[name].ID()
 		delete(db.names, name)
 		delete(db.ids, id)
 	}
@@ -127,8 +184,14 @@ func (db *UserDB) RemoveName(name string) {
 // RemoveID deletes the user that matches the given id from
 // the database.
 func (db *UserDB) RemoveID(id uint32) {
-	if db.HasID(id) {
-		name := db.ByID(id).Name()
+	db.Lock()
+	db.removeID(id)
+	db.Unlock()
+}
+
+func (db *UserDB) removeID(id uint32) {
+	if db.hasID(id) {
+		name := db.ids[id].Name()
 		delete(db.names, name)
 		delete(db.ids, id)
 	}

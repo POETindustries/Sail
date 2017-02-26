@@ -46,7 +46,11 @@ func (m *mysql) Data(query *Query) []interface{} {
 }
 
 func (m *mysql) Init() (*sql.DB, error) {
-	return sql.Open("mysql", m.credentials())
+	db, err := sql.Open("mysql", m.credentials())
+	if err == nil {
+		db.SetMaxOpenConns(16)
+	}
+	return db, err
 }
 
 func (m *mysql) Prepare(query string) string {

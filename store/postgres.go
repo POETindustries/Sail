@@ -36,39 +36,42 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type postgres struct {
-	count int
-}
+type postgres struct{}
 
 func (p *postgres) Copy() Driver {
 	return &postgres{}
 }
 
 func (p *postgres) Data(query *Query) []interface{} {
+	count := 0
 	for i, a := range query.attrs {
 		if strings.HasSuffix(a, "?") {
-			p.count++
-			query.attrs[i] = strings.Replace(a, "?", "$"+strconv.Itoa(p.count), 1)
+			count++
+			query.attrs[i] = strings.Replace(a, "?", "$"+strconv.Itoa(count), 1)
 		}
 	}
 	for i, s := range query.selection {
 		if strings.HasSuffix(s, "?") {
-			p.count++
-			query.selection[i] = strings.Replace(s, "?", "$"+strconv.Itoa(p.count), 1)
+			count++
+			query.selection[i] = strings.Replace(s, "?", "$"+strconv.Itoa(count), 1)
 		}
 	}
 	return append(query.attrVals, query.selectionVals...)
 }
 
 func (p *postgres) Init() (*sql.DB, error) {
-	return sql.Open("postgres", p.credentials())
+	db, err := sql.Open("postgres", p.credentials())
+	if err == nil {
+		db.SetMaxOpenConns(16)
+	}
+	return db, err
 }
 
 func (p *postgres) Prepare(query string) string {
-	p.count = 0
+	count := 0
 	for strings.Contains(query, "?") {
-		p.count++
-		query = strings.Replace(query, "?", "$"+strconv.Itoa(p.count), 1)
+		count++
+		query = strings.Replace(query, "?", "$"+strconv.Itoa(count), 1)
 	}
 	return query
 }

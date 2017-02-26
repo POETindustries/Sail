@@ -50,7 +50,11 @@ func (s *sqlite3) Init() (*sql.DB, error) {
 	if _, err := os.Stat(loc); err != nil {
 		os.MkdirAll(loc, 0700)
 	}
-	return sql.Open("sqlite3", loc+s.credentials())
+	db, err := sql.Open("sqlite3", loc+s.credentials())
+	if err == nil {
+		db.SetMaxOpenConns(1)
+	}
+	return db, err
 }
 
 func (s *sqlite3) Prepare(query string) string {
