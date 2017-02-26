@@ -42,7 +42,8 @@ const skeleton = `{
 
 "dev_mode"      : %t,
 "first_run"     : %t
-}`
+}
+`
 
 const (
 	dbDriver = "sqlite3"
