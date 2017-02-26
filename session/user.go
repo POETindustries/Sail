@@ -33,6 +33,7 @@ import (
 // User describes the base interface that concrete structs need
 // to satisfy in order to work with Sail's session framework.
 type User interface {
+	Copy() User
 	ID() uint32
 	Hash() (string, error)
 	Name() string
@@ -46,6 +47,19 @@ type User interface {
 // currently active. It helps to improve performance and reduce
 // queries to persistent storage. Operations on this object
 // do not change persistent user data.
+//
+// Concurrency Safety
+//
+// UserDB itself is safe for concurrent use from multiple
+// goroutines. In order to preserve safety, when methods return
+// an object directly from the database, they actually return
+// a copy of the object. This is enforced by interface User's
+// Copy() method.
+//
+// Writes to objects retrieved this way do therefore not
+// propagate to the objects inside the database. If such an
+// object is mutated, the related object in the database has
+// to be overwritten with the newly changed one.
 type UserDB struct {
 	sync.RWMutex
 	names map[string]User
@@ -112,7 +126,10 @@ func (db *UserDB) hasID(id uint32) bool {
 func (db *UserDB) ByName(name string) User {
 	db.RLock()
 	defer db.RUnlock()
-	return db.names[name]
+	if u := db.names[name]; u != nil {
+		return u.Copy()
+	}
+	return nil
 }
 
 // ByID fetches a user from the database that matches the
@@ -120,10 +137,15 @@ func (db *UserDB) ByName(name string) User {
 func (db *UserDB) ByID(id uint32) User {
 	db.RLock()
 	defer db.RUnlock()
-	return db.ids[id]
+	if u := db.ids[id]; u != nil {
+		return u.Copy()
+	}
+	return nil
 }
 
 // All returns all users the system knows about.
+//
+// Deprecated: All is deprecated.
 func (db *UserDB) All() []User {
 	var us []User
 	db.RLock()
