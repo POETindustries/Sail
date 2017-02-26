@@ -80,11 +80,13 @@ func Users() *UserDB {
 }
 
 // Add inserts a user into the database. Previous user objects
-// with the same name or id are overwritten.
+// with the same name or id are overwritten. Add is suitable
+// for updating an entry in the database.
 func (db *UserDB) Add(u User) {
+	new := u.Copy()
 	db.Lock()
-	db.names[u.Name()] = u
-	db.ids[u.ID()] = u
+	db.names[u.Name()] = new
+	db.ids[u.ID()] = new
 	db.Unlock()
 }
 
