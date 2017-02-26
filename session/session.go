@@ -129,6 +129,14 @@ func (db *Database) New(req *http.Request, user string) string {
 // Remove removes the session with the given id from the session pool.
 func (db *Database) Remove(id string) {
 	db.Lock()
+	// TODO 2017-02-26: Danger Zone: Remove can deadlock
+	// if the user database is locked at this time and
+	// wants to act on the session database, which will
+	// be locked by Remove. This is never the case in
+	// the current implementation and it should never be.
+	// The user database has no business being on
+	// session database's lawn. Still, something worth
+	// looking out for. The same applies to Clean().
 	Users().RemoveName(db.sessions[id].User)
 	delete(db.sessions, id)
 	db.Unlock()
