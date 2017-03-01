@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	tmplMin, _ = template.New("msg").Parse("To: {{range .To}}{{.}},{{end}}\r\n\r\n{{.Body}}\r\n")
+	tmplMin, _ = template.New("msg").Parse("From: {{.From.Address}}\r\nTo: {{range .To}}{{.Address}},{{end}}\r\n\r\n{{.Body}}\r\n")
 )
 
-// Sender stores login credentials for connecting to an smtp
-// server.
+// Sender represents the sending party of email traffic. The
+// Sender stores identity information and login credentials
+// for connecting to an SMTP server.
 type Sender struct {
 	Name string
 
@@ -23,6 +24,14 @@ type Sender struct {
 	Port    uint16
 
 	Auth smtp.Auth
+}
+
+// Recipient represents the receiving party of email traffic.
+// In order to be able to receive emails, a valid address
+// must be provided, along with an optional name.
+type Recipient struct {
+	Name    string
+	Address string
 }
 
 // ParseAuth composes the Sender's internal data and creates
@@ -35,7 +44,7 @@ func (s *Sender) ParseAuth() {
 // easy way to send an email to multiple recipients.
 type Email struct {
 	From     *Sender
-	To       []string
+	To       []Recipient
 	Subject  string
 	Body     string
 	Template *template.Template
@@ -44,12 +53,19 @@ type Email struct {
 // Send transmits the Email and returns nil if successful.
 // Otherwise, an error describing the problem is returned.
 func (e *Email) Send() error {
-	host := e.From.Host + ":" + strconv.FormatUint(uint64(e.From.Port), 10)
+	if len(e.To) == 0 {
+		return &ErrNoRCPT{}
+	}
 	var msg bytes.Buffer
 	if err := e.Template.Execute(&msg, e); err != nil {
 		return err
 	}
-	return smtp.SendMail(host, e.From.Auth, e.From.Address, e.To, msg.Bytes())
+	host := e.From.Host + ":" + strconv.FormatUint(uint64(e.From.Port), 10)
+	to := []string{}
+	for _, r := range e.To {
+		to = append(to, r.Address)
+	}
+	return smtp.SendMail(host, e.From.Auth, e.From.Address, to, msg.Bytes())
 }
 
 // New returns a new Email, ready to be filled with content
