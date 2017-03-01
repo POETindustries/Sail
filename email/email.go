@@ -3,8 +3,13 @@ package email
 import (
 	"bytes"
 	"net/smtp"
+	"sail/conf"
 	"strconv"
 	"text/template"
+)
+
+var (
+	tmplMin, _ = template.New("msg").Parse("To: {{range .To}}{{.}},{{end}}\r\n\r\n{{.Body}}\r\n")
 )
 
 // Sender stores login credentials for connecting to an smtp
@@ -55,9 +60,20 @@ func New(sender *Sender) *Email {
 	if sender != nil {
 		s = sender
 	}
-	return &Email{From: s}
+	if s.Auth == nil {
+		s.ParseAuth()
+	}
+	return &Email{From: s, Template: tmplMin}
 }
 
+// systemSender returns the application's default mail user.
+// Mails sent with this user should be considered as mails
+// coming from "the app".
 func systemSender() *Sender {
-	return &Sender{}
+	return &Sender{
+		Name:    conf.Instance().MailUser,
+		Address: conf.Instance().MailAddress,
+		Pass:    conf.Instance().MailPass,
+		Host:    conf.Instance().MailHostSMTP,
+		Port:    conf.Instance().MailPortSMTP}
 }
