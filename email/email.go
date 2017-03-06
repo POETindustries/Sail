@@ -8,8 +8,21 @@ import (
 	"text/template"
 )
 
+const (
+	msgPlain = "From: {{if .From.Name}}\"{{.From.Name}}\" <{{.From.Address}}>{{else}}{{.From.Address}}{{end}}\r\n" +
+		"To: {{range .To}}{{if .Name}}\"{{.Name}}\" <{{.Address}}>{{else}}{{.Address}}{{end}},{{end}}\r\n" +
+		"Subject: {{.Subject}}\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n" +
+		"{{.Body}}"
+
+	msgHTML = "From: {{if .From.Name}}\"{{.From.Name}}\" <{{.From.Address}}>{{else}}{{.From.Address}}{{end}}\r\n" +
+		"To: {{range .To}}{{if .Name}}\"{{.Name}}\" <{{.Address}}>{{else}}{{.Address}}{{end}},{{end}}\r\n" +
+		"Subject: {{.Subject}}\r\nContent-Type: text/html; charset=utf-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n" +
+		"<div id='msg'>{{.Body}}</div>"
+)
+
 var (
-	tmplMin, _ = template.New("msg").Parse("From: {{.From.Address}}\r\nTo: {{range .To}}{{.Address}},{{end}}\r\n\r\n{{.Body}}\r\n")
+	tmplPlain, _ = template.New("msg").Parse(msgPlain)
+	tmplHTML, _  = template.New("msg").Parse(msgHTML)
 )
 
 // Sender represents the sending party of email traffic. The
@@ -79,7 +92,13 @@ func New(sender *Sender) *Email {
 	if s.Auth == nil {
 		s.ParseAuth()
 	}
-	return &Email{From: s, Template: tmplMin}
+	return &Email{From: s, Template: tmplPlain}
+}
+
+func NewHTML(sender *Sender) *Email {
+	e := New(sender)
+	e.Template = tmplHTML
+	return e
 }
 
 // systemSender returns the application's default mail user.
