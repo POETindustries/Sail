@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"net/smtp"
 	"path/filepath"
@@ -122,15 +123,16 @@ func (e *Email) AddFile(name string) {
 	if err != nil {
 		return
 	}
-	f := &File{
-		Type:     http.DetectContentType(data),
-		Encoding: "base64",
-		Name:     filepath.Base(name)}
+	f := &File{Encoding: "base64", Name: filepath.Base(name)}
 	for i, d := 72, base64.StdEncoding.EncodeToString(data); i < len(d); i += 72 {
 		f.Data += d[i-72:i] + "\n"
 		if i > len(d)-72 {
 			f.Data += d[i:]
 		}
+	}
+	println(f.Data)
+	if f.Type = mime.TypeByExtension(filepath.Ext(name)); f.Type == "" {
+		f.Type = http.DetectContentType(data)
 	}
 	e.files = append(e.files, f)
 }
