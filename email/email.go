@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sail/conf"
 	"strconv"
+	"strings"
 	"text/template"
 )
 
@@ -124,15 +125,20 @@ func (e *Email) AddFile(name string) {
 		return
 	}
 	f := &File{Encoding: "base64", Name: filepath.Base(name)}
+	mByExt := mime.TypeByExtension(filepath.Ext(name))
+	mByHead := http.DetectContentType(data)
+	if mByExt == "" {
+		f.Type = mByHead
+	} else if strings.Split(mByExt, "/")[0] != strings.Split(mByHead, "/")[0] {
+		f.Type = mByHead
+	} else {
+		f.Type = mByExt
+	}
 	for i, d := 72, base64.StdEncoding.EncodeToString(data); i < len(d); i += 72 {
 		f.Data += d[i-72:i] + "\n"
 		if i > len(d)-72 {
 			f.Data += d[i:]
 		}
-	}
-	println(f.Data)
-	if f.Type = mime.TypeByExtension(filepath.Ext(name)); f.Type == "" {
-		f.Type = http.DetectContentType(data)
 	}
 	e.files = append(e.files, f)
 }
