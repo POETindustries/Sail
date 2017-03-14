@@ -40,6 +40,12 @@ const skeleton = `{
 "db_name"       : "%s",
 "db_host"       : "%s",
 
+"mail_user"      : "%s",
+"mail_pass"      : "%s",
+"mail_address"   : "%s",
+"mail_host_smtp" : "%s",
+"mail_port_smtp" : %d,
+
 "dev_mode"      : %t,
 "first_run"     : %t
 }
@@ -51,6 +57,9 @@ const (
 	dbPass   = "sl_pass"
 	dbName   = "sl_main"
 	dbHost   = "localhost"
+
+	mailUser     = "Sail"
+	mailPortSMTP = 587
 
 	devMode  = true
 	firstRun = false
@@ -72,6 +81,12 @@ type Config struct {
 	DBPass   string `json:"db_password"`
 	DBHost   string `json:"db_host"`
 	DBName   string `json:"db_name"`
+
+	MailUser     string `json:"mail_user"`
+	MailPass     string `json:"mail_pass"`
+	MailAddress  string `json:"mail_address"`
+	MailHostSMTP string `json:"mail_host_smtp"`
+	MailPortSMTP uint16 `json:"mail_port_smtp"`
 
 	DevMode  bool `json:"dev_mode"`
 	FirstRun bool `json:"first_run"`
@@ -97,6 +112,8 @@ func new() *Config {
 		c.DBPass = dbPass
 		c.DBHost = dbHost
 		c.DBName = dbName
+		c.MailUser = mailUser
+		c.MailPortSMTP = mailPortSMTP
 		c.DevMode = devMode
 		c.FirstRun = firstRun
 	}
@@ -127,7 +144,8 @@ func (c *Config) load(file string) error {
 // config file.
 func (c *Config) Save() {
 	f := fmt.Sprintf(skeleton, c.DBDriver, c.DBUser, c.DBPass, c.DBName,
-		c.DBHost, c.DevMode, c.FirstRun)
+		c.DBHost, c.MailUser, c.MailPass, c.MailAddress, c.MailHostSMTP,
+		c.MailPortSMTP, c.DevMode, c.FirstRun)
 	err := ioutil.WriteFile(c.Cwd+"config.json", []byte(f), 0640) //maybe do 0600 for hardened security?
 	if err != nil {
 		log.Srv(err, log.LvlWarn)

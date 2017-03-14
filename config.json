@@ -5,6 +5,12 @@
 "db_name"       : "sl_main",
 "db_host"       : "localhost",
 
+"mail_user"      : "Sail",
+"mail_pass"      : "topsecret",
+"mail_address"   : "system@example.org",
+"mail_host_smtp" : "smtp.example.org",
+"mail_port_smtp" : 587,
+
 "dev_mode"      : true,
 "first_run"     : false
 }
