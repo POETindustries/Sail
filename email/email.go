@@ -3,6 +3,7 @@ package email
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -134,9 +135,10 @@ func (e *Email) AddFile(name string) {
 	} else {
 		f.Type = mByExt
 	}
-	for i, d := 72, base64.StdEncoding.EncodeToString(data); i < len(d); i += 72 {
-		f.Data += d[i-72:i] + "\n"
-		if i > len(d)-72 {
+	for i, d := 0, base64.StdEncoding.EncodeToString(data); i < len(d); i += 72 {
+		if i+72 < len(d) {
+			f.Data += d[i:i+72] + "\r\n"
+		} else {
 			f.Data += d[i:]
 		}
 	}
@@ -165,6 +167,7 @@ func (e *Email) Send() error {
 	for _, r := range e.To {
 		to = append(to, r.Address)
 	}
+	fmt.Printf("%s\n", msg.Bytes())
 	return smtp.SendMail(host, e.From.Auth, e.From.Address, to, msg.Bytes())
 }
 
