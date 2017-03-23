@@ -3,7 +3,6 @@ package email
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -167,7 +166,6 @@ func (e *Email) Send() error {
 	for _, r := range e.To {
 		to = append(to, r.Address)
 	}
-	fmt.Printf("%s\n", msg.Bytes())
 	return smtp.SendMail(host, e.From.Auth, e.From.Address, to, msg.Bytes())
 }
 
