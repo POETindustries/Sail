@@ -90,7 +90,11 @@ func New(sender *Sender) *Email {
 	if s.Auth == nil {
 		s.ParseAuth()
 	}
-	return &Email{From: s, Template: tmplPlain, files: []*File{}}
+	return &Email{
+		From:     s,
+		To:       []Recipient{},
+		Template: tmplPlain,
+		files:    []*File{}}
 }
 
 // NewHTML returns a new HTML-enabled Email, initialized
