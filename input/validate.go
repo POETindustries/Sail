@@ -31,7 +31,7 @@ var (
 	num      = regexp.MustCompile(`^[0-9]+$`)
 
 	email           = regexp.MustCompile(`^.+@.+$`)
-	username        = regexp.MustCompile(`^[a-zA-Z0-9_-]{1,24}$`)
+	username        = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{1,22}[a-zA-Z0-9]$`)
 	badPassTopology = []*regexp.Regexp{
 		// contains only letters
 		alpha,
@@ -59,6 +59,23 @@ func IsEmail(s string) bool {
 	return email.MatchString(s)
 }
 
+// IsValidUsername returns true if s is a valid username according to
+// the following guidelines:
+//
+// - contains only printable alphanumeric ASCII characters plus
+//   hyphen and underscore,
+// - cannot start or end with hyphen or underscore,
+// - is at least 3 and at most 24 characters long
+//
+// Some conditions may seem arbitrary or too restricting. They are
+// chosen with the role of usernames as uniquely identifying users
+// to other users and machines in mind.
+//
+// Limiting the character range to ASCII makes processing by software
+// easier, especially when checkign equality and the like. Since
+// usernames can be part of URLs and other resource identifiers,
+// having them withing ASCII range ensures some amount of backwards
+// compatibility with software that doesn't handle unicode well.
 func IsValidUsername(s string) bool {
 	return username.MatchString(s)
 }
