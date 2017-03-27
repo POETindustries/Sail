@@ -29,6 +29,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sail/conf"
 	"strconv"
 	"strings"
 	"sync"
@@ -116,14 +117,19 @@ func (db *Database) Lang(id string) (l string) {
 
 // New creates a new session, stores it in the database and
 // returns the unique session id.
-func (db *Database) New(req *http.Request, user string) string {
+func (db *Database) New(req *http.Request, user string) *http.Cookie {
 	s := New(req, user)
 	s.Start()
 	db.Lock()
-	defer db.Unlock()
 	s.ID = db.nextID()
 	db.sessions[s.ID] = s
-	return s.ID
+	c := &http.Cookie{Name: "id", Value: s.ID}
+	db.Unlock()
+	if !conf.Instance().DevMode {
+		c.Secure = true
+		c.HttpOnly = true
+	}
+	return c
 }
 
 // Remove removes the session with the given id from the session pool.
