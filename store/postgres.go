@@ -156,6 +156,8 @@ func (p *postgres) asText(v interface{}, size Datasize, outType *string) bool {
 		} else {
 			*outType = "varchar(" + strconv.Itoa(int(size)) + ")"
 		}
+	case JSON:
+		*outType = "jsonb"
 	case []byte:
 		*outType = "bytea"
 	default:

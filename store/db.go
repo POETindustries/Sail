@@ -39,6 +39,8 @@ const (
 	Large Datasize = 4096
 )
 
+type JSON []byte
+
 // Driver provides unified access to the actual sql drivers.
 type Driver interface {
 	Copy() Driver

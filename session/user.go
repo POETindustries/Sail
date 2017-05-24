@@ -69,6 +69,13 @@ type UserDB struct {
 var userdb *UserDB
 var userdbInit sync.Once
 
+// NewUserDB creates and returns an empty user cache.
+func NewUserDB() *UserDB {
+	return &UserDB{
+		names: map[string]User{},
+		ids:   map[uint32]User{}}
+}
+
 // Users returns a pointer to the system-wide user database.
 func Users() *UserDB {
 	userdbInit.Do(func() {
