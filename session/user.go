@@ -166,7 +166,7 @@ func (db *UserDB) ByID(id uint32) (User, error) {
 // Remove deletes the user from the database.
 func (db *UserDB) Remove(u User) {
 	db.Lock()
-	db.RemoveID(u.ID())
+	db.removeID(u.ID())
 	db.Unlock()
 }
 
