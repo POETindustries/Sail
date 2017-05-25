@@ -97,6 +97,17 @@ func (db *UserDB) Add(u User) {
 	db.Unlock()
 }
 
+// All returns the names of all users that are currently cached.
+func (db *UserDB) All() []string {
+	var us []string
+	db.RLock()
+	for _, v := range db.ids {
+		us = append(us, v.Name())
+	}
+	db.RUnlock()
+	return us
+}
+
 // Has checks if a user is already in the database.
 func (db *UserDB) Has(u User) bool {
 	db.RLock()
@@ -132,37 +143,24 @@ func (db *UserDB) hasID(id uint32) bool {
 
 // ByName fetches a user from the database that matches the
 // username given. returns nil if none was found.
-func (db *UserDB) ByName(name string) User {
+func (db *UserDB) ByName(name string) (User, error) {
 	db.RLock()
 	defer db.RUnlock()
 	if u := db.names[name]; u != nil {
-		return u.Copy()
+		return u.Copy(), nil
 	}
-	return nil
+	return nil, &ErrNoUser{}
 }
 
 // ByID fetches a user from the database that matches the
 // id given. returns nil if none was found.
-func (db *UserDB) ByID(id uint32) User {
+func (db *UserDB) ByID(id uint32) (User, error) {
 	db.RLock()
 	defer db.RUnlock()
 	if u := db.ids[id]; u != nil {
-		return u.Copy()
+		return u.Copy(), nil
 	}
-	return nil
-}
-
-// All returns all users the system knows about.
-//
-// Deprecated: All is deprecated.
-func (db *UserDB) All() []User {
-	var us []User
-	db.RLock()
-	for _, v := range db.ids {
-		us = append(us, v)
-	}
-	db.RUnlock()
-	return us
+	return nil, &ErrNoUser{}
 }
 
 // Remove deletes the user from the database.
@@ -225,4 +223,11 @@ func Encrypt(s string) string {
 		return fmt.Sprintf("%s\n", k)
 	}
 	return ""
+}
+
+// ErrNoUser indicates that a user was not found in the cache.
+type ErrNoUser struct{}
+
+func (e *ErrNoUser) Error() string {
+	return "user not found"
 }
