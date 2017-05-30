@@ -52,6 +52,11 @@ const (
 	LvlDbg = 0x04
 )
 
+const (
+	File   uint8 = 0x01
+	StdOut uint8 = 0x02
+)
+
 // File descriptors for the different module-specific log files
 const (
 	loc = "/tmp/sail/"
@@ -62,6 +67,8 @@ const (
 
 // level holds the current log level
 var level = lvlNone
+
+var route = File
 
 // Init prepares the filesystem for logging. It creates the log
 // directory if it doesn't exist.
@@ -90,6 +97,10 @@ func SetLevel(lvl string) bool {
 	return true
 }
 
+func SetRoute(r uint8) {
+	route = r
+}
+
 // DB logs to the log file reserved for database events.
 func DB(obj interface{}, lvl int) {
 	log(obj, lvl, db)
@@ -107,18 +118,23 @@ func Srv(obj interface{}, lvl int) {
 
 func log(obj interface{}, lvl int, file string) {
 	if level != lvlNone && lvl <= level {
-		t := time.Now().String()
-		flags := os.O_APPEND | os.O_WRONLY | os.O_CREATE
-		f, _ := os.OpenFile(file, flags, 0600)
-		switch lvl {
-		case LvlErr:
-			f.WriteString(t + ":   Error: " + msg(obj) + "\n")
-		case LvlWarn:
-			f.WriteString(t + ": Warning: " + msg(obj) + "\n")
-		case LvlDbg:
-			f.WriteString(t + ":   Debug: " + msg(obj) + "\n")
+		if route == route|File {
+			t := time.Now().String()
+			flags := os.O_APPEND | os.O_WRONLY | os.O_CREATE
+			f, _ := os.OpenFile(file, flags, 0600)
+			switch lvl {
+			case LvlErr:
+				f.WriteString(t + ":   Error: " + msg(obj) + "\n")
+			case LvlWarn:
+				f.WriteString(t + ": Warning: " + msg(obj) + "\n")
+			case LvlDbg:
+				f.WriteString(t + ":   Debug: " + msg(obj) + "\n")
+			}
+			f.Close()
 		}
-		f.Close()
+		if route == route|StdOut {
+			println(msg(obj))
+		}
 	}
 }
 
