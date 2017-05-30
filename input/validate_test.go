@@ -25,3 +25,21 @@ func TestUsername(t *testing.T) {
 		}
 	}
 }
+
+func TestPassword(t *testing.T) {
+	good := []string{}
+	for _, n := range good {
+		if !IsValidPassword(n) {
+			t.Errorf("valid password, but flagged as invalid: %s", n)
+		}
+	}
+
+	bad := []string{
+		"", "hello", "whut1!", "ndk7%30", // too short
+	}
+	for _, n := range bad {
+		if IsValidPassword(n) {
+			t.Errorf("invalid password, but flagged as valid: %s", n)
+		}
+	}
+}

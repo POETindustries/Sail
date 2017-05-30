@@ -37,6 +37,8 @@ var (
 		alpha,
 		// contains only numbers
 		num,
+		// empty string
+		regexp.MustCompile(`^$`),
 		// less than 8 characters
 		regexp.MustCompile(`^.{1,7}$`),
 		// Topology: Password1, passwords123, ...
