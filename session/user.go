@@ -35,12 +35,7 @@ import (
 type User interface {
 	Copy() User
 	ID() uint32
-	Hash() (string, error)
 	Name() string
-	Load() bool
-	Save() bool
-	SaveHash(hash string) bool
-	Store() error
 }
 
 // UserDB is a simple in-memory database of all users that are
@@ -74,16 +69,6 @@ func NewUserDB() *UserDB {
 	return &UserDB{
 		names: map[string]User{},
 		ids:   map[uint32]User{}}
-}
-
-// Users returns a pointer to the system-wide user database.
-func Users() *UserDB {
-	userdbInit.Do(func() {
-		userdb = &UserDB{
-			names: map[string]User{},
-			ids:   map[uint32]User{}}
-	})
-	return userdb
 }
 
 // Add inserts a user into the database. Previous user objects
@@ -204,14 +189,12 @@ func (db *UserDB) removeID(id uint32) {
 
 // Verify returns a boolean value indicating whether user
 // and password match entries in the user database.
-func Verify(u User, pass string) bool {
-	if pass == "" || u.Name() == "" {
+func Verify(pass, hash string) bool {
+	if pass == "" || hash == "" {
 		return false
 	}
-	if hash, err := u.Hash(); err == nil {
-		if bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass)) == nil {
-			return true
-		}
+	if bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass)) == nil {
+		return true
 	}
 	return false
 }
