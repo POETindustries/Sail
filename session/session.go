@@ -138,6 +138,19 @@ func (db *Database) Remove(id string) {
 	db.Unlock()
 }
 
+// RemoveByUser removes the session belonging to user identified by name.
+func (db *Database) RemoveByUser(name string) {
+	var id string
+	db.RLock()
+	for _, s := range db.sessions {
+		if s.User == name {
+			id = s.ID
+		}
+	}
+	db.RUnlock()
+	db.Remove(id)
+}
+
 // Start resets a session's timer to the current time.
 func (db *Database) Start(id string) {
 	db.Lock()
