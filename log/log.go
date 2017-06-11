@@ -26,6 +26,7 @@ package log
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -52,30 +53,45 @@ const (
 	LvlDbg = 0x04
 )
 
+// Route defines a type for determining where log messages are sent to.
+type Route uint8
+
 const (
-	File   uint8 = 0x01
-	StdOut uint8 = 0x02
+	// File is a routing parameter, instructing log to send messages to
+	// designated log files on the underlying file system.
+	File Route = 0x01
+
+	// StdOut is a routing parameter, instructing log to send messages
+	// to the underlying OS's stdout, usually the command line.
+	StdOut Route = 0x02
 )
 
-// File descriptors for the different module-specific log files
-const (
-	loc = "/tmp/sail/"
+var (
+	level = lvlNone
+	route = File
+
+	loc = "/tmp/"
 	db  = loc + "db.log"
 	acc = loc + "acc.log"
 	srv = loc + "srv.log"
 )
 
-// level holds the current log level
-var level = lvlNone
-
-var route = File
-
-// Init prepares the filesystem for logging. It creates the log
-// directory if it doesn't exist.
-func Init() {
-	if _, err := os.Stat(loc); err != nil {
-		os.MkdirAll(loc, 0755)
+// SetDir determines where log files are stored.
+func SetDir(path string) {
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
 	}
+
+	if _, err := os.Stat(path); err != nil {
+		if os.MkdirAll(path, 0755) != nil {
+			return
+		}
+	}
+	loc = path
+
+	db = loc + "db.log"
+	acc = loc + "acc.log"
+	srv = loc + "srv.log"
 }
 
 // SetLevel can be used to set the current log level. It is designed to
@@ -97,7 +113,9 @@ func SetLevel(lvl string) bool {
 	return true
 }
 
-func SetRoute(r uint8) {
+// SetRoute determines the output route for log messages. Multiple
+// routes can be combined and the messages are sent through all of them.
+func SetRoute(r Route) {
 	route = r
 }
 
