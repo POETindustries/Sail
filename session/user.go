@@ -25,6 +25,7 @@ package session
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"golang.org/x/crypto/bcrypt"
@@ -77,7 +78,7 @@ func NewUserDB() *UserDB {
 func (db *UserDB) Add(u User) {
 	new := u.Copy()
 	db.Lock()
-	db.names[u.Name()] = new
+	db.names[strings.ToLower(u.Name())] = new
 	db.ids[u.ID()] = new
 	db.Unlock()
 }
@@ -109,7 +110,7 @@ func (db *UserDB) HasName(name string) bool {
 }
 
 func (db *UserDB) hasName(name string) bool {
-	_, ok := db.names[name]
+	_, ok := db.names[strings.ToLower(name)]
 	return ok
 }
 
@@ -131,7 +132,7 @@ func (db *UserDB) hasID(id uint32) bool {
 func (db *UserDB) ByName(name string) (User, error) {
 	db.RLock()
 	defer db.RUnlock()
-	if u := db.names[name]; u != nil {
+	if u := db.names[strings.ToLower(name)]; u != nil {
 		return u.Copy(), nil
 	}
 	return nil, &ErrNoUser{}
@@ -165,6 +166,7 @@ func (db *UserDB) RemoveName(name string) {
 
 func (db *UserDB) removeName(name string) {
 	if db.hasName(name) {
+		name = strings.ToLower(name)
 		id := db.names[name].ID()
 		delete(db.names, name)
 		delete(db.ids, id)
@@ -181,7 +183,7 @@ func (db *UserDB) RemoveID(id uint32) {
 
 func (db *UserDB) removeID(id uint32) {
 	if db.hasID(id) {
-		name := db.ids[id].Name()
+		name := strings.ToLower(db.ids[id].Name())
 		delete(db.names, name)
 		delete(db.ids, id)
 	}
