@@ -122,7 +122,7 @@ func (db *Database) New(req *http.Request, user string) *http.Cookie {
 	db.Lock()
 	s.ID = db.nextID()
 	db.sessions[s.ID] = s
-	c := &http.Cookie{Name: "id", Value: s.ID}
+	c := &http.Cookie{Name: "id", Value: s.ID, Path: "/"}
 	db.Unlock()
 	if !conf.Instance().DevMode {
 		c.Secure = true
