@@ -27,7 +27,9 @@ func TestUsername(t *testing.T) {
 }
 
 func TestPassword(t *testing.T) {
-	good := []string{}
+	good := []string{
+		"Thisisaminimum1!", // edge cases
+	}
 	for _, n := range good {
 		if !IsValidPassword(n) {
 			t.Errorf("valid password, but flagged as invalid: %s", n)
@@ -36,6 +38,7 @@ func TestPassword(t *testing.T) {
 
 	bad := []string{
 		"", "hello", "whut1!", "ndk7%30", // too short
+		"Password1", "Testpass1!", "newpassword2017", "Whutsup123?", // not enough complexity
 	}
 	for _, n := range bad {
 		if IsValidPassword(n) {

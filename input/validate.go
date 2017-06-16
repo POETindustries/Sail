@@ -41,22 +41,27 @@ var (
 		regexp.MustCompile(`^$`),
 		// less than 8 characters
 		regexp.MustCompile(`^.{1,7}$`),
-		// Topology: Password1, passwords123, ...
-		regexp.MustCompile(`^[A-Za-z][a-z]{6,10}[0-9]{1,4}$`)}
+		// Topology: Password1, passwords123, NewPassword1!, ...
+		regexp.MustCompile(`^[A-Za-z][a-z]{6,10}[0-9]{0,4}[!\?]{0,1}$`)}
 )
 
+// IsAlphanum returns true when a string consists of only letters and numbers.
 func IsAlphanum(s string) bool {
 	return alphanum.MatchString(s)
 }
 
+// IsAlpha returns true if a string consists only of letters.
 func IsAlpha(s string) bool {
 	return alpha.MatchString(s)
 }
 
+// IsNum is true if a string contains only numbers.
 func IsNum(s string) bool {
 	return num.MatchString(s)
 }
 
+// IsEmail is true if the string is a valid e-mail address. Note that
+// this check is very permissive in order to prevent false negatives.
 func IsEmail(s string) bool {
 	return email.MatchString(s)
 }
@@ -82,6 +87,15 @@ func IsValidUsername(s string) bool {
 	return username.MatchString(s)
 }
 
+// IsValidPassword returns true if a string is suitable for being used
+// as a password that satisfies a set of security conditions.
+//
+// IsValidPassword checks not only against commonly used password
+// security guidelines, like minimum length and the use of different
+// character classes. It also checks for common topologies to prevent
+// a password's structure from reducing the effort of guessing it. See
+// https://www.korelogic.com/Resources/Presentations/bsidesavl_pathwell_2014-06.pdf
+// for more info on the topic.
 func IsValidPassword(s string) bool {
 	for _, r := range badPassTopology {
 		if r.MatchString(s) {
